@@ -261,10 +261,14 @@ export function ModuleShell({
     }
     setBurst({ ...getRectCenter(el), id: Date.now() });
     window.setTimeout(() => setBurst(null), 900);
-    speak(`${sessionPraiseRef.current} ${currentRound.praiseWord}!`);
     onRecord(currentRound.itemKey, firstTry);
 
-    window.setTimeout(goNext, 1600);
+    // Wait for the praise to finish speaking before moving on, so it never
+    // gets cut off by the next round's prompt.
+    const praiseText = `${sessionPraiseRef.current} ${currentRound.praiseWord}!`;
+    void speak(praiseText).then(() => {
+      window.setTimeout(goNext, 450);
+    });
   };
 
   const goNext = () => {

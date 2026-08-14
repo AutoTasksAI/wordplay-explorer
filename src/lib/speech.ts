@@ -1,11 +1,16 @@
 /**
  * Voice + sound effects for the kid game.
  *
- * Speech: when the Convex TTS integration is configured (ElevenLabs key in
- * the project's Keys tab), phrases are generated with a warm cartoon voice,
- * cached in Convex, and replayed instantly. Until then — or if the API is
- * unreachable — we fall back to the browser's built-in speech synthesis so
- * the game always talks.
+ * Speech: phrases are played one at a time through a queue so one utterance
+ * never cuts another off mid-word. When the Convex TTS integration is
+ * configured (ElevenLabs key in the project's Keys tab), phrases are
+ * generated with a warm cartoon voice, cached in Convex, and replayed
+ * instantly. Until then — or if the API is unreachable — we fall back to the
+ * browser's built-in speech synthesis so the game always talks.
+ *
+ * `speak()` resolves once the phrase has finished playing, so callers can
+ * wait for speech to complete before moving on (e.g. let the praise finish
+ * before advancing to the next round).
  *
  * Sounds: tiny synthesized tones via WebAudio (no assets, no keys).
  */
@@ -21,26 +26,14 @@ export function setSpeechClient(client: ConvexReactClient | null) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Audio playback (base64 mp3 from Convex TTS)                         */
+/* Audio fetching (base64 mp3 from Convex TTS)                         */
 /* ------------------------------------------------------------------ */
 
 const audioCache = new Map<string, string>();
 const pendingFetches = new Map<string, Promise<string | null>>();
-let currentAudio: HTMLAudioElement | null = null;
 
 function normalize(text: string): string {
   return text.toLowerCase().replace(/\s+/g, " ").trim();
-}
-
-function playBase64(b64: string) {
-  try {
-    currentAudio?.pause();
-    const audio = new Audio(`data:audio/mpeg;base64,${b64}`);
-    currentAudio = audio;
-    void audio.play().catch(() => {});
-  } catch {
-    /* ignore playback errors */
-  }
 }
 
 async function fetchAudio(key: string): Promise<string | null> {
@@ -85,7 +78,7 @@ async function fetchAudio(key: string): Promise<string | null> {
 const warmQueue: string[] = [];
 let warming = false;
 
-async function drainQueue() {
+async function drainWarmQueue() {
   if (warming) return;
   warming = true;
   while (warmQueue.length > 0) {
@@ -104,40 +97,127 @@ export function warmUpSpeech(keys: string[]) {
   for (const key of keys) {
     if (!audioCache.has(key)) warmQueue.push(key);
   }
-  void drainQueue();
+  void drainWarmQueue();
 }
 
 /* ------------------------------------------------------------------ */
-/* speak(): cartoon voice first, browser voice as fallback              */
+/* Speech queue: one phrase at a time, never cutting each other off.    */
+/* speak() resolves once the phrase has finished playing.               */
 /* ------------------------------------------------------------------ */
 
-function speakFallback(text: string, opts: { rate?: number; pitch?: number }) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  const synth = window.speechSynthesis;
-  synth.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  const voice = pickVoice();
-  if (voice) utterance.voice = voice;
-  utterance.rate = opts.rate ?? 0.9;
-  utterance.pitch = opts.pitch ?? 1.15;
-  utterance.volume = 1;
-  // Chrome drops an utterance spoken immediately after cancel(); a tick fixes it.
-  window.setTimeout(() => synth.speak(utterance), 30);
+interface QueueItem {
+  key: string;
+  text: string;
+  opts: { rate?: number; pitch?: number };
+  resolve: () => void;
 }
 
-export async function speak(
+const queue: QueueItem[] = [];
+let current: QueueItem | null = null;
+
+export function speak(
   text: string,
   opts: { rate?: number; pitch?: number } = {},
-) {
-  const key = normalize(text);
-  if (convexClient) {
-    const b64 = await fetchAudio(key);
-    if (b64) {
-      playBase64(b64);
-      return;
+): Promise<void> {
+  return new Promise((resolve) => {
+    queue.push({ key: normalize(text), text, opts, resolve });
+    void drain();
+  });
+}
+
+async function drain() {
+  if (current) return;
+  while (queue.length > 0) {
+    const item = queue.shift()!;
+    current = item;
+    try {
+      await playItem(item);
+    } catch {
+      /* never let one bad phrase stall the queue */
+    } finally {
+      current = null;
+      item.resolve();
     }
   }
-  speakFallback(text, opts);
+}
+
+/** Play one phrase to completion (or give up quietly after a timeout). */
+function playItem(item: QueueItem): Promise<void> {
+  return new Promise((resolve) => {
+    let settled = false;
+    let audio: HTMLAudioElement | null = null;
+    let utterance: SpeechSynthesisUtterance | null = null;
+    let timer: number | null = null;
+
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      if (timer !== null) window.clearTimeout(timer);
+      if (audio) {
+        audio.onended = null;
+        audio.onerror = null;
+        audio.pause();
+      }
+      if (utterance) {
+        utterance.onend = null;
+        utterance.onerror = null;
+      }
+      resolve();
+    };
+
+    /** Play a cached base64 mp3, resolving when it finishes. */
+    const playB64 = (b64: string) => {
+      try {
+        audio = new Audio(`data:audio/mpeg;base64,${b64}`);
+        audio.onended = finish;
+        audio.onerror = finish;
+        void audio.play().catch(finish);
+        timer = window.setTimeout(finish, 20000);
+      } catch {
+        finish();
+      }
+    };
+
+    /** Browser speech fallback, resolving when the utterance ends. */
+    const playFallback = () => {
+      if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+        finish();
+        return;
+      }
+      try {
+        const synth = window.speechSynthesis;
+        synth.cancel();
+        utterance = new SpeechSynthesisUtterance(item.text);
+        const voice = pickVoice();
+        if (voice) utterance.voice = voice;
+        utterance.rate = item.opts.rate ?? 0.9;
+        utterance.pitch = item.opts.pitch ?? 1.15;
+        utterance.volume = 1;
+        utterance.onend = finish;
+        utterance.onerror = finish;
+        // Chrome drops an utterance spoken immediately after cancel(); a tick fixes it.
+        window.setTimeout(() => synth.speak(utterance!), 30);
+        timer = window.setTimeout(finish, 20000);
+      } catch {
+        finish();
+      }
+    };
+
+    (async () => {
+      try {
+        if (convexClient) {
+          const b64 = await fetchAudio(item.key);
+          if (b64) {
+            playB64(b64);
+            return;
+          }
+        }
+      } catch {
+        /* fall through to the browser voice */
+      }
+      playFallback();
+    })();
+  });
 }
 
 function pickVoice(): SpeechSynthesisVoice | null {
