@@ -16,19 +16,19 @@ export default function NotFound() {
           transition={{ type: "spring", stiffness: 260, damping: 14 }}
           className="text-8xl"
         >
-          🤔
+          🦖
         </motion.span>
         <h1 className="mt-6 text-6xl font-bold tracking-tight">
           4<span className="bg-tomato px-2 text-white">0</span>4
         </h1>
         <p className="mt-3 text-xl font-medium text-muted-foreground">
-          Oops! That page popped away.
+          Oops! Rex lost this page.
         </p>
         <Link
           to="/"
           className="nb-btn mt-8 bg-sun px-8 py-4 text-xl font-bold"
         >
-          ← Back to WordPop!
+          ← Back to WordPlay Explorer
         </Link>
       </main>
     </motion.div>

@@ -115,10 +115,10 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       <header className="border-b-[3px] border-ink bg-paper">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-lg font-bold shadow-[3px_3px_0_0_#141414]">
-              WP
+            <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-base leading-none shadow-[3px_3px_0_0_#141414]">
+              🦖
             </span>
-            <span className="text-2xl font-bold tracking-tight">WordPop!</span>
+            <span className="text-2xl font-bold tracking-tight">WordPlay Explorer</span>
           </Link>
           <Link
             to="/"
@@ -136,12 +136,12 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
             <>
               <CardHeader className="text-center">
                 <div className="flex justify-center">
-                  <span className="flex size-14 items-center justify-center border-[3px] border-ink bg-sun text-2xl font-bold shadow-[4px_4px_0_0_#141414]">
-                    WP
+                  <span className="flex size-14 items-center justify-center border-[3px] border-ink bg-sun text-3xl leading-none shadow-[4px_4px_0_0_#141414]">
+                    🦖
                   </span>
                 </div>
                 <CardTitle className="mt-3 text-3xl font-bold tracking-tight">
-                  Welcome to WordPop!
+                  Welcome to WordPlay Explorer!
                 </CardTitle>
                 <CardDescription className="text-base">
                   Enter your email to log in or sign up
@@ -205,7 +205,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     </Button>
                     <p className="mt-3 text-center text-sm font-medium text-muted-foreground">
                       For a 5-year-old, guest mode is perfect — one tap and
-                      they&apos;re playing.
+                      they&apos;re exploring.
                     </p>
                   </div>
                 </CardContent>

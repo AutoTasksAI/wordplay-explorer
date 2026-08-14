@@ -281,10 +281,10 @@ export default function Game() {
       {/* top bar */}
       <header className="flex items-center justify-between border-b-[3px] border-ink px-4 py-3 sm:px-6">
         <div className="flex items-center gap-2">
-          <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-lg font-bold text-ink shadow-[3px_3px_0_0_#141414]">
-            WP
+          <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-base leading-none shadow-[3px_3px_0_0_#141414]">
+            🦖
           </span>
-          <span className="text-xl font-bold tracking-tight">WordPop!</span>
+          <span className="text-xl font-bold tracking-tight">WordPlay Explorer</span>
         </div>
         {phase === "start" && (
           <button
@@ -308,16 +308,25 @@ export default function Game() {
             transition={{ duration: 0.25 }}
             className="flex flex-1 flex-col items-center justify-center gap-8 px-4 py-10 text-center"
           >
-            <div>
-              <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-                {user?.name ? `Hi ${user.name}!` : "Hi! Ready to read?"}
+            <div className="flex flex-col items-center">
+              <motion.span
+                className="text-8xl leading-none"
+                animate={{ y: [0, -10, 0], rotate: [0, -4, 4, 0] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+              >
+                🦖
+              </motion.span>
+              <p className="mt-4 mb-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                {user?.name ? `Hi ${user.name}!` : "Hi! Ready to explore?"}
               </p>
-              <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
                 WORD
-                <span className="text-tomato">POP</span>!
+                <span className="text-tomato">PLAY</span>
+                <br />
+                EXPLORER<span className="text-tomato">!</span>
               </h1>
               <p className="mx-auto mt-3 max-w-md text-lg text-muted-foreground">
-                Tap the right word or picture. Every win gets a star!
+                Rex says: tap the right word or picture. Every win gets a star!
               </p>
             </div>
 
@@ -339,7 +348,7 @@ export default function Game() {
               ▶ PLAY
             </button>
             <p className="text-sm font-medium text-muted-foreground">
-              Tap PLAY and listen! 👂
+              Tap PLAY and listen for Rex! 👂
             </p>
           </motion.section>
         )}
@@ -469,18 +478,18 @@ export default function Game() {
             <RainConfetti />
             <div className="relative z-10 flex flex-col items-center gap-6">
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ scale: 0, rotate: -20 }}
+                animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 260, damping: 12, delay: 0.1 }}
               >
-                <span className="text-8xl">🎉</span>
+                <span className="inline-block text-8xl">🦖</span>
               </motion.div>
               <div>
                 <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
                   YOU DID IT!
                 </h1>
                 <p className="mt-2 text-xl font-medium text-muted-foreground">
-                  {SESSION_LENGTH} words read!
+                  {SESSION_LENGTH} words explored!
                 </p>
               </div>
               <div className="flex items-center gap-2 border-[3px] border-ink bg-sun px-6 py-3 nb-shadow">
@@ -498,6 +507,9 @@ export default function Game() {
               </div>
               <p className="text-2xl font-bold">
                 {starsEarned} of {SESSION_LENGTH} stars!
+              </p>
+              <p className="text-lg font-medium text-muted-foreground">
+                Rex is so proud of you! 🦖
               </p>
               <button
                 type="button"

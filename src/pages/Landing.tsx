@@ -7,12 +7,12 @@ const PLAY_URL = "/auth?returnTo=/game";
 const STEPS = [
   {
     emoji: "🔉",
-    title: "Hear it",
-    body: "Every word is spoken out loud — big, slow, and friendly. One tap replays it anytime, so your child never gets stuck.",
+    title: "Rex says it",
+    body: "Every word is spoken out loud — big, slow, and friendly. One tap replays it anytime, so your little explorer never gets stuck.",
   },
   {
     emoji: "👀",
-    title: "See it",
+    title: "Spot it",
     body: "A big word, a big picture, and two silly decoys. Just enough choice to make it a game, never a maze.",
   },
   {
@@ -30,8 +30,8 @@ const STEPS = [
 const TRUST = [
   { bg: "bg-sun", text: "text-ink", title: "No ads. No paywalls.", body: "Ever. Nothing to buy, nothing to sit through." },
   { bg: "bg-tomato", text: "text-white", title: "No timers. No streaks.", body: "No pressure, no losing. Just gentle try-again." },
-  { bg: "bg-sky", text: "text-white", title: "Fully voiced.", body: "Your child plays alone — every prompt is spoken." },
-  { bg: "bg-grass", text: "text-ink", title: "Adapts to them.", body: "Missed words reappear; known words make room." },
+  { bg: "bg-sky", text: "text-white", title: "Rex does the talking.", body: "Every prompt is spoken aloud — your child plays alone." },
+  { bg: "bg-grass", text: "text-ink", title: "Adapts to your explorer.", body: "Missed words reappear; known words make room." },
   { bg: "bg-bubblegum", text: "text-ink", title: "Short sessions.", body: "Eight words, then a celebration. Perfect focus." },
   { bg: "bg-tangerine", text: "text-ink", title: "Zero menus.", body: "One screen, giant taps, nothing to get lost in." },
 ];
@@ -77,7 +77,7 @@ function DemoCard() {
       </div>
 
       <p className="mt-4 text-center text-sm font-semibold text-muted-foreground">
-        Match the word to the picture — it&apos;s that simple. 🎉
+        Match the word to the picture. Rex says: roar! 🦖
       </p>
     </div>
   );
@@ -90,10 +90,10 @@ export default function Landing() {
       <header className="sticky top-0 z-40 border-b-[3px] border-ink bg-paper">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-lg font-bold shadow-[3px_3px_0_0_#141414]">
-              WP
+            <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-base leading-none shadow-[3px_3px_0_0_#141414]">
+              🦖
             </span>
-            <span className="text-2xl font-bold tracking-tight">WordPop!</span>
+            <span className="text-2xl font-bold tracking-tight">WordPlay Explorer</span>
           </Link>
           <nav className="flex items-center gap-4">
             <a
@@ -144,24 +144,24 @@ export default function Landing() {
               For ages 4–6 · Learn to read
             </span>
             <h1 className="mt-5 text-5xl font-bold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
-              First words,{" "}
+              Roar into{" "}
               <span className="relative inline-block bg-tomato px-2 text-white">
-                popped
-              </span>{" "}
-              into reading.
+                reading
+              </span>
+              !
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-              WordPop! turns your child&apos;s very first words into a game a
-              five-year-old can play all alone. Every word is spoken aloud,
-              every win becomes a star, and there are no ads, timers, or
-              paywalls — just words, pictures, and pops.
+              WordPlay Explorer turns your child&apos;s very first words into a
+              dinosaur-sized adventure. Rex the T-Rex speaks every word out
+              loud, your little explorer taps the match, and every win pops
+              into a star.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 to={PLAY_URL}
                 className="nb-btn bg-tomato px-8 py-4 text-xl font-bold text-white sm:text-2xl"
               >
-                ▶ Start playing
+                ▶ Start exploring
               </Link>
               <a
                 href="#how"
@@ -194,7 +194,7 @@ export default function Landing() {
                 How it works
               </span>
               <h2 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-                Three taps to reading.
+                A word safari with Rex.
               </h2>
             </div>
             <p className="max-w-sm text-muted-foreground">
@@ -256,7 +256,7 @@ export default function Landing() {
       <section className="border-y-[3px] border-ink bg-ink">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
           <p className="text-center text-sm font-bold uppercase tracking-[0.25em] text-paper/70">
-            Words they&apos;ll pop first
+            Words your explorer will meet first
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             {CHIPS.map((chip, i) => (
@@ -285,20 +285,20 @@ export default function Landing() {
           transition={{ duration: 0.5 }}
           className="border-[3px] border-ink bg-sun p-8 text-center nb-shadow sm:p-14"
         >
-          <span className="text-6xl">⭐</span>
+          <span className="text-6xl">🦖</span>
           <h2 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            Ready for their first word?
+            Ready to explore?
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-lg font-medium">
-            Ten minutes a day with WordPop! and first words stop being scary —
-            they become a game your child begs to play.
+            Ten minutes a day with WordPlay Explorer and first words stop being
+            scary — they become an adventure your child begs to play.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
               to={PLAY_URL}
               className="nb-btn bg-ink px-10 py-4 text-2xl font-bold text-paper"
             >
-              ▶ Start playing
+              ▶ Start exploring
             </Link>
             <Link
               to={PLAY_URL}
@@ -317,15 +317,15 @@ export default function Landing() {
       <footer className="border-t-[3px] border-ink bg-white">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
-            <span className="flex size-8 items-center justify-center border-[3px] border-ink bg-sun text-sm font-bold">
-              WP
+            <span className="flex size-8 items-center justify-center border-[3px] border-ink bg-sun text-sm leading-none">
+              🦖
             </span>
-            <span className="font-bold">WordPop!</span>
+            <span className="font-bold">WordPlay Explorer</span>
           </div>
           <p className="text-sm text-muted-foreground">
             Made for new readers · No ads, ever
           </p>
-          <p className="text-sm font-semibold">© 2026 WordPop!</p>
+          <p className="text-sm font-semibold">© 2026 WordPlay Explorer</p>
         </div>
       </footer>
     </div>
