@@ -33,19 +33,28 @@ export const PATTERN_TYPES: PatternType[] = [
   { id: "abc", name: "ABC" },
 ];
 
-/** Six visible items for the chosen pattern type. */
-function buildVisible(type: PatternType, colors: PatternColor[]): PatternColor[] {
+/** The repeating unit for the chosen pattern type. */
+function buildCycle(type: PatternType, colors: PatternColor[]): PatternColor[] {
   const [a, b, c] = colors;
   switch (type.id) {
     case "ab":
-      return [a, b, a, b, a, b];
+      return [a, b];
     case "aabb":
-      return [a, a, b, b, a, a];
+      return [a, a, b, b];
     case "abc":
-      return [a, b, c, a, b, c];
+      return [a, b, c];
     default:
-      return [a, b, a, b, a, b];
+      return [a, b];
   }
+}
+
+/** The first six items of the repeating pattern. */
+function buildVisible(
+  type: PatternType,
+  colors: PatternColor[],
+): PatternColor[] {
+  const cycle = buildCycle(type, colors);
+  return Array.from({ length: 6 }, (_, i) => cycle[i % cycle.length]);
 }
 
 function pickDistractor(colors: PatternColor[]): PatternColor {
@@ -86,12 +95,16 @@ function PatternRow({ slots }: { slots: (PatternColor | null)[] }) {
 function buildPatternRound(type: PatternType, isNext: boolean): Round {
   const itemCount = type.id === "abc" ? 3 : 2;
   const colors = shuffle(COLORS).slice(0, itemCount);
+  const cycle = buildCycle(type, colors);
   const visible = buildVisible(type, colors);
 
   const slots: (PatternColor | null)[] = isNext
     ? [...visible, null]
     : visible.map((c, i) => (i === 2 ? null : c));
-  const answer = isNext ? visible[visible.length - 1] : visible[2];
+  // "Next": the hole sits after the six visible items, so the answer is the
+  // first item of the next cycle (position 6), NOT the last visible item.
+  // "Missing": the hole replaces position 2 of the cycle.
+  const answer = isNext ? cycle[6 % cycle.length] : cycle[2 % cycle.length];
   const visibleForSpeech = slots.filter(
     (c): c is PatternColor => c !== null,
   );
