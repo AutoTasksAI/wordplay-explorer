@@ -17,6 +17,7 @@ import {
   warmUpAudio,
   warmUpSpeech,
 } from "@/lib/speech";
+import { BatCelebration } from "./BatCelebration";
 import { SpiderCelebration } from "./SpiderCelebration";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, LogOut, Volume2 } from "lucide-react";
@@ -149,11 +150,16 @@ export function ModuleShell({
   const spokenRoundRef = useRef<number | null>(null);
   const sessionPraiseRef = useRef("Great job!");
 
-  // 20-star milestone: when the lifetime total crosses a 20-star boundary
-  // (20, 40, 60...), the spider celebration plays on the next session end.
-  const [milestone, setMilestone] = useState<number | null>(null);
+  // Star milestones: when the lifetime total crosses a 20-star boundary
+  // (20, 40, 60...), a creature celebration plays on the next session end.
+  // 40-star boundaries get the bat; other 20-star boundaries get the spider,
+  // so the two never overlap.
+  const [celebration, setCelebration] = useState<{
+    kind: "spider" | "bat";
+    value: number;
+  } | null>(null);
   const lastStarsRef = useRef<number | null>(null);
-  const milestoneTimeoutRef = useRef<number | null>(null);
+  const celebrationTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (lastStarsRef.current === null) {
@@ -162,23 +168,24 @@ export function ModuleShell({
     }
     const prev = lastStarsRef.current;
     if (stars > prev && Math.floor(stars / 20) > Math.floor(prev / 20)) {
-      if (milestone === null) {
+      if (celebration === null) {
         const hit = Math.floor(stars / 20) * 20;
-        setMilestone(hit);
+        const kind = hit % 40 === 0 ? "bat" : "spider";
+        setCelebration({ kind, value: hit });
         playBoing();
-        milestoneTimeoutRef.current = window.setTimeout(
-          () => setMilestone(null),
-          9000,
+        celebrationTimeoutRef.current = window.setTimeout(
+          () => setCelebration(null),
+          kind === "bat" ? 13500 : 9000,
         );
       }
     }
     lastStarsRef.current = stars;
-  }, [stars, milestone]);
+  }, [stars, celebration]);
 
   useEffect(
     () => () => {
-      if (milestoneTimeoutRef.current !== null) {
-        window.clearTimeout(milestoneTimeoutRef.current);
+      if (celebrationTimeoutRef.current !== null) {
+        window.clearTimeout(celebrationTimeoutRef.current);
       }
     },
     [],
@@ -555,8 +562,11 @@ export function ModuleShell({
 
       <ConfettiBurst burst={burst} />
       <AnimatePresence>
-        {milestone !== null && (
-          <SpiderCelebration key="spider" milestone={milestone} />
+        {celebration?.kind === "spider" && (
+          <SpiderCelebration key="spider" milestone={celebration.value} />
+        )}
+        {celebration?.kind === "bat" && (
+          <BatCelebration key="bat" milestone={celebration.value} />
         )}
       </AnimatePresence>
     </main>
