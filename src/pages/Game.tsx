@@ -17,6 +17,7 @@ import {
   randomPraise,
   speak,
   warmUpAudio,
+  warmUpSpeech,
 } from "@/lib/speech";
 import { AnimatePresence, motion } from "framer-motion";
 import { LogOut, Volume2 } from "lucide-react";
@@ -141,6 +142,7 @@ export default function Game() {
   const starsRef = useRef(0);
   const wrongTriedRef = useRef(false);
   const spokenRoundRef = useRef<number | null>(null);
+  const sessionPraiseRef = useRef("Great job!");
 
   const progressMap = useMemo<ProgressMap>(() => {
     const map: ProgressMap = {};
@@ -189,14 +191,26 @@ export default function Game() {
 
   const startSession = () => {
     warmUpAudio();
+    sessionPraiseRef.current = randomPraise();
     wrongTriedRef.current = false;
     starsRef.current = 0;
     setStarsEarned(0);
     setRoundIndex(0);
     setRoundStatus("pending");
     setWrongWord(null);
-    setTargets(pickTargets(progressMap, SESSION_LENGTH));
+    const targets = pickTargets(progressMap, SESSION_LENGTH);
+    setTargets(targets);
     spokenRoundRef.current = null;
+    // Pre-generate this session's phrases in the background so rounds play
+    // with zero lag once the cartoon voice is configured.
+    const praise = sessionPraiseRef.current;
+    warmUpSpeech(
+      targets.flatMap((w) => [
+        `find the word. ${w.word}.`,
+        `find the picture. ${w.word}.`,
+        `${praise} ${w.word}.`,
+      ]),
+    );
     speak("Let's play!");
     setPhase("round");
   };
@@ -233,7 +247,7 @@ export default function Game() {
     }
     setBurst({ ...getRectCenter(el), id: Date.now() });
     window.setTimeout(() => setBurst(null), 900);
-    speak(`${randomPraise()} ${currentRound.word}!`);
+    speak(`${sessionPraiseRef.current} ${currentRound.word}!`);
     void recordAnswer({ word: currentRound.word, correct: firstTry });
 
     window.setTimeout(goNext, 1600);

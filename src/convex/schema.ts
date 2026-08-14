@@ -49,6 +49,14 @@ const schema = defineSchema(
       stars: v.number(),
       sessionsCompleted: v.number(),
     }).index("by_user", ["userId"]),
+
+    // cached TTS audio (base64 mp3) keyed by normalized text, so each word
+    // and phrase is generated once and replayed instantly forever after
+    audioCache: defineTable({
+      key: v.string(),
+      audioBase64: v.string(),
+      createdAt: v.number(),
+    }).index("by_key", ["key"]),
   },
   {
     schemaValidation: false,
