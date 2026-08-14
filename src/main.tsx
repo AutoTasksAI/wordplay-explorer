@@ -13,7 +13,8 @@ import "./index.css";
 // Lazy load route components for better code splitting
 const Landing = lazy(() => import("./pages/Landing.tsx"));
 const AuthPage = lazy(() => import("./pages/Auth.tsx"));
-const Game = lazy(() => import("./pages/Game.tsx"));
+const GameHub = lazy(() => import("./pages/GameHub.tsx"));
+const ModulePage = lazy(() => import("./pages/ModulePage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -133,7 +134,15 @@ createRoot(document.getElementById("root")!).render(
                 path="/game"
                 element={
                   <RequireAuth>
-                    <Game />
+                    <GameHub />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/game/:module"
+                element={
+                  <RequireAuth>
+                    <ModulePage />
                   </RequireAuth>
                 }
               />

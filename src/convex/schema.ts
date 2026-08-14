@@ -32,16 +32,22 @@ const schema = defineSchema(
       role: v.optional(roleValidator), // role of the user. do not remove
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
-    // per-word mastery for the word recognition game
-    wordProgress: defineTable({
+    // per-item mastery for every game module (words, numbers, patterns):
+    // keyed by (module, item) so each module tracks its own progress
+    itemProgress: defineTable({
       userId: v.id("users"),
-      word: v.string(),
+      module: v.union(
+        v.literal("words"),
+        v.literal("numbers"),
+        v.literal("patterns"),
+      ),
+      item: v.string(),
       correct: v.number(),
       wrong: v.number(),
       lastPlayedAt: v.number(),
     })
       .index("by_user", ["userId"])
-      .index("by_user_word", ["userId", "word"]),
+      .index("by_user_module_item", ["userId", "module", "item"]),
 
     // lifetime stats for the player (stars earned, sessions finished)
     playerStats: defineTable({

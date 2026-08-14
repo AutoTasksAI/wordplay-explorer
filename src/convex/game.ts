@@ -2,9 +2,15 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
+export const MODULE_VALIDATOR = v.union(
+  v.literal("words"),
+  v.literal("numbers"),
+  v.literal("patterns"),
+);
+
 /**
- * Player state for the word game: lifetime stars + per-word mastery.
- * Returns null when signed out.
+ * Player state for all game modules: lifetime stars + per-item mastery
+ * (items are words, numbers, or pattern types). Returns null when signed out.
  */
 export const getPlayerState = query({
   args: {},
@@ -14,13 +20,13 @@ export const getPlayerState = query({
       return null;
     }
 
-    const [statsRow, wordRows] = await Promise.all([
+    const [statsRow, itemRows] = await Promise.all([
       ctx.db
         .query("playerStats")
         .withIndex("by_user", (q) => q.eq("userId", userId))
         .first(),
       ctx.db
-        .query("wordProgress")
+        .query("itemProgress")
         .withIndex("by_user", (q) => q.eq("userId", userId))
         .collect(),
     ]);
@@ -28,8 +34,9 @@ export const getPlayerState = query({
     return {
       stars: statsRow?.stars ?? 0,
       sessionsCompleted: statsRow?.sessionsCompleted ?? 0,
-      words: wordRows.map((row) => ({
-        word: row.word,
+      items: itemRows.map((row) => ({
+        module: row.module,
+        item: row.item,
         correct: row.correct,
         wrong: row.wrong,
         lastPlayedAt: row.lastPlayedAt,
@@ -38,9 +45,13 @@ export const getPlayerState = query({
   },
 });
 
-/** Record the outcome of one round for a single word. */
+/** Record the outcome of one round for a single item in a module. */
 export const recordAnswer = mutation({
-  args: { word: v.string(), correct: v.boolean() },
+  args: {
+    module: MODULE_VALIDATOR,
+    item: v.string(),
+    correct: v.boolean(),
+  },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (userId === null) {
@@ -48,9 +59,12 @@ export const recordAnswer = mutation({
     }
 
     const existing = await ctx.db
-      .query("wordProgress")
-      .withIndex("by_user_word", (q) =>
-        q.eq("userId", userId).eq("word", args.word),
+      .query("itemProgress")
+      .withIndex("by_user_module_item", (q) =>
+        q
+          .eq("userId", userId)
+          .eq("module", args.module)
+          .eq("item", args.item),
       )
       .first();
 
@@ -63,9 +77,10 @@ export const recordAnswer = mutation({
         lastPlayedAt: now,
       });
     } else {
-      await ctx.db.insert("wordProgress", {
+      await ctx.db.insert("itemProgress", {
         userId,
-        word: args.word,
+        module: args.module,
+        item: args.item,
         correct: args.correct ? 1 : 0,
         wrong: args.correct ? 0 : 1,
         lastPlayedAt: now,

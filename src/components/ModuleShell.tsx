@@ -1,14 +1,11 @@
-import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
 import {
   MASTERY_COUNT,
   SESSION_LENGTH,
-  WORDS,
-  pickOptions,
-  pickTargets,
+  type ModuleConfig,
   type ProgressMap,
-  type Word,
-} from "@/lib/words";
+  type Round,
+} from "@/lib/game-core";
 import {
   playCorrect,
   playFanfare,
@@ -20,10 +17,9 @@ import {
   warmUpSpeech,
 } from "@/lib/speech";
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOut, Volume2 } from "lucide-react";
+import { ArrowLeft, LogOut, Volume2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { useMutation, useQuery } from "convex/react";
 
 type Phase = "start" | "round" | "celebrate";
 type RoundStatus = "pending" | "correct";
@@ -112,11 +108,7 @@ function StarDots({ done }: { done: number }) {
         <span
           key={i}
           className={`size-4 border-[3px] border-ink ${
-            i < done
-              ? "bg-grass"
-              : i === done
-                ? "bg-sun"
-                : "bg-white"
+            i < done ? "bg-grass" : i === done ? "bg-sun" : "bg-white"
           }`}
         />
       ))}
@@ -124,33 +116,36 @@ function StarDots({ done }: { done: number }) {
   );
 }
 
-export default function Game() {
+interface ModuleShellProps {
+  meta: ModuleConfig;
+  progressMap: ProgressMap;
+  stars: number;
+  onRecord: (item: string, correct: boolean) => void;
+  onComplete: (stars: number) => void;
+}
+
+export function ModuleShell({
+  meta,
+  progressMap,
+  stars,
+  onRecord,
+  onComplete,
+}: ModuleShellProps) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const playerState = useQuery(api.game.getPlayerState);
-  const recordAnswer = useMutation(api.game.recordAnswer);
-  const completeSession = useMutation(api.game.completeSession);
 
   const [phase, setPhase] = useState<Phase>("start");
-  const [targets, setTargets] = useState<Word[]>([]);
+  const [rounds, setRounds] = useState<Round[]>([]);
   const [roundIndex, setRoundIndex] = useState(0);
   const [starsEarned, setStarsEarned] = useState(0);
   const [roundStatus, setRoundStatus] = useState<RoundStatus>("pending");
-  const [wrongWord, setWrongWord] = useState<string | null>(null);
+  const [wrongKey, setWrongKey] = useState<string | null>(null);
   const [burst, setBurst] = useState<Burst | null>(null);
 
   const starsRef = useRef(0);
   const wrongTriedRef = useRef(false);
   const spokenRoundRef = useRef<number | null>(null);
   const sessionPraiseRef = useRef("Great job!");
-
-  const progressMap = useMemo<ProgressMap>(() => {
-    const map: ProgressMap = {};
-    for (const row of playerState?.words ?? []) {
-      map[row.word] = row;
-    }
-    return map;
-  }, [playerState]);
 
   const knownCount = useMemo(
     () =>
@@ -159,27 +154,14 @@ export default function Game() {
     [progressMap],
   );
 
-  const currentRound = roundIndex < targets.length ? targets[roundIndex] : null;
-  // "picture" rounds show the printed word and ask for the picture;
-  // "word" rounds show the picture and ask for the printed word.
-  const roundType = roundIndex % 2 === 0 ? "picture" : "word";
-
-  const options = useMemo<Word[]>(
-    () => (currentRound ? pickOptions(currentRound, WORDS) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentRound],
-  );
+  const currentRound = roundIndex < rounds.length ? rounds[roundIndex] : null;
 
   // Speak the prompt for each new round so a non-reader always knows what to do.
   useEffect(() => {
     if (phase !== "round" || !currentRound) return;
     if (spokenRoundRef.current === roundIndex) return;
     spokenRoundRef.current = roundIndex;
-    const prompt =
-      roundType === "word"
-        ? `Find the word. ${currentRound.word}.`
-        : `Find the picture. ${currentRound.word}.`;
-    speak(prompt);
+    speak(currentRound.spoken);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, roundIndex, currentRound]);
 
@@ -197,19 +179,15 @@ export default function Game() {
     setStarsEarned(0);
     setRoundIndex(0);
     setRoundStatus("pending");
-    setWrongWord(null);
-    const targets = pickTargets(progressMap, SESSION_LENGTH);
-    setTargets(targets);
+    setWrongKey(null);
+    const nextRounds = meta.buildRounds(progressMap);
+    setRounds(nextRounds);
     spokenRoundRef.current = null;
     // Pre-generate this session's phrases in the background so rounds play
     // with zero lag once the cartoon voice is configured.
     const praise = sessionPraiseRef.current;
     warmUpSpeech(
-      targets.flatMap((w) => [
-        `find the word. ${w.word}.`,
-        `find the picture. ${w.word}.`,
-        `${praise} ${w.word}.`,
-      ]),
+      nextRounds.flatMap((r) => [r.spoken, `${praise} ${r.praiseWord}.`]),
     );
     speak("Let's play!");
     setPhase("round");
@@ -217,23 +195,22 @@ export default function Game() {
 
   const handleReplay = () => {
     if (!currentRound) return;
-    const prompt =
-      roundType === "word"
-        ? `Find the word. ${currentRound.word}.`
-        : `Find the picture. ${currentRound.word}.`;
-    speak(prompt);
+    speak(currentRound.spoken);
   };
 
-  const handleTap = (option: Word, el: HTMLElement) => {
+  const handleTap = (
+    option: { key: string },
+    el: HTMLElement,
+  ) => {
     if (phase !== "round" || roundStatus !== "pending" || !currentRound) return;
-    const correct = option.word === currentRound.word;
+    const correct = option.key === currentRound.targetKey;
 
     if (!correct) {
       wrongTriedRef.current = true;
-      setWrongWord(option.word);
+      setWrongKey(option.key);
       playWrong();
       speak("Try again!");
-      window.setTimeout(() => setWrongWord(null), 650);
+      window.setTimeout(() => setWrongKey(null), 650);
       return;
     }
 
@@ -247,24 +224,26 @@ export default function Game() {
     }
     setBurst({ ...getRectCenter(el), id: Date.now() });
     window.setTimeout(() => setBurst(null), 900);
-    speak(`${sessionPraiseRef.current} ${currentRound.word}!`);
-    void recordAnswer({ word: currentRound.word, correct: firstTry });
+    speak(`${sessionPraiseRef.current} ${currentRound.praiseWord}!`);
+    onRecord(currentRound.itemKey, firstTry);
 
     window.setTimeout(goNext, 1600);
   };
 
   const goNext = () => {
     if (!currentRound) return;
-    setWrongWord(null);
+    setWrongKey(null);
     setRoundStatus("pending");
     wrongTriedRef.current = false;
 
     const next = roundIndex + 1;
-    if (next >= targets.length) {
+    if (next >= rounds.length) {
       setPhase("celebrate");
       playFanfare();
-      speak("Amazing! You finished! You earned " + starsRef.current + " stars!");
-      void completeSession({ stars: starsRef.current });
+      speak(
+        "Amazing! You finished! You earned " + starsRef.current + " stars!",
+      );
+      onComplete(starsRef.current);
       return;
     }
     setRoundIndex(next);
@@ -276,20 +255,6 @@ export default function Game() {
     // back to start, next PLAY builds a fresh session from updated progress
   };
 
-  if (playerState === undefined) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-paper">
-        <motion.span
-          className="text-6xl"
-          animate={{ scale: [1, 1.25, 1], rotate: [0, 12, -12, 0] }}
-          transition={{ duration: 1.2, repeat: Infinity }}
-        >
-          ⭐
-        </motion.span>
-      </main>
-    );
-  }
-
   return (
     <main className="kid-ui flex min-h-screen flex-col bg-paper">
       {/* top bar */}
@@ -298,17 +263,29 @@ export default function Game() {
           <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-base leading-none shadow-[3px_3px_0_0_#141414]">
             🦖
           </span>
-          <span className="text-xl font-bold tracking-tight">WordPlay Explorer</span>
+          <span className="text-xl font-bold tracking-tight">
+            WordPlay Explorer
+          </span>
         </div>
         {phase === "start" && (
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="nb-btn flex items-center gap-1.5 bg-white px-3 py-2 text-sm font-semibold"
-          >
-            <LogOut className="size-4" />
-            <span className="hidden sm:inline">Bye!</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate("/game")}
+              className="nb-btn flex items-center gap-1.5 bg-white px-3 py-2 text-sm font-semibold"
+            >
+              <ArrowLeft className="size-4" />
+              <span className="hidden sm:inline">Games</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="nb-btn flex items-center gap-1.5 bg-white px-3 py-2 text-sm font-semibold"
+            >
+              <LogOut className="size-4" />
+              <span className="hidden sm:inline">Bye!</span>
+            </button>
+          </div>
         )}
       </header>
 
@@ -328,28 +305,26 @@ export default function Game() {
                 animate={{ y: [0, -10, 0], rotate: [0, -4, 4, 0] }}
                 transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
               >
-                🦖
+                {meta.mascot}
               </motion.span>
               <p className="mt-4 mb-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
                 {user?.name ? `Hi ${user.name}!` : "Hi! Ready to explore?"}
               </p>
               <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-                WORD
-                <span className="text-tomato">PLAY</span>
-                <br />
-                EXPLORER<span className="text-tomato">!</span>
+                {meta.headline[0]}{" "}
+                <span className={meta.headlineColor}>{meta.headline[1]}</span>
               </h1>
               <p className="mx-auto mt-3 max-w-md text-lg text-muted-foreground">
-                Rex says: tap the right word or picture. Every win gets a star!
+                {meta.tagline}
               </p>
             </div>
 
             <div className="flex items-center gap-3 border-[3px] border-ink bg-white px-5 py-3 nb-shadow-sm">
               <span className="text-3xl">⭐</span>
-              <span className="text-3xl font-bold">{playerState?.stars ?? 0}</span>
+              <span className="text-3xl font-bold">{stars}</span>
               {knownCount > 0 && (
                 <span className="text-sm font-semibold text-muted-foreground">
-                  · {knownCount} words known
+                  · {meta.countEmoji} {knownCount} {meta.countLabel}
                 </span>
               )}
             </div>
@@ -357,12 +332,12 @@ export default function Game() {
             <button
               type="button"
               onClick={startSession}
-              className="nb-btn bg-tomato px-14 py-6 text-3xl font-bold text-white sm:text-4xl"
+              className={`nb-btn ${meta.accent} px-14 py-6 text-3xl font-bold ${meta.accentText} sm:text-4xl`}
             >
               ▶ PLAY
             </button>
             <p className="text-sm font-medium text-muted-foreground">
-              Tap PLAY and listen for Rex! 👂
+              {meta.startHint}
             </p>
           </motion.section>
         )}
@@ -389,32 +364,21 @@ export default function Game() {
             {/* prompt */}
             <div className="relative flex flex-col items-center gap-4">
               <span className="border-[3px] border-ink bg-sky px-4 py-1 text-sm font-bold uppercase tracking-widest text-white nb-shadow-xs">
-                {roundType === "word" ? "Find the word" : "Find the picture"}
+                {currentRound.prompt}
               </span>
               <div className="relative flex w-full items-center justify-center border-[3px] border-ink bg-white px-6 py-10 nb-shadow sm:py-14">
-                {roundType === "word" ? (
-                  <motion.span
-                    key={currentRound.word}
-                    initial={{ scale: 0.5 }}
-                    animate={{ scale: 1 }}
-                    className="text-8xl leading-none sm:text-9xl"
-                  >
-                    {currentRound.emoji}
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key={currentRound.word}
-                    initial={{ scale: 0.6 }}
-                    animate={{ scale: 1 }}
-                    className="text-6xl font-bold tracking-wide sm:text-8xl"
-                  >
-                    {currentRound.word}
-                  </motion.span>
-                )}
+                <motion.div
+                  key={roundIndex}
+                  initial={{ scale: 0.6, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="flex items-center justify-center"
+                >
+                  {currentRound.display}
+                </motion.div>
                 <button
                   type="button"
                   onClick={handleReplay}
-                  aria-label="Hear the word again"
+                  aria-label="Hear it again"
                   className="nb-btn absolute bottom-3 right-3 flex size-12 items-center justify-center bg-sun"
                 >
                   <Volume2 className="size-6" />
@@ -424,12 +388,13 @@ export default function Game() {
 
             {/* options */}
             <div className="grid grid-cols-3 gap-3 sm:gap-5">
-              {options.map((option) => {
-                const isWrongFlash = wrongWord === option.word;
-                const isCorrect = roundStatus === "correct" && option.word === currentRound.word;
+              {currentRound.options.map((option) => {
+                const isWrongFlash = wrongKey === option.key;
+                const isCorrect =
+                  roundStatus === "correct" && option.key === currentRound.targetKey;
                 return (
                   <motion.button
-                    key={option.word}
+                    key={option.key}
                     type="button"
                     onClick={(e) => handleTap(option, e.currentTarget)}
                     whileHover={{ y: -4 }}
@@ -442,7 +407,7 @@ export default function Game() {
                           : { x: 0 }
                     }
                     transition={{ duration: isWrongFlash ? 0.4 : 0.3 }}
-                    className={`flex aspect-square w-full flex-col items-center justify-center gap-2 border-[3px] border-ink nb-shadow-sm ${
+                    className={`relative flex aspect-square w-full items-center justify-center overflow-hidden border-[3px] border-ink p-1.5 nb-shadow-sm ${
                       isCorrect
                         ? "bg-grass"
                         : isWrongFlash
@@ -450,22 +415,12 @@ export default function Game() {
                           : "bg-white"
                     }`}
                   >
-                    {roundType === "word" ? (
-                      <span
-                        className={`text-3xl font-bold sm:text-5xl ${isCorrect || isWrongFlash ? "text-white" : ""}`}
-                      >
-                        {option.word}
-                      </span>
-                    ) : (
-                      <span className="text-6xl leading-none sm:text-8xl">
-                        {option.emoji}
-                      </span>
-                    )}
+                    {option.node}
                     {isCorrect && (
                       <motion.span
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="text-2xl text-white"
+                        className="absolute bottom-1 right-1.5 text-xl text-white"
                       >
                         ✓
                       </motion.span>
@@ -494,16 +449,21 @@ export default function Game() {
               <motion.div
                 initial={{ scale: 0, rotate: -20 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", stiffness: 260, damping: 12, delay: 0.1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 12,
+                  delay: 0.1,
+                }}
               >
-                <span className="inline-block text-8xl">🦖</span>
+                <span className="inline-block text-8xl">{meta.mascot}</span>
               </motion.div>
               <div>
                 <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
                   YOU DID IT!
                 </h1>
                 <p className="mt-2 text-xl font-medium text-muted-foreground">
-                  {SESSION_LENGTH} words explored!
+                  {SESSION_LENGTH} {meta.unitLabel} explored!
                 </p>
               </div>
               <div className="flex items-center gap-2 border-[3px] border-ink bg-sun px-6 py-3 nb-shadow">
@@ -512,8 +472,15 @@ export default function Game() {
                     key={i}
                     initial={{ scale: 0, rotate: -30 }}
                     animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.3 + i * 0.12, type: "spring", stiffness: 300, damping: 10 }}
-                    className={`text-4xl ${i < starsEarned ? "" : "opacity-25 grayscale"}`}
+                    transition={{
+                      delay: 0.3 + i * 0.12,
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 10,
+                    }}
+                    className={`text-4xl ${
+                      i < starsEarned ? "" : "opacity-25 grayscale"
+                    }`}
                   >
                     ⭐
                   </motion.span>
@@ -528,19 +495,17 @@ export default function Game() {
               <button
                 type="button"
                 onClick={handlePlayAgain}
-                className="nb-btn bg-sky px-10 py-5 text-2xl font-bold text-white"
+                className={`nb-btn ${meta.accent} px-10 py-5 text-2xl font-bold ${meta.accentText}`}
               >
                 ▶ PLAY AGAIN
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  speak("See you soon! Bye bye!");
-                  navigate("/");
-                }}
-                className="nb-btn bg-white px-6 py-3 text-sm font-semibold"
+                onClick={() => navigate("/game")}
+                className="nb-btn flex items-center gap-1.5 bg-white px-6 py-3 text-sm font-semibold"
               >
-                Go home
+                <ArrowLeft className="size-4" />
+                All games
               </button>
             </div>
           </motion.section>

@@ -7,23 +7,23 @@ const PLAY_URL = "/auth?returnTo=/game";
 const STEPS = [
   {
     emoji: "🔉",
-    title: "Rex says it",
-    body: "Every word is spoken out loud — big, slow, and friendly. One tap replays it anytime, so your little explorer never gets stuck.",
+    title: "Rex explains it",
+    body: "Every word, number, and pattern is spoken out loud — big, slow, and friendly. One tap replays it anytime, so your little explorer never gets stuck.",
   },
   {
     emoji: "👀",
     title: "Spot it",
-    body: "A big word, a big picture, and two silly decoys. Just enough choice to make it a game, never a maze.",
+    body: "A big word, a row of dots to count, or a pattern with a missing piece — and two silly decoys. Just enough choice to make it a game, never a maze.",
   },
   {
     emoji: "👆",
     title: "Pop it",
-    body: "Tap the right tile and it pops into a star. Eight words a session — short, sweet, and finished with a party.",
+    body: "Tap the right tile and it pops into a star. Eight rounds a session — short, sweet, and finished with a party.",
   },
   {
     emoji: "🧠",
     title: "Remember it",
-    body: "Words your child misses come back. Words they know step aside for new ones. The game learns with them.",
+    body: "Things your child misses come back. Things they know step aside for new ones. The game learns with them.",
   },
 ];
 
@@ -31,9 +31,33 @@ const TRUST = [
   { bg: "bg-sun", text: "text-ink", title: "No ads. No paywalls.", body: "Ever. Nothing to buy, nothing to sit through." },
   { bg: "bg-tomato", text: "text-white", title: "No timers. No streaks.", body: "No pressure, no losing. Just gentle try-again." },
   { bg: "bg-sky", text: "text-white", title: "Rex does the talking.", body: "Every prompt is spoken aloud — your child plays alone." },
-  { bg: "bg-grass", text: "text-ink", title: "Adapts to your explorer.", body: "Missed words reappear; known words make room." },
-  { bg: "bg-bubblegum", text: "text-ink", title: "Short sessions.", body: "Eight words, then a celebration. Perfect focus." },
-  { bg: "bg-tangerine", text: "text-ink", title: "Zero menus.", body: "One screen, giant taps, nothing to get lost in." },
+  { bg: "bg-grass", text: "text-ink", title: "Adapts to your explorer.", body: "Missed words and numbers reappear; known ones make room for new challenges." },
+  { bg: "bg-bubblegum", text: "text-ink", title: "Short sessions.", body: "Eight rounds, then a celebration. Perfect focus." },
+  { bg: "bg-tangerine", text: "text-ink", title: "Three adventures.", body: "Words, numbers, and patterns — giant taps, nothing to get lost in." },
+];
+
+const MODULE_STRIP = [
+  {
+    emoji: "🔤",
+    title: "Word Safari",
+    body: "First words, spoken aloud. Tap the match and pop it into a star.",
+    bg: "bg-tomato",
+    text: "text-white",
+  },
+  {
+    emoji: "🔢",
+    title: "Number Jungle",
+    body: "Count the dots and find the number. One to ten, then off they go.",
+    bg: "bg-sky",
+    text: "text-white",
+  },
+  {
+    emoji: "🧩",
+    title: "Pattern Path",
+    body: "Red, blue, red, blue — what comes next? Spot the missing piece.",
+    bg: "bg-grass",
+    text: "text-ink",
+  },
 ];
 
 const CHIPS: { word: string; bg: string; text: string }[] = [
@@ -152,9 +176,9 @@ export default function Landing() {
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
               WordPlay Explorer turns your child&apos;s very first words into a
-              dinosaur-sized adventure. Rex the T-Rex speaks every word out
-              loud, your little explorer taps the match, and every win pops
-              into a star.
+              dinosaur-sized adventure. Rex the T-Rex speaks every word,
+              number, and pattern out loud, your little explorer taps the
+              match, and every win pops into a star.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
@@ -171,7 +195,8 @@ export default function Landing() {
               </a>
             </div>
             <p className="mt-5 text-sm font-semibold text-muted-foreground">
-              One-tap guest mode · No account needed to try it
+              Three adventures in one · One-tap guest mode · No account needed
+              to try it
             </p>
           </motion.div>
 
@@ -185,6 +210,42 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ===== Module strip ===== */}
+      <section className="border-y-[3px] border-ink bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+          <div className="mb-8 flex items-end justify-between gap-4">
+            <div>
+              <span className="inline-block border-[3px] border-ink bg-bubblegum px-3 py-1 text-xs font-bold uppercase tracking-widest nb-shadow-xs">
+                Pick your adventure
+              </span>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                Three little games, one big jungle.
+              </h2>
+            </div>
+            <p className="hidden max-w-xs text-right text-muted-foreground sm:block">
+              Same stars, same Rex, same celebration — three skills to mix up
+              each day.
+            </p>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {MODULE_STRIP.map((m, i) => (
+              <motion.div
+                key={m.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                className={`border-[3px] border-ink p-6 nb-shadow-sm hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#141414] transition-all ${m.bg} ${m.text}`}
+              >
+                <span className="text-5xl">{m.emoji}</span>
+                <h3 className="mt-4 text-2xl font-bold">{m.title}</h3>
+                <p className="mt-2 leading-relaxed opacity-90">{m.body}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== How it works ===== */}
       <section id="how" className="border-y-[3px] border-ink bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
@@ -194,12 +255,12 @@ export default function Landing() {
                 How it works
               </span>
               <h2 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-                A word safari with Rex.
+                A learning safari with Rex.
               </h2>
             </div>
             <p className="max-w-sm text-muted-foreground">
-              Built on the way kids actually learn first words: sound, sight,
-              then instant reward.
+              Built on the way kids actually learn: sound, sight, then instant
+              reward.
             </p>
           </div>
 
@@ -290,8 +351,9 @@ export default function Landing() {
             Ready to explore?
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-lg font-medium">
-            Ten minutes a day with WordPlay Explorer and first words stop being
-            scary — they become an adventure your child begs to play.
+            Ten minutes a day with WordPlay Explorer and first words, numbers,
+            and patterns stop being scary — they become adventures your child
+            begs to play.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
