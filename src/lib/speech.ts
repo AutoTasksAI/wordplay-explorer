@@ -120,7 +120,29 @@ export function speak(
   opts: { rate?: number; pitch?: number } = {},
 ): Promise<void> {
   return new Promise((resolve) => {
-    queue.push({ key: normalize(text), text, opts, resolve });
+    const key = normalize(text);
+    // Coalesce duplicate phrases: if the exact same phrase is already queued
+    // (or playing right now), don't add another copy — resolve together with
+    // it when it finishes. Rapid repeat taps should never make the voice loop
+    // the same line over and over.
+    const last = queue[queue.length - 1];
+    if (last && last.key === key) {
+      const prev = last.resolve;
+      last.resolve = () => {
+        prev();
+        resolve();
+      };
+      return;
+    }
+    if (current && current.key === key) {
+      const prev = current.resolve;
+      current.resolve = () => {
+        prev();
+        resolve();
+      };
+      return;
+    }
+    queue.push({ key, text, opts, resolve });
     void drain();
   });
 }
@@ -148,11 +170,13 @@ function playItem(item: QueueItem): Promise<void> {
     let audio: HTMLAudioElement | null = null;
     let utterance: SpeechSynthesisUtterance | null = null;
     let timer: number | null = null;
+    let heartbeat: number | null = null;
 
     const finish = () => {
       if (settled) return;
       settled = true;
       if (timer !== null) window.clearTimeout(timer);
+      if (heartbeat !== null) window.clearInterval(heartbeat);
       if (audio) {
         audio.onended = null;
         audio.onerror = null;
@@ -161,6 +185,13 @@ function playItem(item: QueueItem): Promise<void> {
       if (utterance) {
         utterance.onend = null;
         utterance.onerror = null;
+        // Stop any ghost utterance the browser may keep looping after onend
+        // or a timeout (a known Chrome speechSynthesis bug).
+        try {
+          window.speechSynthesis.cancel();
+        } catch {
+          /* ignore */
+        }
       }
       resolve();
     };
@@ -198,12 +229,24 @@ function playItem(item: QueueItem): Promise<void> {
         // Chrome drops an utterance spoken immediately after cancel(); a tick fixes it.
         window.setTimeout(() => synth.speak(utterance!), 30);
         timer = window.setTimeout(finish, 20000);
+        // Chrome has a known bug where speechSynthesis gets "stuck" speaking
+        // or loops a phrase; a gentle pause/resume heartbeat keeps it moving.
+        heartbeat = window.setInterval(() => {
+          try {
+            if (synth.speaking && !synth.paused) {
+              synth.pause();
+              synth.resume();
+            }
+          } catch {
+            /* ignore */
+          }
+        }, 5000);
       } catch {
         finish();
       }
     };
 
-    (async () => {
+    const run = async () => {
       try {
         if (convexClient) {
           const b64 = await fetchAudio(item.key);
@@ -216,7 +259,25 @@ function playItem(item: QueueItem): Promise<void> {
         /* fall through to the browser voice */
       }
       playFallback();
-    })();
+    };
+    // Never let an unexpected throw leave the queue stalled.
+    run().catch(finish);
+  });
+}
+
+// Stop speech when the tab is hidden — Chrome can otherwise keep a stuck
+// utterance looping in the background.
+if (typeof window !== "undefined" && "speechSynthesis" in window) {
+  const stopSynth = () => {
+    try {
+      window.speechSynthesis.cancel();
+    } catch {
+      /* ignore */
+    }
+  };
+  window.addEventListener("pagehide", stopSynth);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") stopSynth();
   });
 }
 
