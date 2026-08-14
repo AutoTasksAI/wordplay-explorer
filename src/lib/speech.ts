@@ -231,6 +231,26 @@ export function playFanfare() {
   tone(1318.5, notes.length * 0.11, 0.5, "triangle", 0.22);
 }
 
+/** Bouncy "boing!" for milestone celebrations (20 stars, 40 stars...). */
+export function playBoing() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const start = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(170, start);
+  osc.frequency.exponentialRampToValueAtTime(680, start + 0.22);
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(0.24, start + 0.03);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.4);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start + 0.45);
+  tone(1568, 0.26, 0.16, "sine", 0.14);
+}
+
 const PRAISES = [
   "Great job!",
   "Awesome!",

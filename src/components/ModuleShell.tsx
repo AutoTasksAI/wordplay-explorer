@@ -7,6 +7,7 @@ import {
   type Round,
 } from "@/lib/game-core";
 import {
+  playBoing,
   playCorrect,
   playFanfare,
   playStar,
@@ -16,6 +17,7 @@ import {
   warmUpAudio,
   warmUpSpeech,
 } from "@/lib/speech";
+import { SpiderCelebration } from "./SpiderCelebration";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, LogOut, Volume2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -146,6 +148,41 @@ export function ModuleShell({
   const wrongTriedRef = useRef(false);
   const spokenRoundRef = useRef<number | null>(null);
   const sessionPraiseRef = useRef("Great job!");
+
+  // 20-star milestone: when the lifetime total crosses a 20-star boundary
+  // (20, 40, 60...), the spider celebration plays on the next session end.
+  const [milestone, setMilestone] = useState<number | null>(null);
+  const lastStarsRef = useRef<number | null>(null);
+  const milestoneTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (lastStarsRef.current === null) {
+      lastStarsRef.current = stars;
+      return;
+    }
+    const prev = lastStarsRef.current;
+    if (stars > prev && Math.floor(stars / 20) > Math.floor(prev / 20)) {
+      if (milestone === null) {
+        const hit = Math.floor(stars / 20) * 20;
+        setMilestone(hit);
+        playBoing();
+        milestoneTimeoutRef.current = window.setTimeout(
+          () => setMilestone(null),
+          9000,
+        );
+      }
+    }
+    lastStarsRef.current = stars;
+  }, [stars, milestone]);
+
+  useEffect(
+    () => () => {
+      if (milestoneTimeoutRef.current !== null) {
+        window.clearTimeout(milestoneTimeoutRef.current);
+      }
+    },
+    [],
+  );
 
   const knownCount = useMemo(
     () =>
@@ -513,6 +550,11 @@ export function ModuleShell({
       </AnimatePresence>
 
       <ConfettiBurst burst={burst} />
+      <AnimatePresence>
+        {milestone !== null && (
+          <SpiderCelebration key="spider" milestone={milestone} />
+        )}
+      </AnimatePresence>
     </main>
   );
 }
