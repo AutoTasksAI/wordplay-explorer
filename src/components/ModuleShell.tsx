@@ -17,7 +17,9 @@ import {
   warmUpAudio,
   warmUpSpeech,
 } from "@/lib/speech";
+import { MODULE_IDS } from "@/lib/modules";
 import { BatCelebration } from "./BatCelebration";
+import { OctopusCelebration } from "./OctopusCelebration";
 import { SpiderCelebration } from "./SpiderCelebration";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, LogOut, Volume2 } from "lucide-react";
@@ -152,10 +154,10 @@ export function ModuleShell({
 
   // Star milestones: when the lifetime total crosses a 20-star boundary
   // (20, 40, 60...), a creature celebration plays on the next session end.
-  // 40-star boundaries get the bat; other 20-star boundaries get the spider,
-  // so the two never overlap.
+  // 60-boundaries get the octopus, 40-boundaries the bat, other 20-boundaries
+  // the spider — so they never overlap.
   const [celebration, setCelebration] = useState<{
-    kind: "spider" | "bat";
+    kind: "spider" | "bat" | "octopus";
     value: number;
   } | null>(null);
   const lastStarsRef = useRef<number | null>(null);
@@ -170,17 +172,27 @@ export function ModuleShell({
     if (stars > prev && Math.floor(stars / 20) > Math.floor(prev / 20)) {
       if (celebration === null) {
         const hit = Math.floor(stars / 20) * 20;
-        const kind = hit % 40 === 0 ? "bat" : "spider";
+        const kind: "spider" | "bat" | "octopus" =
+          hit % 60 === 0 ? "octopus" : hit % 40 === 0 ? "bat" : "spider";
+        const timeout = kind === "octopus" ? 11000 : kind === "bat" ? 13500 : 9000;
         setCelebration({ kind, value: hit });
         playBoing();
         celebrationTimeoutRef.current = window.setTimeout(
           () => setCelebration(null),
-          kind === "bat" ? 13500 : 9000,
+          timeout,
         );
       }
     }
     lastStarsRef.current = stars;
   }, [stars, celebration]);
+
+  // Mirror the phase so late callbacks (like the octopus ink handoff, which
+  // fires seconds after it was created) can tell whether we're still on the
+  // celebration screen before navigating away.
+  const phaseRef = useRef<Phase>("start");
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   useEffect(
     () => () => {
@@ -301,6 +313,15 @@ export function ModuleShell({
     warmUpAudio();
     setPhase("start");
     // back to start, next PLAY builds a fresh session from updated progress
+  };
+
+  // The octopus celebration ends with an ink cover; when it's done, glide the
+  // player over to the next module in the rotation (words → numbers → patterns).
+  const handleOctopusDone = () => {
+    if (phaseRef.current !== "celebrate") return;
+    const idx = MODULE_IDS.indexOf(meta.id);
+    const next = MODULE_IDS[(idx + 1) % MODULE_IDS.length];
+    navigate(`/game/${next}`);
   };
 
   return (
@@ -567,6 +588,13 @@ export function ModuleShell({
         )}
         {celebration?.kind === "bat" && (
           <BatCelebration key="bat" milestone={celebration.value} />
+        )}
+        {celebration?.kind === "octopus" && (
+          <OctopusCelebration
+            key="octopus"
+            milestone={celebration.value}
+            onDone={handleOctopusDone}
+          />
         )}
       </AnimatePresence>
     </main>
