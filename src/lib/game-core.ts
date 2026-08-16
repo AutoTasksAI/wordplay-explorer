@@ -73,8 +73,16 @@ export function shuffle<T>(items: T[]): T[] {
 }
 
 /**
- * Pick the next session's targets: least-mastered first (ties random), so
- * items the child misses come back and mastered items make way for new ones.
+ * Pick the next session's targets using a spaced-repetition-style score:
+ *
+ * - Items still being learned (correct < MASTERY_COUNT) are kept in rotation
+ *   with extra weight for missed attempts — repetition is how sight words
+ *   stick. Jitter keeps the exact lineup varied between sessions.
+ * - Known items are scheduled for spaced review: the longer it's been since
+ *   they were last seen, the sooner they come back (capped so nothing waits
+ *   forever). This stops mastered words from being forgotten.
+ * - The chosen set is shuffled, so round order varies too.
+ *
  * If the pool is smaller than `count`, it cycles through the pool.
  */
 export function pickTargets<T>(
@@ -83,19 +91,40 @@ export function pickTargets<T>(
   keyOf: (item: T) => string,
   count: number,
 ): T[] {
-  const scored = pool.map((item) => ({
-    item,
-    correct: progress[keyOf(item)]?.correct ?? 0,
-  }));
-  scored.sort((a, b) => {
-    const diff = a.correct - b.correct;
-    return diff !== 0 ? diff : Math.random() - 0.5;
+  const now = Date.now();
+  const DAY_MS = 86_400_000;
+
+  const scored = pool.map((item) => {
+    const p = progress[keyOf(item)];
+    const correct = p?.correct ?? 0;
+    const wrong = p?.wrong ?? 0;
+    const lastPlayedAt = p?.lastPlayedAt ?? 0;
+    const daysSince =
+      lastPlayedAt > 0 ? (now - lastPlayedAt) / DAY_MS : Infinity;
+
+    let score: number;
+    if (correct < MASTERY_COUNT) {
+      // Still learning: high base priority; extra misses raise it further.
+      score = 1000 + wrong * 60 + Math.random() * 40;
+    } else if (daysSince === Infinity) {
+      score = 600 + Math.random() * 40;
+    } else {
+      // Known: spaced review — up to 10 days of backlog, 60 pts per day.
+      score = Math.min(daysSince, 10) * 60 + Math.random() * 40;
+    }
+    return { item, score };
   });
+
+  scored.sort((a, b) => b.score - a.score);
+
+  const selected = scored
+    .slice(0, Math.min(count, scored.length))
+    .map((s) => s.item);
 
   const result: T[] = [];
   while (result.length < count) {
-    for (const s of scored) {
-      result.push(s.item);
+    for (const item of shuffle(selected)) {
+      result.push(item);
       if (result.length >= count) break;
     }
   }

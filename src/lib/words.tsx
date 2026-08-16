@@ -41,6 +41,22 @@ export const WORDS: Word[] = [
   { word: "tree", emoji: "🌳" },
   { word: "ball", emoji: "⚽" },
   { word: "bed", emoji: "🛏️" },
+  // Safari friends + everyday words for more variety
+  { word: "frog", emoji: "🐸" },
+  { word: "bear", emoji: "🐻" },
+  { word: "lion", emoji: "🦁" },
+  { word: "tiger", emoji: "🐯" },
+  { word: "bird", emoji: "🐦" },
+  { word: "chick", emoji: "🐤" },
+  { word: "whale", emoji: "🐳" },
+  { word: "snake", emoji: "🐍" },
+  { word: "horse", emoji: "🐴" },
+  { word: "cake", emoji: "🎂" },
+  { word: "milk", emoji: "🥛" },
+  { word: "leaf", emoji: "🍃" },
+  { word: "hand", emoji: "✋" },
+  { word: "nose", emoji: "👃" },
+  { word: "rain", emoji: "🌧️" },
 ];
 
 /**
