@@ -19,6 +19,7 @@ import {
 } from "@/lib/speech";
 import { MODULE_IDS } from "@/lib/modules";
 import { BatCelebration } from "./BatCelebration";
+import { LizardCelebration } from "./LizardCelebration";
 import { OctopusCelebration } from "./OctopusCelebration";
 import { SpiderCelebration } from "./SpiderCelebration";
 import { AnimatePresence, motion } from "framer-motion";
@@ -152,12 +153,12 @@ export function ModuleShell({
   const spokenRoundRef = useRef<number | null>(null);
   const sessionPraiseRef = useRef("Great job!");
 
-  // Star milestones: when the lifetime total crosses a 20-star boundary
-  // (20, 40, 60...), a creature celebration plays on the next session end.
-  // 60-boundaries get the octopus, 40-boundaries the bat, other 20-boundaries
-  // the spider — so they never overlap.
+  // Star milestones: when the lifetime total crosses a 20-star boundary, a
+  // creature celebration plays on the next session end. Each one is bigger
+  // than the last: 20 spider → 40 bat → 60 octopus → 80 lizard, then the
+  // ladder repeats every 80 stars (100 spider, 120 bat, 140 octopus...).
   const [celebration, setCelebration] = useState<{
-    kind: "spider" | "bat" | "octopus";
+    kind: "spider" | "bat" | "octopus" | "lizard";
     value: number;
   } | null>(null);
   const lastStarsRef = useRef<number | null>(null);
@@ -172,9 +173,16 @@ export function ModuleShell({
     if (stars > prev && Math.floor(stars / 20) > Math.floor(prev / 20)) {
       if (celebration === null) {
         const hit = Math.floor(stars / 20) * 20;
-        const kind: "spider" | "bat" | "octopus" =
-          hit % 60 === 0 ? "octopus" : hit % 40 === 0 ? "bat" : "spider";
-        const timeout = kind === "octopus" ? 11000 : kind === "bat" ? 13500 : 9000;
+        const kinds = ["spider", "bat", "octopus", "lizard"] as const;
+        const kind = kinds[((hit / 20 - 1) % 4 + 4) % 4];
+        const timeout =
+          kind === "lizard"
+            ? 14500
+            : kind === "octopus"
+              ? 11000
+              : kind === "bat"
+                ? 13500
+                : 9000;
         setCelebration({ kind, value: hit });
         playBoing();
         celebrationTimeoutRef.current = window.setTimeout(
@@ -595,6 +603,9 @@ export function ModuleShell({
             milestone={celebration.value}
             onDone={handleOctopusDone}
           />
+        )}
+        {celebration?.kind === "lizard" && (
+          <LizardCelebration key="lizard" milestone={celebration.value} />
         )}
       </AnimatePresence>
     </main>

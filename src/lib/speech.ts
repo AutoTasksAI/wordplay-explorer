@@ -392,6 +392,33 @@ export function playBoing() {
   tone(1568, 0.26, 0.16, "sine", 0.14);
 }
 
+/** Cartoon gecko chirps ("tchk tchk tchk!") for the lizard milestone. */
+export function playLizard() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const start = ctx.currentTime;
+  const chirp = (at: number) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(520, start + at);
+    osc.frequency.exponentialRampToValueAtTime(980, start + at + 0.05);
+    osc.frequency.exponentialRampToValueAtTime(560, start + at + 0.11);
+    gain.gain.setValueAtTime(0.0001, start + at);
+    gain.gain.exponentialRampToValueAtTime(0.16, start + at + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + at + 0.13);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(start + at);
+    osc.stop(start + at + 0.16);
+  };
+  // Four quick chirps, like a happy gecko saying hello.
+  chirp(0);
+  chirp(0.16);
+  chirp(0.32);
+  chirp(0.52);
+}
+
 const PRAISES = [
   "Great job!",
   "Awesome!",
