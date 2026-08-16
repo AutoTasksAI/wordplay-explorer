@@ -75,7 +75,11 @@ function buildRounds(progress: ProgressMap): Round[] {
   );
   return targets.map((n, i) => {
     const showCount = i % 2 === 0;
-    const emoji = COUNT_EMOJIS[i % COUNT_EMOJIS.length];
+    // Randomize which emoji is counted each round (still the same emoji across
+    // a round's options so it stays pure counting, but different every round
+    // so sessions don't feel identical).
+    const emoji =
+      COUNT_EMOJIS[Math.floor(Math.random() * COUNT_EMOJIS.length)];
     const name = NUMBER_NAMES[n.value];
     const options = pickOptions(
       n,

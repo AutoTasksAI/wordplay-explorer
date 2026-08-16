@@ -26,10 +26,12 @@ export interface PatternType {
   name: string;
 }
 
-/** The three pattern shapes a 5-year-old meets first, in difficulty order. */
+/** The pattern shapes a 5-year-old meets first, in difficulty order. */
 export const PATTERN_TYPES: PatternType[] = [
   { id: "ab", name: "AB" },
   { id: "aabb", name: "AABB" },
+  { id: "abb", name: "ABB" },
+  { id: "aab", name: "AAB" },
   { id: "abc", name: "ABC" },
 ];
 
@@ -41,6 +43,10 @@ function buildCycle(type: PatternType, colors: PatternColor[]): PatternColor[] {
       return [a, b];
     case "aabb":
       return [a, a, b, b];
+    case "abb":
+      return [a, b, b];
+    case "aab":
+      return [a, a, b];
     case "abc":
       return [a, b, c];
     default:
