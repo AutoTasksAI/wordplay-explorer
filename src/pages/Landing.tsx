@@ -110,6 +110,25 @@ function DemoCard() {
 export default function Landing() {
   return (
     <div className="min-h-screen bg-paper text-ink">
+      {/* ===== Age band (top of site: who it's for + what it does) ===== */}
+      <div className="border-b-[3px] border-ink bg-ink text-paper">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-6 gap-y-1 px-4 py-2.5 text-center sm:justify-between sm:px-6">
+          <p className="flex items-center gap-2 text-sm font-bold sm:text-base">
+            <span aria-hidden="true">🦖</span>
+            <span className="border-[3px] border-paper bg-tomato px-2 py-0.5 text-paper">
+              For ages 4–6
+            </span>
+            <span className="text-paper">who&apos;s just starting to read</span>
+          </p>
+          <p className="flex items-center gap-2 text-sm font-bold sm:text-base">
+            <span className="border-[3px] border-paper bg-sun px-2 py-0.5 text-ink">
+              Learn to read
+            </span>
+            <span className="text-paper">first words, numbers &amp; patterns</span>
+          </p>
+        </div>
+      </div>
+
       {/* ===== Nav ===== */}
       <header className="sticky top-0 z-40 border-b-[3px] border-ink bg-paper">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
@@ -385,7 +404,7 @@ export default function Landing() {
             <span className="font-bold">WordPlay Explorer</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Made for new readers · No ads, ever
+            Made for ages 4–6, just starting to read · No ads, ever
           </p>
           <p className="text-sm font-semibold">© 2026 WordPlay Explorer</p>
         </div>
