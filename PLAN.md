@@ -1,4 +1,4 @@
-# WordPlay Explorer — Launch, SEO & Monetization Plan
+# Read with Rex — Launch, SEO & Monetization Plan
 
 > Saved from the planning session so nothing is lost. This project is built and
 > working; this document is the playbook for taking it public. Roadmap is at
@@ -6,9 +6,10 @@
 
 ## What exists today
 
-- **Product**: WordPlay Explorer — a voice-first reading game for a 5-year-old.
-  Three modules: Word Safari (39 words), Number Jungle (1–10), Pattern Path
-  (5 pattern types). Neobrutalism minimalism theme, Rex the T-Rex guide.
+- **Product**: Read with Rex (formerly WordPlay Explorer) — a voice-first
+  reading game for a 5-year-old. Three modules: Word Safari (39 words),
+  Number Jungle (1–10), Pattern Path (5 pattern types). Neobrutalism
+  minimalism theme, Rex the T-Rex guide.
 - **Stack**: Vite + React 19 + TypeScript + Tailwind v4, Convex backend
   (progress, stars, TTS audio cache), Convex Auth (guest mode + email OTP),
   ElevenLabs cartoon voice (via `ELEVENLABS_API_KEY`).
@@ -33,7 +34,9 @@ The app is directed at children under 13, so the COPPA rules apply:
 
 ## Phase 0 — Make it available (after domain purchase)
 
-1. **Domain**: `wordplayexplorer.com` (~$10–12/yr).
+1. **Domain**: `readwithrex.com` (~$10–12/yr) — the name was chosen for SEO
+   (it contains the money keyword "read" and pairs with the mascot). Fallbacks
+   if it's taken: `readwithrex.app`, `readwithrex.io`, `rexlearnstoread.com`.
 2. **Deploy to Vercel** (config already in repo):
    - Push/export this project (Vly manages version control — use the
      platform's export/GitHub flow) and import into Vercel, or deploy with the
@@ -50,13 +53,51 @@ The app is directed at children under 13, so the COPPA rules apply:
 
 ## Phase 1 — SEO (compounding, mostly free)
 
-### Technical
-- [ ] Per-page meta tags (title, description, Open Graph) — one small hook or
-      `react-helmet-async`; today all routes share one title.
-- [ ] JSON-LD structured data on the landing: `WebApplication` +
-      `LearningResource` (audience 4–6, teaches reading) + `FAQPage` schema
-      matching the landing FAQ.
-- [ ] `sitemap.xml` + `robots.txt` (static files or `vite-plugin-sitemap`).
+### Research summary (done Aug 2026)
+
+**Why the name changed.** Searches for "free reading apps for 5 year olds",
+"best reading app for 4 year old", "free reading games for kindergarten",
+"phonics games online free", and "sight words for 5 year olds" are dominated
+by Starfall, Teach Your Monster to Read, Reading.com, and Duolingo ABC. The
+winners share one trait: the name or title says what the app teaches. "Teach
+Your Monster to Read" ranks and gets LLM recommendations because the name
+itself is the pitch. "WordPlay Explorer" said nothing about reading, so the
+site was invisible to parents searching for exactly what the game does.
+
+**Decision.** Rebrand to **Read with Rex** — the mascot (Rex the T-Rex) stays,
+the money keyword "read" is in the name, it's short enough for LLMs to cite,
+and the domain `readwithrex.com` is available-ish. The full shortlist was:
+Read with Rex (chosen) · Rex Reads · First Words with Rex · Learn to Read
+with Rex. Switching back to any of these is a 10-minute find-and-replace.
+
+**Keywords baked into the site (not stuffed).** Title + meta description +
+OG tags, hero sub-copy, module copy, sight-word chips band, FAQ section and
+FAQPage schema: *free reading games for kids*, *reading games for
+kindergarten*, *learn to read*, *first sight words*, *sight words for 5 year
+olds*, *first words for kids*, *ages 4–6*. We deliberately did NOT claim
+"phonics" — the game teaches whole-word/sight-word recognition first, and
+claiming phonics would be inaccurate (and bad E-E-A-T).
+
+**E-E-A-T (Experience, Expertise, Authoritativeness, Trust).**
+- *Experience*: "Made by a dad for his 5-year-old" section on the landing —
+  the product's origin story is its best credential.
+- *Expertise*: copy grounded in how beginners actually learn (spoken prompts,
+  repetition, spaced review of known words) — no fake credentials.
+- *Authoritativeness*: one consistent brand, canonical URL, honest FAQ,
+  no invented ratings/reviews.
+- *Trust*: no-ads/no-child-data promises (COPPA-aware) stated on the page
+  and in the FAQ, which is also the headline parents search for.
+
+### Technical — DONE in repo (verify after deploy)
+- [x] Title, meta description, keywords, canonical, Open Graph + Twitter tags
+      in `index.html`.
+- [x] JSON-LD structured data: `WebApplication` + `LearningResource`
+      (audience 4–6, teaches first sight words) + `FAQPage` matching the
+      on-page FAQ.
+- [x] `public/robots.txt` + `public/sitemap.xml` (static; served by Vercel).
+- [ ] **After the domain is registered**: update every `readwithrex.com`
+      reference in `index.html` (canonical + JSON-LD), `robots.txt`, and
+      `sitemap.xml` if the actual domain differs.
 - [ ] Prerender the landing page so crawlers/social previews get full HTML
       (optional but strong for a Vite SPA).
 - [ ] Core Web Vitals: already good (lazy-loaded routes, single vendor chunks);
@@ -66,12 +107,13 @@ The app is directed at children under 13, so the COPPA rules apply:
 Parents search for exactly this. Target keywords with parent intent:
 - "sight words for 5 year olds" · "first words to teach a child to read"
 - "free reading games for kindergarten" · "learn to read app for 4 year olds"
-- "phonics games for kids" · "how to teach a 5 year old to read"
+- "how to teach a 5 year old to read" · "free reading games for kids"
 
 Write 5–10 short parent articles ("The 50 first sight words (free printable)",
-"Reading milestones by age", "Phonics vs. sight words explained") — each links
-to the app and feeds the email list. Blog + printables are the reliable SEO
-play; the app itself ranks mostly on brand terms.
+"Reading milestones by age", "First words: what order to teach them") — each
+links to the app and feeds the email list. Blog + printables are the reliable
+SEO play; the app itself ranks mostly on brand terms. (Save "phonics vs.
+sight words" for when the app actually teaches phonics.)
 
 ### Measurement
 - **Plausible Analytics** — cookie-free, no consent banner, matches the
@@ -130,9 +172,10 @@ Keys live in the project's **Keys/API keys** tab (never in `.env` files).
 
 ## Roadmap
 
-- [ ] **Now**: get domain → deploy → privacy policy → Search Console
-- [ ] **Week 1**: email signup form (EmailOctopus) + SEO technical pass
-      (meta/JSON-LD/sitemap) + Plausible
+- [ ] **Now**: register `readwithrex.com` → deploy → update the canonical
+      domain in index.html/robots.txt/sitemap.xml → privacy policy → Search Console
+- [ ] **Week 1**: email signup form (EmailOctopus) + Plausible
+      (SEO technical pass is already in the repo)
 - [ ] **Month 1–2**: parent articles + printables + affiliate links
 - [ ] **When traffic is real (~1k+ visitors/mo)**: Stripe premium tier +
       parent dashboard

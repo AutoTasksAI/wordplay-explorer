@@ -341,7 +341,7 @@ export function ModuleShell({
             🦖
           </span>
           <span className="text-xl font-bold tracking-tight">
-            WordPlay Explorer
+            Read with Rex
           </span>
         </div>
         {phase === "start" && (

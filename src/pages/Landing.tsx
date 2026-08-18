@@ -40,7 +40,7 @@ const MODULE_STRIP = [
   {
     emoji: "🔤",
     title: "Word Safari",
-    body: "First words, spoken aloud. Tap the match and pop it into a star.",
+    body: "First sight words, spoken aloud. Tap the match and pop it into a star.",
     bg: "bg-tomato",
     text: "text-white",
   },
@@ -57,6 +57,33 @@ const MODULE_STRIP = [
     body: "Red, blue, red, blue — what comes next? Spot the missing piece.",
     bg: "bg-grass",
     text: "text-ink",
+  },
+];
+
+const FAQS = [
+  {
+    q: "What age is Read with Rex for?",
+    a: "Ages 4–6 — preschool through kindergarten — who are just starting to learn to read. The first games focus on recognizing first sight words like cat, dog, and sun, plus counting 1–10 and simple patterns.",
+  },
+  {
+    q: "Is Read with Rex really free?",
+    a: "Yes. The reading games are completely free — no paywalls, no subscriptions, and no ads. Your child can start playing in one tap with guest mode.",
+  },
+  {
+    q: "What will my child learn first?",
+    a: "Children start by recognizing their first words (cat, dog, sun, hat, bus…), then mix in counting 1–10 and completing simple color patterns. Every word, number, and prompt is spoken out loud.",
+  },
+  {
+    q: "Can my 4- or 5-year-old play alone?",
+    a: "Yes. Rex the T-Rex speaks every prompt aloud, so no reading is required to start. There are no timers, no streaks, and no losing — just gentle try-again and a star for every win.",
+  },
+  {
+    q: "Do you collect data from my child?",
+    a: "No. There are no ads and no tracking, and children are never asked for personal information. Guest mode means no account and no email — just play.",
+  },
+  {
+    q: "Do reading games actually help kids learn to read?",
+    a: "Yes, when they repeat the right things. Read with Rex brings missed words back more often and schedules known ones for later review, so children get the repetition that helps sight words stick — wrapped in a game they want to play.",
   },
 ];
 
@@ -136,7 +163,7 @@ export default function Landing() {
             <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-base leading-none shadow-[3px_3px_0_0_#141414]">
               🦖
             </span>
-            <span className="text-2xl font-bold tracking-tight">WordPlay Explorer</span>
+            <span className="text-2xl font-bold tracking-tight">Read with Rex</span>
           </Link>
           <nav className="flex items-center gap-4">
             <a
@@ -194,7 +221,8 @@ export default function Landing() {
               !
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-              WordPlay Explorer turns your child&apos;s very first words into a
+              Read with Rex is a free reading game for kids ages 4–6 that
+              turns your child&apos;s very first sight words into a
               dinosaur-sized adventure. Rex the T-Rex speaks every word,
               number, and pattern out loud, your little explorer taps the
               match, and every win pops into a star.
@@ -214,8 +242,8 @@ export default function Landing() {
               </a>
             </div>
             <p className="mt-5 text-sm font-semibold text-muted-foreground">
-              Three adventures in one · One-tap guest mode · No account needed
-              to try it
+              Three adventures in one · 100% free · One-tap guest mode, no
+              account needed
             </p>
           </motion.div>
 
@@ -332,11 +360,43 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ===== Made by a parent (E-E-A-T: Experience) ===== */}
+      <section className="border-y-[3px] border-ink bg-ink text-paper">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16">
+          <div className="grid items-center gap-8 lg:grid-cols-[auto_1fr]">
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ type: "spring", stiffness: 220, damping: 14 }}
+              className="flex size-28 items-center justify-center border-[3px] border-paper bg-sun text-7xl sm:size-32"
+            >
+              🦖
+            </motion.div>
+            <div>
+              <span className="inline-block border-[3px] border-paper bg-tomato px-3 py-1 text-xs font-bold uppercase tracking-widest text-paper">
+                Made by a dad, for his 5-year-old
+              </span>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+                Every tap in this game was tested on a real beginning reader.
+              </h2>
+              <p className="mt-3 max-w-2xl text-lg leading-relaxed text-paper/85">
+                Read with Rex started at our kitchen table, watching a
+                5-year-old light up when he read &ldquo;cat&rdquo; all by
+                himself. Big taps, spoken prompts, gentle try-again, short
+                sessions — everything comes from what actually worked with
+                him, and it&apos;s free for every family.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ===== Word chips band ===== */}
       <section className="border-y-[3px] border-ink bg-ink">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
           <p className="text-center text-sm font-bold uppercase tracking-[0.25em] text-paper/70">
-            Words your explorer will meet first
+            Your child&apos;s first sight words
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             {CHIPS.map((chip, i) => (
@@ -356,6 +416,37 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ===== FAQ ===== */}
+      <section className="border-y-[3px] border-ink bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+          <div className="mb-10 text-center">
+            <span className="inline-block border-[3px] border-ink bg-sky px-3 py-1 text-xs font-bold uppercase tracking-widest text-white nb-shadow-xs">
+              For parents
+            </span>
+            <h2 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+              Questions parents ask.
+            </h2>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {FAQS.map((faq, i) => (
+              <motion.div
+                key={faq.q}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.4, delay: (i % 2) * 0.08 }}
+                className="border-[3px] border-ink bg-paper p-6 nb-shadow-sm hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#141414] transition-all"
+              >
+                <h3 className="text-lg font-bold tracking-tight">{faq.q}</h3>
+                <p className="mt-2 leading-relaxed text-muted-foreground">
+                  {faq.a}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== CTA ===== */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
         <motion.div
@@ -370,9 +461,9 @@ export default function Landing() {
             Ready to explore?
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-lg font-medium">
-            Ten minutes a day with WordPlay Explorer and first words, numbers,
-            and patterns stop being scary — they become adventures your child
-            begs to play.
+            Ten minutes a day with Read with Rex and first sight words,
+            numbers, and patterns stop being scary — they become adventures
+            your child begs to play.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
@@ -401,12 +492,13 @@ export default function Landing() {
             <span className="flex size-8 items-center justify-center border-[3px] border-ink bg-sun text-sm leading-none">
               🦖
             </span>
-            <span className="font-bold">WordPlay Explorer</span>
+            <span className="font-bold">Read with Rex</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Made for ages 4–6, just starting to read · No ads, ever
+            Free reading games for kids ages 4–6 · No ads, no child data,
+            ever
           </p>
-          <p className="text-sm font-semibold">© 2026 WordPlay Explorer</p>
+          <p className="text-sm font-semibold">© 2026 Read with Rex</p>
         </div>
       </footer>
     </div>

@@ -1,16 +1,16 @@
 {
-  "name": "freebuff.com application",
-  "short_name": "freebuff.com",
-  "description": "freebuff.com application",
+  "name": "Read with Rex — Free Reading Games for Kids Ages 4-6",
+  "short_name": "Read with Rex",
+  "description": "Free reading games for kids ages 4-6: first sight words, numbers, and patterns, spoken aloud by Rex the T-Rex. No ads, no timers.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#fff8e7",
+  "theme_color": "#141414",
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "/logo.svg",
       "sizes": "any",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]

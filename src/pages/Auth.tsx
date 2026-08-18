@@ -118,7 +118,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
             <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-base leading-none shadow-[3px_3px_0_0_#141414]">
               🦖
             </span>
-            <span className="text-2xl font-bold tracking-tight">WordPlay Explorer</span>
+            <span className="text-2xl font-bold tracking-tight">Read with Rex</span>
           </Link>
           <Link
             to="/"
@@ -141,7 +141,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                   </span>
                 </div>
                 <CardTitle className="mt-3 text-3xl font-bold tracking-tight">
-                  Welcome to WordPlay Explorer!
+                  Welcome to Read with Rex!
                 </CardTitle>
                 <CardDescription className="text-base">
                   Enter your email to log in or sign up

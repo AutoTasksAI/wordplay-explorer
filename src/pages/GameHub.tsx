@@ -66,7 +66,7 @@ export default function GameHub() {
             🦖
           </span>
           <span className="text-xl font-bold tracking-tight">
-            WordPlay Explorer
+            Read with Rex
           </span>
         </div>
         <button

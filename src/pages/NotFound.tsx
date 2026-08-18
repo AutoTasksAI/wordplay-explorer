@@ -28,7 +28,7 @@ export default function NotFound() {
           to="/"
           className="nb-btn mt-8 bg-sun px-8 py-4 text-xl font-bold"
         >
-          ← Back to WordPlay Explorer
+          ← Back to Read with Rex
         </Link>
       </main>
     </motion.div>
