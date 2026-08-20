@@ -52,8 +52,41 @@ ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
   build was blocked only on missing `_generated/`; it now exists.
 - `npm run preview` smoke test: `/`, `/sight-words`, `/game/words`, `/privacy`,
   `/auth` all return HTTP 200 with the correct title + canonical URL.
-- `eslint` on all changed files: 0 errors (the repo has 14 pre-existing lint
-  errors elsewhere — see "Open items" below).
+- `eslint` on all changed files: 0 errors (the repo had 14 pre-existing lint
+  errors that were fixed in the follow-up cleanup below).
+
+### Build cleanup (same day, commit `45f3c53`)
+
+**Code changes made by the agent (committed to `main` as `45f3c53`, pushed
+2026-08-20):**
+- Fixed all 14 pre-existing ESLint errors:
+  - `src/hooks/use-mobile.ts` — initialize `isMobile` from `window.innerWidth`
+    instead of calling `setState` inside the effect body.
+  - `src/convex/savedProgressCore.ts` — removed unused `mutation` import.
+  - `src/components/ui/carousel.tsx` — deferred the initial Embla state sync
+    with `setTimeout` to avoid a synchronous setState cascade in the effect.
+  - `src/components/ui/sidebar.tsx` — replaced `Math.random()` in skeleton
+    width with a deterministic hash of `React.useId()`.
+  - `src/components/SpiderCelebration.tsx` — replaced `Math.random()` in web
+    spot placement with a seeded pseudo-random generator keyed by milestone.
+  - `src/components/ModuleShell.tsx` — replaced all render-phase `Math.random()`
+    and `Date.now()` calls with seeded random + a ref-based burst id; deferred
+    the milestone celebration trigger to avoid setState inside the effect.
+- Deleted the stale tracked `isolate/` directory (old Freebuff build artifact).
+- Added the Plausible analytics script to `index.html`
+  (`data-domain="readwithrex.com"`) — activates once the owner creates the
+  Plausible site.
+- Added `docs/email-templates.md` with lead-magnet delivery, welcome, weekly
+  tips, and save-progress reminder copy.
+
+**Verified this cleanup:**
+- `npm run lint` → **0 errors, 13 warnings** (warnings are only shadcn/ui
+  `react-refresh/only-export-components` fast-refresh warnings and are
+  harmless).
+- `npm run build` passes (tsc + vite, 0 errors). The "empty convex-vendor chunk"
+  warning remains harmless.
+- `npm run preview` smoke test: `/`, `/sight-words`, `/game/words`, `/privacy`,
+  `/auth`, `/terms` all return HTTP 200 with the correct title.
 
 ### The exact next step for a new thread
 
@@ -78,21 +111,22 @@ ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
 4. Google Search Console: verify the domain, submit `sitemap.xml`.
 
 ### Open items for the next agent (ask before large changes)
-- Add the Plausible analytics script to `index.html` (owner account needed).
-- Draft the parent welcome email + sight-word lead-magnet delivery copy.
-- Fix the 14 pre-existing lint errors (`npm run lint`: `use-mobile.ts`
-  setState-in-effect, `savedProgressCore.ts` unused import, several
-  "impure function during render" / setState-in-effect in game components).
-- Remove the stray tracked `isolate/` directory (stale Freebuff build artifact
-  committed by accident) — confirm with the owner first.
+- ✅ ~~Add the Plausible analytics script to `index.html`~~ — done in `45f3c53`.
+  Still needs the owner to create the Plausible site for `readwithrex.com`.
+- ✅ ~~Draft the parent welcome email + sight-word lead-magnet delivery copy~~ —
+  done in `docs/email-templates.md` (`45f3c53`).
+- ✅ ~~Fix the 14 pre-existing lint errors~~ — done in `45f3c53`.
+- ✅ ~~Remove the stray tracked `isolate/` directory~~ — done in `45f3c53`.
 - Optionally create a production Convex deployment (`npx convex deploy`) and
   update `VITE_CONVEX_URL` to its URL before or at launch.
 
 ### Git note
 The session-3 changes are **committed and pushed to `main`** as `fc6da9d`
-("Swap auth OTP to Resend and remove Freebuff scaffolding"), and the working
-tree is clean. `.env.local` and `src/convex/_generated/` are gitignored
-(generated/secret — never commit).
+("Swap auth OTP to Resend and remove Freebuff scaffolding"). The follow-up
+build cleanup is **committed and pushed to `main`** as `45f3c53` ("chore: fix
+lint errors, remove isolate artifact, add Plausible + email templates"), and
+the working tree is clean. `.env.local` and `src/convex/_generated/` are
+gitignored (generated/secret — never commit).
 
 ### Handoff checklist
 - [x] Current status and owner are updated.

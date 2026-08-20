@@ -4,9 +4,11 @@
 > items are free or on free tiers. Full strategy lives in `PLAN.md`.
 >
 > **Status 2026-08-20:** Domain bought (Namecheap), Convex project created and
-> live at `https://calculating-basilisk-420.convex.cloud`, code builds clean.
-> The email-OTP Freebuff→Resend swap and scaffolding removal are committed to
-> `main`. Remaining steps below are owner account creation + deploy.
+> live at `https://calculating-basilisk-420.convex.cloud`, code builds clean,
+> all pre-existing lint errors are fixed, and the stale `isolate/` build
+> artifact is removed. The email-OTP Freebuff→Resend swap, scaffolding removal,
+> Plausible script, and email-template drafts are committed to `main`
+> (`45f3c53`). Remaining steps below are owner account creation + deploy.
 
 ## ⚠️ Auth blocker (do after step 3)
 - The email-OTP sender was swapped from Freebuff's service to **Resend**
@@ -53,7 +55,8 @@
   - Parent email only, opt-in
 
 ## 6. Analytics & search
-- [ ] Create a Plausible Analytics account (~$9/mo after trial; cookie-free, no consent banner) and add the script tag to `index.html` (or use GA4 for $0).
+- [x] Add the Plausible script tag to `index.html` (`data-domain="readwithrex.com"`).
+- [ ] Create a Plausible Analytics account (~$9/mo after trial; cookie-free, no consent banner) for `readwithrex.com` to activate it (or use GA4 for $0).
 - [ ] Google Search Console — verify `readwithrex.com`, submit `sitemap.xml`.
 - [ ] Bing Webmaster Tools (free, small extra traffic) — optional.
 
