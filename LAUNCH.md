@@ -5,10 +5,11 @@
 >
 > **Status 2026-08-20:** Domain bought (Namecheap), Convex project created and
 > live at `https://calculating-basilisk-420.convex.cloud`, code builds clean,
-> all pre-existing lint errors are fixed, and the stale `isolate/` build
-> artifact is removed. The email-OTP Freebuff→Resend swap, scaffolding removal,
-> Plausible script, and email-template drafts are committed to `main`
-> (`45f3c53`). Remaining steps below are owner account creation + deploy.
+> all pre-existing lint errors are fixed, guest/email sign-in no longer spins,
+> all em dashes are removed from copy, and the stale `isolate/` build artifact
+> is removed. The email-OTP Freebuff→Resend swap, scaffolding removal, Plausible
+> script, email-template drafts, and `_generated/` tracking are committed to
+> `main` (`9c32251`). Remaining steps below are owner account creation + deploy.
 
 ## ⚠️ Auth blocker (do after step 3)
 - The email-OTP sender was swapped from Freebuff's service to **Resend**

@@ -5,7 +5,7 @@
 
 ---
 
-## ⚠️ READ FIRST, Status as of Aug 20, 2026 (build session 3)
+## ⚠️ READ FIRST: Status as of Aug 20, 2026 (build session 3)
 
 The project is **NOT deployed or public yet**, but it is now fully buildable
 and running against the owner's real backend. All code is on GitHub
@@ -13,7 +13,7 @@ and running against the owner's real backend. All code is on GitHub
 public is **owner account creation + keys + deploy** (Resend, EmailOctopus,
 ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
 
-### What happened in session 3 (2026-08-20), Freebuff cleanup + first real backend
+### What happened in session 3 (2026-08-20): Freebuff cleanup + first real backend
 
 **Owner actions completed:**
 - Bought the domain **`readwithrex.com`** on Namecheap.
@@ -88,6 +88,32 @@ ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
 - `npm run preview` smoke test: `/`, `/sight-words`, `/game/words`, `/privacy`,
   `/auth`, `/terms` all return HTTP 200 with the correct title.
 
+### Auth + copy cleanup (same day, commit `9c32251`)
+
+**Code changes made by the agent (committed to `main` as `9c32251`, pushed
+2026-08-20):**
+- Fixed the infinite spinner on both **Guest** and **Email OTP** sign-in. The
+  root cause was `useAuth()` treating the `api.users.currentUser` query loading
+  state as part of auth loading. Now `isLoading` comes directly from
+  `useConvexAuth()`, so sign-in completes as soon as the auth provider says it
+  is done.
+- Removed every em dash (`—`) from user-facing copy and internal docs, replacing
+  each with a comma or period.
+- Fixed comma splices introduced by the em-dash replacement across
+  `index.html`, `Landing.tsx`, `Privacy.tsx`, `Terms.tsx`, `HowToTeach.tsx`,
+  `ReadingMilestones.tsx`, `FirstWordsOrder.tsx`, `SightWords.tsx`, `Auth.tsx`,
+  `ContentLayout.tsx`, `docs/email-templates.md`, and `public/llms.txt`.
+- Made the FAQ copy in `index.html` JSON-LD match the on-page FAQ in
+  `Landing.tsx`.
+- Standardized the "free / no account / no ads" phrasing across pages.
+
+**Verified this cleanup:**
+- `npm run lint` → **0 errors, 13 warnings** (harmless shadcn/ui fast-refresh
+  warnings).
+- `npm run build` passes (tsc + vite, 0 errors).
+- `npm run preview` smoke test: `/`, `/sight-words`, `/game/words`, `/privacy`,
+  `/auth`, `/terms` all return HTTP 200 with the correct title.
+
 ### The exact next step for a new thread
 
 1. Have the owner create the remaining free accounts and paste keys into the
@@ -124,8 +150,10 @@ ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
 The session-3 changes are **committed and pushed to `main`** as `fc6da9d`
 ("Swap auth OTP to Resend and remove Freebuff scaffolding"). The follow-up
 build cleanup is **committed and pushed to `main`** as `45f3c53` ("chore: fix
-lint errors, remove isolate artifact, add Plausible + email templates"), and
-the working tree is clean. `.env.local` is gitignored; `src/convex/_generated/`
+lint errors, remove isolate artifact, add Plausible + email templates"). The
+auth + copy cleanup is **committed and pushed to `main`** as `9c32251`
+("fix(auth): stop guest/email sign-in from spinning forever + remove em dashes"),
+and the working tree is clean. `.env.local` is gitignored; `src/convex/_generated/`
 is now tracked so Cloudflare Pages can build without an authenticated Convex
 CLI step. Regenerate it with `npx convex dev --once` after schema changes.
 
@@ -143,7 +171,7 @@ CLI step. Regenerate it with `npx convex dev --once` after schema changes.
 
 **Read with Rex** is a voice-first, gamified reading app for a 5-year-old (and
 children ages 4–6). It teaches first sight words, counting 1–10, and simple
-patterns. The child plays alone, no account management, no ads, no data
+patterns. The child plays alone with no account management, no ads, and no data
 collection from kids. Rex the T-Rex is the mascot/guide.
 
 The app was built by a dad for his son. It started as "WordPlay Explorer" and
