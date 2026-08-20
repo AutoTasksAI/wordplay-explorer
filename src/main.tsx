@@ -15,6 +15,7 @@ const Landing = lazy(() => import("./pages/Landing.tsx"));
 const AuthPage = lazy(() => import("./pages/Auth.tsx"));
 const GameHub = lazy(() => import("./pages/GameHub.tsx"));
 const ModulePage = lazy(() => import("./pages/ModulePage.tsx"));
+const SightWords = lazy(() => import("./pages/SightWords.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -126,6 +127,7 @@ createRoot(document.getElementById("root")!).render(
           <Suspense fallback={<RouteLoading />}>
             <Routes>
               <Route path="/" element={<Landing />} />
+              <Route path="/sight-words" element={<SightWords />} />
               <Route
                 path="/auth"
                 element={<AuthPage redirectAfterAuth="/game" />}

@@ -25,6 +25,7 @@ Every prompt and answer is spoken aloud. Missed words come back for repetition; 
 ## Pages
 
 - Landing page: https://readwithrex.com/ — free reading games for kids, ages 4-6, with first sight words, numbers, and patterns, all spoken aloud.
+- First 50 sight words (free printable): https://readwithrex.com/sight-words — a free printable list of the first 50 sight words for beginning readers ages 4-6.
 - Play now: https://readwithrex.com/auth?returnTo=/game
 
 ## Common questions

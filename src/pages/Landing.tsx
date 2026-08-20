@@ -181,6 +181,12 @@ export default function Landing() {
               For parents
             </a>
             <Link
+              to="/sight-words"
+              className="hidden text-sm font-semibold underline decoration-[3px] underline-offset-4 hover:text-grass sm:block"
+            >
+              Free printables
+            </Link>
+            <Link
               to="/auth"
               className="text-sm font-semibold underline decoration-[3px] underline-offset-4 hover:text-sky"
             >
