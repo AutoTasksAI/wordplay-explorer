@@ -217,7 +217,21 @@ export default function SightWords() {
           <p className="text-sm text-muted-foreground">
             Free reading games for kids ages 4–6 · No ads, no child data, ever
           </p>
-          <p className="text-sm font-semibold">© 2026 Read with Rex</p>
+          <div className="flex items-center gap-4 text-sm font-semibold">
+            <Link
+              to="/privacy"
+              className="underline decoration-[3px] underline-offset-4 hover:text-sky"
+            >
+              Privacy
+            </Link>
+            <Link
+              to="/terms"
+              className="underline decoration-[3px] underline-offset-4 hover:text-sky"
+            >
+              Terms
+            </Link>
+            <p className="text-sm font-semibold">© 2026 Read with Rex</p>
+          </div>
         </div>
       </footer>
 

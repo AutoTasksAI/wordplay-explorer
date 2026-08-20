@@ -539,7 +539,18 @@ export default function Landing() {
             >
               For parents
             </a>
-            <span className="text-muted-foreground">·</span>
+            <Link
+              to="/privacy"
+              className="underline decoration-[3px] underline-offset-4 hover:text-sky"
+            >
+              Privacy
+            </Link>
+            <Link
+              to="/terms"
+              className="underline decoration-[3px] underline-offset-4 hover:text-sky"
+            >
+              Terms
+            </Link>
             <p className="text-sm font-semibold">© 2026 Read with Rex</p>
           </div>
         </div>

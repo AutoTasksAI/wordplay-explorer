@@ -16,6 +16,11 @@ const AuthPage = lazy(() => import("./pages/Auth.tsx"));
 const GameHub = lazy(() => import("./pages/GameHub.tsx"));
 const ModulePage = lazy(() => import("./pages/ModulePage.tsx"));
 const SightWords = lazy(() => import("./pages/SightWords.tsx"));
+const ReadingMilestones = lazy(() => import("./pages/ReadingMilestones.tsx"));
+const HowToTeach = lazy(() => import("./pages/HowToTeach.tsx"));
+const FirstWordsOrder = lazy(() => import("./pages/FirstWordsOrder.tsx"));
+const Privacy = lazy(() => import("./pages/Privacy.tsx"));
+const Terms = lazy(() => import("./pages/Terms.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -128,6 +133,14 @@ createRoot(document.getElementById("root")!).render(
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/sight-words" element={<SightWords />} />
+              <Route path="/reading-milestones" element={<ReadingMilestones />} />
+              <Route
+                path="/how-to-teach-a-5-year-old-to-read"
+                element={<HowToTeach />}
+              />
+              <Route path="/first-words-order" element={<FirstWordsOrder />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
               <Route
                 path="/auth"
                 element={<AuthPage redirectAfterAuth="/game" />}
