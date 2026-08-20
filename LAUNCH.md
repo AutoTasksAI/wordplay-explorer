@@ -29,7 +29,7 @@
 ## 2. Backend (Convex) — required first
 - [x] **DONE 2026-08-20** — project `josh-a2865/wordplay-explorer`, dev deployment
   `https://calculating-basilisk-420.convex.cloud` (this is `VITE_CONVEX_URL`).
-  `src/convex/_generated/` is generated; `npm run build` passes.
+  `src/convex/_generated/` is generated and tracked so CI builds pass; `npm run build` passes.
 - [ ] For production, create a production deployment later (`npx convex deploy`)
   and update `VITE_CONVEX_URL` to its URL.
 
