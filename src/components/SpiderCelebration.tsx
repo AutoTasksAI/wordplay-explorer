@@ -19,6 +19,12 @@ interface WebSpot {
   rotate: number;
 }
 
+/** Deterministic pseudo-random value in [0, 1) seeded by an integer. */
+function seededRandom(seed: number) {
+  const x = Math.sin(seed * 9999) * 10000;
+  return x - Math.floor(x);
+}
+
 /**
  * Milestone celebration: a spider drops in near the top of the screen, shoots
  * webs to every edge, and bounces up and down while cobwebs pop in around it.
@@ -77,10 +83,10 @@ export function SpiderCelebration({ milestone }: { milestone: number }) {
       x: w * fx,
       y: h * fy,
       delay: 0.55 + i * 0.16,
-      scale: 0.8 + Math.random() * 0.7,
-      rotate: Math.random() * 40 - 20,
+      scale: 0.8 + seededRandom(milestone + i * 37) * 0.7,
+      rotate: seededRandom(milestone + i * 73) * 40 - 20,
     }));
-  }, [size]);
+  }, [milestone, size]);
 
   if (!size) return null;
 

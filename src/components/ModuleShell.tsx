@@ -36,6 +36,12 @@ interface Burst {
   id: number;
 }
 
+/** Deterministic pseudo-random value in [0, 1) seeded by an integer. */
+function seededRandom(seed: number) {
+  const x = Math.sin(seed * 9999) * 10000;
+  return x - Math.floor(x);
+}
+
 function getRectCenter(el: HTMLElement): { x: number; y: number } {
   const rect = el.getBoundingClientRect();
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
@@ -43,31 +49,44 @@ function getRectCenter(el: HTMLElement): { x: number; y: number } {
 
 /** Little emoji explosion that pops out of the tapped tile on a correct answer. */
 function ConfettiBurst({ burst }: { burst: Burst | null }) {
+  const pieces = useMemo(() => {
+    if (!burst) return [];
+    const emojis = ["⭐", "✨", "🎉", "💛", "🌟"];
+    return emojis.map((emoji, i) => {
+      const seed = burst.id + i * 41;
+      const angle = (i / emojis.length) * Math.PI * 2 + seededRandom(seed) * 0.6;
+      const dist = 70 + seededRandom(seed + 1) * 70;
+      return {
+        emoji,
+        key: `${burst.id}-${i}`,
+        angle,
+        dist,
+        rotate: seededRandom(seed + 2) * 200 - 100,
+      };
+    });
+  }, [burst]);
+
   if (!burst) return null;
-  const pieces = ["⭐", "✨", "🎉", "💛", "🌟"];
+
   return (
     <div className="pointer-events-none fixed inset-0 z-50">
-      {pieces.map((p, i) => {
-        const angle = (i / pieces.length) * Math.PI * 2 + Math.random() * 0.6;
-        const dist = 70 + Math.random() * 70;
-        return (
-          <motion.span
-            key={`${burst.id}-${i}`}
-            className="absolute text-2xl"
-            initial={{ x: burst.x, y: burst.y, opacity: 1, scale: 1 }}
-            animate={{
-              x: burst.x + Math.cos(angle) * dist,
-              y: burst.y + Math.sin(angle) * dist - 40,
-              opacity: 0,
-              scale: 1.5,
-              rotate: Math.random() * 200 - 100,
-            }}
-            transition={{ duration: 0.85, ease: "easeOut" }}
-          >
-            {p}
-          </motion.span>
-        );
-      })}
+      {pieces.map((p) => (
+        <motion.span
+          key={p.key}
+          className="absolute text-2xl"
+          initial={{ x: burst.x, y: burst.y, opacity: 1, scale: 1 }}
+          animate={{
+            x: burst.x + Math.cos(p.angle) * p.dist,
+            y: burst.y + Math.sin(p.angle) * p.dist - 40,
+            opacity: 0,
+            scale: 1.5,
+            rotate: p.rotate,
+          }}
+          transition={{ duration: 0.85, ease: "easeOut" }}
+        >
+          {p.emoji}
+        </motion.span>
+      ))}
     </div>
   );
 }
@@ -78,9 +97,9 @@ function RainConfetti() {
     () =>
       Array.from({ length: 26 }, (_, i) => ({
         id: i,
-        x: Math.random() * 100,
-        delay: Math.random() * 1.4,
-        duration: 2.6 + Math.random() * 1.6,
+        x: seededRandom(i * 13) * 100,
+        delay: seededRandom(i * 17) * 1.4,
+        duration: 2.6 + seededRandom(i * 19) * 1.6,
         emoji: ["⭐", "✨", "🎉", "💛", "🎈", "🌟"][i % 6],
       })),
     [],
@@ -152,6 +171,7 @@ export function ModuleShell({
   const wrongTriedRef = useRef(false);
   const spokenRoundRef = useRef<number | null>(null);
   const sessionPraiseRef = useRef("Great job!");
+  const burstIdRef = useRef(0);
 
   // Star milestones: when the lifetime total crosses a 20-star boundary, a
   // creature celebration plays on the next session end. Each one is bigger
@@ -183,12 +203,17 @@ export function ModuleShell({
               : kind === "bat"
                 ? 13500
                 : 9000;
-        setCelebration({ kind, value: hit });
-        playBoing();
-        celebrationTimeoutRef.current = window.setTimeout(
-          () => setCelebration(null),
-          timeout,
-        );
+        // Defer the state update so it doesn't happen synchronously inside
+        // the effect body (avoids a cascading render warning).
+        const startTimer = window.setTimeout(() => {
+          setCelebration({ kind, value: hit });
+          playBoing();
+          celebrationTimeoutRef.current = window.setTimeout(
+            () => setCelebration(null),
+            timeout,
+          );
+        }, 0);
+        return () => window.clearTimeout(startTimer);
       }
     }
     lastStarsRef.current = stars;
@@ -226,7 +251,6 @@ export function ModuleShell({
     if (spokenRoundRef.current === roundIndex) return;
     spokenRoundRef.current = roundIndex;
     speak(currentRound.spoken);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, roundIndex, currentRound]);
 
   const handleSignOut = async () => {
@@ -286,7 +310,8 @@ export function ModuleShell({
       setStarsEarned(starsRef.current);
       window.setTimeout(playStar, 120);
     }
-    setBurst({ ...getRectCenter(el), id: Date.now() });
+    burstIdRef.current += 1;
+    setBurst({ ...getRectCenter(el), id: burstIdRef.current });
     window.setTimeout(() => setBurst(null), 900);
     onRecord(currentRound.itemKey, firstTry);
 
