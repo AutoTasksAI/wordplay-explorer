@@ -23,7 +23,8 @@ ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
   schema (all tables + indexes + auth tables), and regenerated
   `src/convex/_generated/`.
 
-**Code changes made by the agent (all in the working tree, NOT yet committed):**
+**Code changes made by the agent (committed to `main` as `fc6da9d`, pushed
+2026-08-20):**
 - `src/convex/auth/emailOtp.ts` — **Freebuff OTP → Resend**. The hardcoded
   Freebuff API key / `auth.freebuff.app/send_otp` call is gone. It now POSTs to
   Resend's API using `RESEND_API_KEY` + `EMAIL_FROM` env vars and emails the
@@ -77,8 +78,6 @@ ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
 4. Google Search Console: verify the domain, submit `sitemap.xml`.
 
 ### Open items for the next agent (ask before large changes)
-- Commit + push the session-3 working-tree changes to `main` (owner approval —
-  see Git note below).
 - Add the Plausible analytics script to `index.html` (owner account needed).
 - Draft the parent welcome email + sight-word lead-magnet delivery copy.
 - Fix the 14 pre-existing lint errors (`npm run lint`: `use-mobile.ts`
@@ -90,14 +89,10 @@ ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
   update `VITE_CONVEX_URL` to its URL before or at launch.
 
 ### Git note
-The session-3 changes are in the working tree but **not committed or pushed**
-as of this handoff. Run `git status` to see the list (modified: `package.json`,
-`package-lock.json`, `src/main.tsx`, `src/pages/Auth.tsx`, `src/convex/auth.ts`,
-`src/convex/auth.config.ts`, `src/convex/auth/emailOtp.ts`, `vite.config.ts`,
-`tsconfig.app.json`, `.env.example`, `LAUNCH.md`, `HANDOFF.md`, `PLAN.md`;
-deleted: `vly-toolbar-readonly.tsx`, `src/lib/vly-integrations.ts`,
-`src/instrumentation.tsx`, `integrations.md`). `.env.local` and
-`src/convex/_generated/` are gitignored (generated/secret — never commit).
+The session-3 changes are **committed and pushed to `main`** as `fc6da9d`
+("Swap auth OTP to Resend and remove Freebuff scaffolding"), and the working
+tree is clean. `.env.local` and `src/convex/_generated/` are gitignored
+(generated/secret — never commit).
 
 ### Handoff checklist
 - [x] Current status and owner are updated.
@@ -105,7 +100,7 @@ deleted: `vly-toolbar-readonly.tsx`, `src/lib/vly-integrations.ts`,
 - [x] Checks actually run are recorded with their real result.
 - [x] Blockers and approvals are explicit.
 - [x] Exact next action is written for the next agent.
-- [ ] Commit + push for another device to resume — pending owner approval.
+- [x] Commit + push for another device to resume — DONE (`fc6da9d`).
 
 ---
 
