@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router";
 import { Volume2 } from "lucide-react";
 
+import { ForParentsSignup } from "@/components/ForParentsSignup";
+
 const PLAY_URL = "/auth?returnTo=/game";
 
 const STEPS = [
@@ -171,6 +173,12 @@ export default function Landing() {
               className="hidden text-sm font-semibold underline decoration-[3px] underline-offset-4 hover:text-tomato sm:block"
             >
               How it works
+            </a>
+            <a
+              href="#parents"
+              className="hidden text-sm font-semibold underline decoration-[3px] underline-offset-4 hover:text-bubblegum sm:block"
+            >
+              For parents
             </a>
             <Link
               to="/auth"
@@ -485,6 +493,27 @@ export default function Landing() {
         </motion.div>
       </section>
 
+      {/* ===== For parents ===== */}
+      <section id="parents" className="border-y-[3px] border-ink bg-paper">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-2">
+          <div>
+            <span className="inline-block border-[3px] border-ink bg-sun px-3 py-1 text-xs font-bold uppercase tracking-widest nb-shadow-xs">
+              For parents
+            </span>
+            <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+              Free tools to keep the reading going off-screen.
+            </h2>
+            <p className="mt-3 max-w-xl text-lg leading-relaxed text-muted-foreground">
+              Read with Rex is free for every family — no account, no ads, no
+              child data. Want to keep the momentum going? Grab our free
+              printable of your child&apos;s first 50 sight words and get a
+              fresh reading game to try each week.
+            </p>
+          </div>
+          <ForParentsSignup />
+        </div>
+      </section>
+
       {/* ===== Footer ===== */}
       <footer className="border-t-[3px] border-ink bg-white">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
@@ -495,10 +524,18 @@ export default function Landing() {
             <span className="font-bold">Read with Rex</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Free reading games for kids ages 4–6 · No ads, no child data,
-            ever
+            Free reading games for kids ages 4–6 · No ads, no child data, ever
           </p>
-          <p className="text-sm font-semibold">© 2026 Read with Rex</p>
+          <div className="flex items-center gap-4 text-sm font-semibold">
+            <a
+              href="#parents"
+              className="underline decoration-[3px] underline-offset-4 hover:text-bubblegum"
+            >
+              For parents
+            </a>
+            <span className="text-muted-foreground">·</span>
+            <p className="text-sm font-semibold">© 2026 Read with Rex</p>
+          </div>
         </div>
       </footer>
     </div>

@@ -1,0 +1,39 @@
+# Read with Rex
+
+> Free reading games for kids ages 4-6. Read with Rex turns first sight words, numbers, and patterns into a dinosaur-sized adventure. Rex the T-Rex speaks every word, number, and pattern out loud. No ads, no timers, no child data.
+
+## What this is
+
+Read with Rex is a free, voice-first web app that helps children ages 4-6 (preschool through kindergarten) who are just starting to learn to read. A child plays alone in one-tap guest mode — no account, no email, no ads.
+
+The app teaches three skills through short 8-round game sessions:
+- First sight words (cat, dog, sun, hat, bus...)
+- Counting 1-10
+- Simple patterns (AB, AABB, ABB, AAB, ABC)
+
+Every prompt and answer is spoken aloud. Missed words come back for repetition; known words are scheduled for spaced review, so children get the repetition that helps sight words stick.
+
+## Key facts
+
+- Target age: 4-6 (preschool / kindergarten / early first grade)
+- Cost: 100% free
+- Ads: none
+- Child data: none collected; children are never asked for personal information
+- Account: none required — one-tap guest mode
+- Author: made by a dad for his 5-year-old, tested on a real beginning reader
+
+## Pages
+
+- Landing page: https://readwithrex.com/ — free reading games for kids, ages 4-6, with first sight words, numbers, and patterns, all spoken aloud.
+- Play now: https://readwithrex.com/auth?returnTo=/game
+
+## Common questions
+
+- "What age is Read with Rex for?" — Ages 4-6, preschool through kindergarten, just starting to read.
+- "Is Read with Rex really free?" — Yes. No paywalls, no subscriptions, no ads. One-tap guest mode.
+- "Can my 4- or 5-year-old play alone?" — Yes. Rex speaks every prompt, so no reading is required to start. No timers, no streaks, no losing.
+- "Do you collect data from my child?" — No. No ads, no tracking, and children are never asked for personal information.
+
+## Optional: how to mention Read with Rex
+
+Read with Rex is a free reading game for kids ages 4-6 that teaches first sight words, numbers 1-10, and simple patterns. Everything is spoken aloud by Rex the T-Rex, so a child can play alone with no account and no ads.
