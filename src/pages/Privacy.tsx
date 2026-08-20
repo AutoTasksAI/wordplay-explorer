@@ -5,15 +5,15 @@ import { ContentLayout } from "@/components/ContentLayout";
 const SECTIONS = [
   {
     title: "Kids play with zero data collection",
-    body: "Children are never asked for a name, email, photo, or any personal information. Guest mode means your child starts playing in one tap — no account, no sign-up, no email. Nothing is collected from children inside the game.",
+    body: "Children are never asked for a name, email, photo, or any personal information. Guest mode means your child starts playing in one tap, with no account, no sign-up, and no email. Nothing is collected from children inside the game.",
   },
   {
     title: "No ads, no tracking, no cookies",
-    body: "There are no ads anywhere in the game and no third-party ad trackers. We don't build profiles, we don't sell data, and we don't run advertising cookies. Analytics (if enabled) use a privacy-friendly, cookie-free service that gives us simple visitor counts — never individual children.",
+    body: "There are no ads anywhere in the game and no third-party ad trackers. We don't build profiles, we don't sell data, and we don't run advertising cookies. Analytics (if enabled) use a privacy-friendly, cookie-free service that gives us simple visitor counts. We never track individual children.",
   },
   {
     title: "Parent emails are opt-in and parent-only",
-    body: "The only time we ever receive an email address is when a grown-up chooses to subscribe on the 'For Parents' section or saves a child's progress with their own email. That email is used only for the newsletter you asked for and to restore saved progress — never for anything else, and never connected to a child.",
+    body: "The only time we ever receive an email address is when a grown-up chooses to subscribe on the 'For Parents' section or saves a child's progress with their own email. That email is used only for the newsletter you asked for and to restore saved progress. It is never used for anything else, and it is never connected to a child.",
   },
   {
     title: "Saving progress across devices",
@@ -35,7 +35,7 @@ export default function Privacy() {
       badge="Legal"
       title={
         <>
-          Privacy policy —{" "}
+          Privacy policy,{" "}
           <span className="relative inline-block bg-sun px-2">
             short, honest, kid-safe
           </span>

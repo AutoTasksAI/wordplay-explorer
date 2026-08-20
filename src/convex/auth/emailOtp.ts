@@ -4,9 +4,9 @@ import { RandomReader, generateRandomString } from "@oslojs/crypto/random";
 /**
  * Email OTP sign-in for parents, sent through Resend (production provider).
  *
- * Env vars (set in the Convex project's Keys tab — never in .env):
- *   RESEND_API_KEY — Resend API key (free tier)
- *   EMAIL_FROM     — verified sender, e.g. "Read with Rex <hello@readwithrex.com>"
+ * Env vars (set in the Convex project's Keys tab, never in .env):
+ *   RESEND_API_KEY, Resend API key (free tier)
+ *   EMAIL_FROM    , verified sender, e.g. "Read with Rex <hello@readwithrex.com>"
  *
  * The 6-digit code is emailed to the parent so a grown-up can finish sign-in
  * on the child's device. The child never creates an account or shares an

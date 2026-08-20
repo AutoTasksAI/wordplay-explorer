@@ -20,7 +20,7 @@ const BATCHES = [
     label: "Batch 3",
     name: "Everyday CVC words",
     words: ["cat", "dog", "sun", "hat", "bus", "egg", "fish", "star", "run", "jump"],
-    why: "Short, soundable words with a picture in easy reach. Cat, dog, sun — these are the words Read with Rex teaches first, with an emoji for every one.",
+    why: "Short, soundable words with a picture in easy reach. Cat, dog, and sun are the words Read with Rex teaches first, with an emoji for every one.",
   },
   {
     label: "Batch 4",
@@ -31,7 +31,7 @@ const BATCHES = [
 ];
 
 const TIPS = [
-  "Teach 3–5 new words at a time — never a big list all at once",
+  "Teach 3–5 new words at a time, never a big list all at once",
   "Only add new words once a few old ones are instantly recognized",
   "Use the same words in books, on fridge magnets, and in games",
   "Keep reviewing old words; forgotten words come back with practice",
@@ -65,7 +65,7 @@ export default function FirstWordsOrder() {
           </span>
         </>
       }
-      intro="The order you teach first words matters more than the words themselves. Start with words your child cares about, add the helpers that fill every book, then the everyday words with pictures — three to five at a time."
+      intro="The order you teach first words matters more than the words themselves. Start with words your child cares about, add the helpers that fill every book, then the everyday words with pictures, three to five at a time."
       schema={{
         "@context": "https://schema.org",
         "@graph": [

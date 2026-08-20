@@ -6,12 +6,12 @@ const MILESTONES = [
   {
     age: "Birth–2",
     title: "Sounds and words start here",
-    body: "Babies tune into your voice from day one. They babble, imitate sounds, and recognize familiar words like their own name. Reading aloud every day — even for a few minutes — builds the listening skills reading later depends on.",
+    body: "Babies tune into your voice from day one. They babble, imitate sounds, and recognize familiar words like their own name. Reading aloud every day, even for a few minutes, builds the listening skills reading later depends on.",
   },
   {
     age: "2–3",
     title: "First words and 'read' books",
-    body: "Toddlers learn their first words and start 'pretend reading' — holding a book, turning pages, and retelling a familiar story. Point at words as you read so they begin to notice that print means something.",
+    body: "Toddlers learn their first words and start 'pretend reading', holding a book, turning pages, and retelling a familiar story. Point at words as you read so they begin to notice that print means something.",
   },
   {
     age: "3–4",
@@ -21,7 +21,7 @@ const MILESTONES = [
   {
     age: "4–5",
     title: "First sight words appear",
-    body: "Many 4- and 5-year-olds recognize a handful of sight words (cat, dog, the, and) without sounding them out. They may 'read' books from memory. This is exactly the age Read with Rex is built for — short, spoken, pressure-free games.",
+    body: "Many 4- and 5-year-olds recognize a handful of sight words (cat, dog, the, and) without sounding them out. They may 'read' books from memory. This is exactly the age Read with Rex is built for. Short, spoken, pressure-free games.",
   },
   {
     age: "5–6",
@@ -30,7 +30,7 @@ const MILESTONES = [
   },
   {
     age: "6–7",
-    title: "Fluency — reading with flow",
+    title: "Fluency, reading with flow",
     body: "First grade is when reading becomes smoother. Children read short sentences, recognize more words on sight, and start reading for meaning. They still benefit hugely from reading the same books again and again.",
   },
 ];
@@ -40,13 +40,13 @@ const SIGNS = [
   "They can recognize their own name and a few sight words by 4–5",
   "They ask what words say and try to 'read' signs and labels",
   "They retell favorite stories or finish sentences in familiar books",
-  "Reading feels playful — they pick up books on their own",
+  "Reading feels playful. They pick up books on their own",
 ];
 
 const FAQS = [
   {
     q: "What age should a child start learning to read?",
-    a: "There's no single right age — it's a range. Many children begin recognizing letters and a few sight words around age 4, with real reading taking off in kindergarten and first grade (ages 5–7). Reading aloud and playing sound games can start from birth.",
+    a: "There's no single right age. It's a range. Many children begin recognizing letters and a few sight words around age 4, with real reading taking off in kindergarten and first grade (ages 5–7). Reading aloud and playing sound games can start from birth.",
   },
   {
     q: "Is it normal for a 5-year-old to not read yet?",
@@ -54,7 +54,7 @@ const FAQS = [
   },
   {
     q: "When should I worry about my child's reading?",
-    a: "Talk to a teacher or pediatrician if a child older than 6–7 struggles to learn letter sounds, doesn't recognize their own name, or avoids books entirely. Early, gentle support makes a huge difference — and it's rarely cause for alarm.",
+    a: "Talk to a teacher or pediatrician if a child older than 6–7 struggles to learn letter sounds, doesn't recognize their own name, or avoids books entirely. Early, gentle support makes a huge difference, and it's rarely cause for alarm.",
   },
 ];
 
@@ -70,7 +70,7 @@ export default function ReadingMilestones() {
           </span>
         </>
       }
-      intro="Every parent wonders: should my 4-year-old be reading yet? Here's what reading actually looks like at each age — so you know what's normal, what to encourage, and when to gently check in. Spoiler: it's a wide, wobbly range."
+      intro="Every parent wonders: should my 4-year-old be reading yet? Here's what reading actually looks like at each age, so you know what's normal, what to encourage, and when to gently check in. Spoiler: it's a wide, wobbly range."
       schema={{
         "@context": "https://schema.org",
         "@graph": [
@@ -128,7 +128,7 @@ export default function ReadingMilestones() {
       <div className="mt-12 grid gap-8 lg:grid-cols-2">
         <div className="border-[3px] border-ink bg-paper p-6 nb-shadow-sm">
           <span className="inline-block border-[3px] border-ink bg-grass px-3 py-1 text-sm font-bold text-white">
-            On track — great signs
+            On track, great signs
           </span>
           <ul className="mt-4 space-y-3">
             {SIGNS.map((s) => (

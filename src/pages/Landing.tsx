@@ -10,17 +10,17 @@ const STEPS = [
   {
     emoji: "🔉",
     title: "Rex explains it",
-    body: "Every word, number, and pattern is spoken out loud — big, slow, and friendly. One tap replays it anytime, so your little explorer never gets stuck.",
+    body: "Every word, number, and pattern is spoken out loud, big, slow, and friendly. One tap replays it anytime, so your little explorer never gets stuck.",
   },
   {
     emoji: "👀",
     title: "Spot it",
-    body: "A big word, a row of dots to count, or a pattern with a missing piece — and two silly decoys. Just enough choice to make it a game, never a maze.",
+    body: "A big word, a row of dots to count, or a pattern with a missing piece, and two silly decoys. Just enough choice to make it a game, never a maze.",
   },
   {
     emoji: "👆",
     title: "Pop it",
-    body: "Tap the right tile and it pops into a star. Eight rounds a session — short, sweet, and finished with a party.",
+    body: "Tap the right tile and it pops into a star. Eight rounds a session, short, sweet, and finished with a party.",
   },
   {
     emoji: "🧠",
@@ -32,10 +32,10 @@ const STEPS = [
 const TRUST = [
   { bg: "bg-sun", text: "text-ink", title: "No ads. No paywalls.", body: "Ever. Nothing to buy, nothing to sit through." },
   { bg: "bg-tomato", text: "text-white", title: "No timers. No streaks.", body: "No pressure, no losing. Just gentle try-again." },
-  { bg: "bg-sky", text: "text-white", title: "Rex does the talking.", body: "Every prompt is spoken aloud — your child plays alone." },
+  { bg: "bg-sky", text: "text-white", title: "Rex does the talking.", body: "Every prompt is spoken aloud, so your child plays alone." },
   { bg: "bg-grass", text: "text-ink", title: "Adapts to your explorer.", body: "Missed words and numbers reappear; known ones make room for new challenges." },
   { bg: "bg-bubblegum", text: "text-ink", title: "Short sessions.", body: "Eight rounds, then a celebration. Perfect focus." },
-  { bg: "bg-tangerine", text: "text-ink", title: "Three adventures.", body: "Words, numbers, and patterns — giant taps, nothing to get lost in." },
+  { bg: "bg-tangerine", text: "text-ink", title: "Three adventures.", body: "Words, numbers, and patterns. Giant taps. Nothing to get lost in." },
 ];
 
 const MODULE_STRIP = [
@@ -56,7 +56,7 @@ const MODULE_STRIP = [
   {
     emoji: "🧩",
     title: "Pattern Path",
-    body: "Red, blue, red, blue — what comes next? Spot the missing piece.",
+    body: "Red, blue, red, blue, what comes next? Spot the missing piece.",
     bg: "bg-grass",
     text: "text-ink",
   },
@@ -65,11 +65,11 @@ const MODULE_STRIP = [
 const FAQS = [
   {
     q: "What age is Read with Rex for?",
-    a: "Ages 4–6 — preschool through kindergarten — who are just starting to learn to read. The first games focus on recognizing first sight words like cat, dog, and sun, plus counting 1–10 and simple patterns.",
+    a: "Ages 4–6, preschool through kindergarten, who are just starting to learn to read. The first games focus on recognizing first sight words like cat, dog, and sun, plus counting 1–10 and simple patterns.",
   },
   {
     q: "Is Read with Rex really free?",
-    a: "Yes. The reading games are completely free — no paywalls, no subscriptions, and no ads. Your child can start playing in one tap with guest mode.",
+    a: "Yes. The reading games are completely free. No paywalls, no subscriptions, and no ads. Your child can start playing in one tap with guest mode.",
   },
   {
     q: "What will my child learn first?",
@@ -77,15 +77,15 @@ const FAQS = [
   },
   {
     q: "Can my 4- or 5-year-old play alone?",
-    a: "Yes. Rex the T-Rex speaks every prompt aloud, so no reading is required to start. There are no timers, no streaks, and no losing — just gentle try-again and a star for every win.",
+    a: "Yes. Rex the T-Rex speaks every prompt aloud, so no reading is required to start. There are no timers, no streaks, and no losing. Just gentle try-again and a star for every win.",
   },
   {
     q: "Do you collect data from my child?",
-    a: "No. There are no ads and no tracking, and children are never asked for personal information. Guest mode means no account and no email — just play.",
+    a: "No. There are no ads and no tracking, and children are never asked for personal information. Guest mode means no account and no email. Just play.",
   },
   {
     q: "Do reading games actually help kids learn to read?",
-    a: "Yes, when they repeat the right things. Read with Rex brings missed words back more often and schedules known ones for later review, so children get the repetition that helps sight words stick — wrapped in a game they want to play.",
+    a: "Yes, when they repeat the right things. Read with Rex brings missed words back more often and schedules known ones for later review, so children get the repetition that helps sight words stick, wrapped in a game they want to play.",
   },
 ];
 
@@ -238,7 +238,7 @@ export default function Landing() {
               Read with Rex is a free reading game for kids ages 4–6 that
               turns your child&apos;s very first sight words into a
               dinosaur-sized adventure. Rex the T-Rex speaks every word,
-              number, and pattern out loud, your little explorer taps the
+              number, and pattern out loud. Your little explorer taps the
               match, and every win pops into a star.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -284,7 +284,7 @@ export default function Landing() {
               </h2>
             </div>
             <p className="hidden max-w-xs text-right text-muted-foreground sm:block">
-              Same stars, same Rex, same celebration — three skills to mix up
+              Same stars, same Rex, same celebration. Three skills to mix up
               each day.
             </p>
           </div>
@@ -397,8 +397,8 @@ export default function Landing() {
               <p className="mt-3 max-w-2xl text-lg leading-relaxed text-paper/85">
                 Read with Rex started at our kitchen table, watching a
                 5-year-old light up when he read &ldquo;cat&rdquo; all by
-                himself. Big taps, spoken prompts, gentle try-again, short
-                sessions — everything comes from what actually worked with
+                himself. Big taps, spoken prompts, gentle try-again, and short
+                sessions. Everything comes from what actually worked with
                 him, and it&apos;s free for every family.
               </p>
             </div>
@@ -476,7 +476,7 @@ export default function Landing() {
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-lg font-medium">
             Ten minutes a day with Read with Rex and first sight words,
-            numbers, and patterns stop being scary — they become adventures
+            numbers, and patterns stop being scary. They become adventures
             your child begs to play.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -510,7 +510,7 @@ export default function Landing() {
               Free tools to keep the reading going off-screen.
             </h2>
             <p className="mt-3 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Read with Rex is free for every family — no account, no ads, no
+              Read with Rex is free for every family, no account, no ads, no
               child data. Want to keep the momentum going? Grab our free
               printable of your child&apos;s first 50 sight words and get a
               fresh reading game to try each week.

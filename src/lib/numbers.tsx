@@ -11,7 +11,7 @@ export interface NumberItem {
   value: number;
 }
 
-/** Numbers 1–10 — the classic first counting range for a 5-year-old. */
+/** Numbers 1–10, the classic first counting range for a 5-year-old. */
 export const NUMBERS: NumberItem[] = Array.from({ length: 10 }, (_, i) => ({
   value: i + 1,
 }));

@@ -61,10 +61,10 @@ export default function SightWords() {
           </span>
         </h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-          These are the first words most children learn to recognize by sight
-          — the ones that unlock reading. Cut them into flashcards, stick them
-          on the fridge, or turn them into a game with Rex. Download and print
-          for free, forever.
+          These are the first words most children learn to recognize by sight.
+          They are the ones that unlock reading. Cut them into flashcards, stick
+          them on the fridge, or turn them into a game with Rex. Download and
+          print for free, forever.
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-4 print:hidden">
           <button
@@ -132,7 +132,7 @@ export default function SightWords() {
             {
               emoji: "🦖",
               title: "Make it a game",
-              body: "Hold up a card and race to say it. Rex does this in the app too — every word is spoken aloud.",
+              body: "Hold up a card and race to say it. Rex does this in the app too. Every word is spoken aloud.",
             },
             {
               emoji: "🔁",
@@ -175,7 +175,7 @@ export default function SightWords() {
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-lg font-medium">
             Read with Rex turns these same words into a spoken reading game.
-            Free, no account, no ads — your child plays in one tap.
+            It is free, with no account and no ads. Your child plays in one tap.
           </p>
           <Link
             to={PLAY_URL}

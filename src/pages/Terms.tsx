@@ -25,7 +25,7 @@ const SECTIONS = [
   },
   {
     title: "Made by a parent",
-    body: "This app was built by a dad for his 5-year-old and is offered free to other families. If something isn't right, please tell us — we take feedback seriously.",
+    body: "This app was built by a dad for his 5-year-old and is offered free to other families. If something isn't right, please tell us. We take feedback seriously.",
   },
 ];
 
@@ -35,7 +35,7 @@ export default function Terms() {
       badge="Legal"
       title={
         <>
-          Terms of use —{" "}
+          Terms of use,{" "}
           <span className="relative inline-block bg-sun px-2">
             the short, friendly version
           </span>

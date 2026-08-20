@@ -1,4 +1,4 @@
-# Read with Rex — Email templates
+# Read with Rex email templates
 
 Email service: EmailOctopus (COPPA-safe, parent-facing only).
 List tag used in `src/convex/newsletter.ts`: `lead-magnet-sight-words`.
@@ -18,7 +18,7 @@ List tag used in `src/convex/newsletter.ts`: `lead-magnet-sight-words`.
 
 Hi there,
 
-Welcome to Read with Rex — a tiny dinosaur-powered reading game I built for my own 5-year-old.
+Welcome to Read with Rex, a tiny dinosaur-powered reading game I built for my own 5-year-old.
 
 Here are your **50 free printable sight-word flashcards**:  
 https://readwithrex.com/sight-words
@@ -29,7 +29,7 @@ https://readwithrex.com/sight-words
 2. **Match race.** Lay out 10 cards face up, say a word, and see how fast they can slap the right one.
 3. **Build a sentence.** Use 3–4 cards to make a silly sentence together (“The cat sat on a sun.”).
 
-You’ll also get a short email each week with **3 reading games to play at home** — no worksheets, no pressure, just fun.
+You’ll also get a short email each week with **3 reading games to play at home**. No worksheets, no pressure, just fun.
 
 If your child is ready to play on a phone, tablet, or computer, the free game is here:  
 https://readwithrex.com
@@ -56,7 +56,7 @@ Hi there,
 
 I’m Josh. I built **Read with Rex** for my 5-year-old son, and I’m so glad you found it.
 
-Read with Rex is a free voice-first reading game for kids ages 4–6. No ads, no timers, and no account required for kids — they just tap and play while Rex the T-Rex speaks every prompt out loud.
+Read with Rex is a free voice-first reading game for kids ages 4–6. No ads, no timers, and no account required for kids. They just tap and play while Rex the T-Rex speaks every prompt out loud.
 
 **Start here:**
 
@@ -69,7 +69,7 @@ Read with Rex is a free voice-first reading game for kids ages 4–6. No ads, no
 - Counting 1–10
 - Simple patterns (AB, AABB, ABC)
 
-Every week I send one short email with **3 reading games you can play at home** — usually with nothing more than a deck of cards, a snack, or a walk around the block.
+Every week I send one short email with **3 reading games you can play at home**, usually with nothing more than a deck of cards, a snack, or a walk around the block.
 
 Thanks for trusting me with your inbox.
 
@@ -88,9 +88,9 @@ P.S. This list is for parents and caregivers only. We never collect information 
 
 **Structure:**
 
-1. **One game from Read with Rex** — link directly to a module.
-2. **One offline game** — e.g., “sound scavenger hunt,” “rhyme time,” “letter snack.”
-3. **One quick win** — e.g., “read the cereal box together,” “point out STOP signs.”
+1. **One game from Read with Rex.** Link directly to a module.
+2. **One offline game.** E.g., “sound scavenger hunt,” “rhyme time,” “letter snack.”
+3. **One quick win.** E.g., “read the cereal box together,” “point out STOP signs.”
 
 **Footer in every email:**
 
@@ -129,6 +129,6 @@ Josh (and Rex 🦖)
 ## Implementation notes
 
 - These templates assume EmailOctopus supports plain-text + HTML. Keep HTML minimal and readable on mobile.
-- All links use `https://readwithrex.com` — update if the final domain changes.
+- All links use `https://readwithrex.com`. Update if the final domain changes.
 - For Plausible outbound-link tracking, add `data-analytics` attributes if desired once Plausible is active.
 - Tag all subscribers with `lead-magnet-sight-words` for segmentation (already done in `newsletter.ts`).

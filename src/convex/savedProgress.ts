@@ -12,7 +12,7 @@ import { createHash } from "node:crypto";
  * The PARENT's email + a 4-digit code lock a snapshot of the child's progress
  * (stars + per-item mastery). The parent can save from one device and restore
  * onto another. The child never provides any personal information, and saving
- * is optional — guest play stays one tap, no account, no email.
+ * is optional, guest play stays one tap, no account, no email.
  */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -75,7 +75,7 @@ export const saveProgress = action({
 
     const state = await ctx.runQuery(api.game.getPlayerState, {});
     if (state === null) {
-      throw new Error("No progress to save yet — play a game first!");
+      throw new Error("No progress to save yet, play a game first!");
     }
 
     const now = Date.now();

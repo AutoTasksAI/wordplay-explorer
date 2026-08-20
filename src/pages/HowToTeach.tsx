@@ -16,12 +16,12 @@ const STEPS = [
   {
     emoji: "👀",
     title: "Teach first sight words",
-    body: "Some words just need to be recognized on sight: cat, dog, the, and, look, see. Pick 5 at a time, use them every day, and don't move on until a few stick. Repetition is the whole trick — which is why the game brings missed words back.",
+    body: "Some words just need to be recognized on sight: cat, dog, the, and, look, see. Pick 5 at a time, use them every day, and don't move on until a few stick. Repetition is the whole trick, which is why the game brings missed words back.",
   },
   {
     emoji: "🔁",
     title: "Let them read the same thing again and again",
-    body: "Rereading is not a sign you've failed — it's how fluency happens. The 47th time through the same little book, your child is suddenly reading confidently. Let them. Familiar books build speed and pride.",
+    body: "Rereading is not a sign you've failed. It's how fluency happens. The 47th time through the same little book, your child is suddenly reading confidently. Let them. Familiar books build speed and pride.",
   },
   {
     emoji: "🎉",
@@ -31,22 +31,22 @@ const STEPS = [
   {
     emoji: "🦖",
     title: "Let a game carry the repetition",
-    body: "Children practice what they love. A short, spoken reading game delivers the same words over and over without you having to play teacher — and without timers, streaks, or losing. That's exactly what Read with Rex was built to do.",
+    body: "Children practice what they love. A short, spoken reading game delivers the same words over and over without you having to play teacher, and without timers, streaks, or losing. That's exactly what Read with Rex was built to do.",
   },
 ];
 
 const FAQS = [
   {
     q: "How many minutes a day should we practice reading?",
-    a: "Five to ten focused, happy minutes a day is plenty for a 5-year-old. Short daily sessions beat long weekly ones, and the goal is that your child asks for more — not that you drag them through it.",
+    a: "Five to ten focused, happy minutes a day is plenty for a 5-year-old. Short daily sessions beat long weekly ones, and the goal is that your child asks for more, not that you drag them through it.",
   },
   {
     q: "Sight words or phonics first?",
-    a: "Most children do best with a mix, but for the very first words, sight recognition is a gentle on-ramp: your child memorizes 'cat' and 'dog' as whole words and feels the thrill of reading fast. Letter sounds and phonics layer in alongside — usually a bit later.",
+    a: "Most children do best with a mix, but for the very first words, sight recognition is a gentle on-ramp: your child memorizes 'cat' and 'dog' as whole words and feels the thrill of reading fast. Letter sounds and phonics layer in alongside, usually a bit later.",
   },
   {
     q: "My child memorizes books instead of reading. Is that okay?",
-    a: "Yes — it's a milestone, not a problem. 'Reading' a memorized book shows your child understands that print carries a story. Gently point to the words as they go, and they'll start matching the words they know to the print.",
+    a: "Yes, it's a milestone, not a problem. 'Reading' a memorized book shows your child understands that print carries a story. Gently point to the words as they go, and they'll start matching the words they know to the print.",
   },
 ];
 

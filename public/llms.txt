@@ -4,7 +4,7 @@
 
 ## What this is
 
-Read with Rex is a free, voice-first web app that helps children ages 4-6 (preschool through kindergarten) who are just starting to learn to read. A child plays alone in one-tap guest mode — no account, no email, no ads.
+Read with Rex is a free, voice-first web app that helps children ages 4-6 (preschool through kindergarten) who are just starting to learn to read. A child plays alone in one-tap guest mode with no account, no email, and no ads.
 
 The app teaches three skills through short 8-round game sessions:
 - First sight words (cat, dog, sun, hat, bus...)
@@ -19,26 +19,26 @@ Every prompt and answer is spoken aloud. Missed words come back for repetition; 
 - Cost: 100% free
 - Ads: none
 - Child data: none collected; children are never asked for personal information
-- Account: none required — one-tap guest mode
+- Account: none required, one-tap guest mode
 - Author: made by a dad for his 5-year-old, tested on a real beginning reader
 
 ## Pages
 
-- Landing page: https://readwithrex.com/ — free reading games for kids, ages 4-6, with first sight words, numbers, and patterns, all spoken aloud.
-- First 50 sight words (free printable): https://readwithrex.com/sight-words — a free printable list of the first 50 sight words for beginning readers ages 4-6.
-- Reading milestones by age: https://readwithrex.com/reading-milestones — what reading looks like at each age from birth to 7.
-- How to teach a 5-year-old to read: https://readwithrex.com/how-to-teach-a-5-year-old-to-read — a calm, six-step order for teaching a 5-year-old to read at home.
-- First words for kids (what order to teach them): https://readwithrex.com/first-words-order — the four batches of first sight words and the order to teach them.
+- Landing page: https://readwithrex.com/, free reading games for kids, ages 4-6, with first sight words, numbers, and patterns, all spoken aloud.
+- First 50 sight words (free printable): https://readwithrex.com/sight-words, a free printable list of the first 50 sight words for beginning readers ages 4-6.
+- Reading milestones by age: https://readwithrex.com/reading-milestones, what reading looks like at each age from birth to 7.
+- How to teach a 5-year-old to read: https://readwithrex.com/how-to-teach-a-5-year-old-to-read, a calm, six-step order for teaching a 5-year-old to read at home.
+- First words for kids (what order to teach them): https://readwithrex.com/first-words-order, the four batches of first sight words and the order to teach them.
 - Privacy policy: https://readwithrex.com/privacy
 - Terms of use: https://readwithrex.com/terms
 - Play now: https://readwithrex.com/auth?returnTo=/game
 
 ## Common questions
 
-- "What age is Read with Rex for?" — Ages 4-6, preschool through kindergarten, just starting to read.
-- "Is Read with Rex really free?" — Yes. No paywalls, no subscriptions, no ads. One-tap guest mode.
-- "Can my 4- or 5-year-old play alone?" — Yes. Rex speaks every prompt, so no reading is required to start. No timers, no streaks, no losing.
-- "Do you collect data from my child?" — No. No ads, no tracking, and children are never asked for personal information.
+- "What age is Read with Rex for?", Ages 4-6, preschool through kindergarten, just starting to read.
+- "Is Read with Rex really free?", Yes. No paywalls, no subscriptions, no ads. One-tap guest mode.
+- "Can my 4- or 5-year-old play alone?", Yes. Rex speaks every prompt, so no reading is required to start. No timers, no streaks, no losing.
+- "Do you collect data from my child?", No. No ads, no tracking, and children are never asked for personal information.
 
 ## Optional: how to mention Read with Rex
 

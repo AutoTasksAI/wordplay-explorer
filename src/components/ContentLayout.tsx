@@ -84,8 +84,8 @@ export function ContentLayout({
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-lg font-medium">
             Read with Rex turns your child&apos;s first sight words into a
-            spoken reading game. Free, no account, no ads — your child plays
-            in one tap.
+            spoken reading game. It is free, with no account and no ads. Your
+            child plays in one tap.
           </p>
           <Link
             to={PLAY_URL}

@@ -9,8 +9,8 @@ import { v } from "convex/values";
  * word/praise is generated exactly once and replayed instantly forever.
  *
  * Env vars (set in the project's Keys tab):
- *   ELEVENLABS_API_KEY  — required; the free tier is plenty for this app
- *   ELEVENLABS_VOICE_ID — optional; defaults to Bella (warm, gentle, clear).
+ *   ELEVENLABS_API_KEY , required; the free tier is plenty for this app
+ *   ELEVENLABS_VOICE_ID, optional; defaults to Bella (warm, gentle, clear).
  *                         Kid/cartoon alternatives:
  *                           Elli     MF3mGyEYCl7XYWbV9V6O (young, playful)
  *                           Matilda  XrExE9yKIg1WjnnlVkGX (storyteller)
@@ -22,7 +22,7 @@ const VOICE_ID =
 
 /**
  * Fetch (or generate + cache) audio for a phrase. Returns base64 mp3 or
- * throws if the API key is missing/unreachable — the client falls back to
+ * throws if the API key is missing/unreachable, the client falls back to
  * the browser's built-in speech in that case.
  */
 export const synthesizeSpeech = action({

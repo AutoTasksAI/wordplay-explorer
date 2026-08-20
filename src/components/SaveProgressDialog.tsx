@@ -212,7 +212,7 @@ export function SaveProgressDialog() {
 
           <p className="mt-4 text-center text-xs font-semibold text-muted-foreground">
             Grown-ups only, please. We never ask children for information, and
-            the game has no ads — ever.
+            the game has no ads, ever.
           </p>
         </div>
       </DialogContent>

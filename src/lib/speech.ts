@@ -5,7 +5,7 @@
  * never cuts another off mid-word. When the Convex TTS integration is
  * configured (ElevenLabs key in the project's Keys tab), phrases are
  * generated with a warm cartoon voice, cached in Convex, and replayed
- * instantly. Until then — or if the API is unreachable — we fall back to the
+ * instantly. Until then, or if the API is unreachable, we fall back to the
  * browser's built-in speech synthesis so the game always talks.
  *
  * `speak()` resolves once the phrase has finished playing, so callers can
@@ -122,7 +122,7 @@ export function speak(
   return new Promise((resolve) => {
     const key = normalize(text);
     // Coalesce duplicate phrases: if the exact same phrase is already queued
-    // (or playing right now), don't add another copy — resolve together with
+    // (or playing right now), don't add another copy, resolve together with
     // it when it finishes. Rapid repeat taps should never make the voice loop
     // the same line over and over.
     const last = queue[queue.length - 1];
@@ -265,7 +265,7 @@ function playItem(item: QueueItem): Promise<void> {
   });
 }
 
-// Stop speech when the tab is hidden — Chrome can otherwise keep a stuck
+// Stop speech when the tab is hidden, Chrome can otherwise keep a stuck
 // utterance looping in the background.
 if (typeof window !== "undefined" && "speechSynthesis" in window) {
   const stopSynth = () => {
@@ -354,7 +354,7 @@ export function playCorrect() {
   tone(990, 0.09, 0.22, "triangle", 0.25);
 }
 
-/** Soft low "boop" for a wrong answer — gentle, never scary. */
+/** Soft low "boop" for a wrong answer, gentle, never scary. */
 export function playWrong() {
   tone(220, 0, 0.18, "sine", 0.18);
 }

@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 /**
  * Parent-facing email signup (COPPA-safe). This lives ONLY on the landing
- * page's "For Parents" section — never in the game, and never aimed at the
+ * page's "For Parents" section, never in the game, and never aimed at the
  * child. Parents who join get the free printable sight-word flashcards as a
  * lead magnet plus a monthly "3 reading games to play this week" email.
  */
@@ -95,7 +95,7 @@ export function ForParentsSignup() {
 
       <p className="mt-3 text-xs font-semibold text-muted-foreground">
         For parents and caregivers only. We never ask children for information,
-        and there are no ads in the game — ever.
+        and there are no ads in the game, ever.
       </p>
     </motion.div>
   );

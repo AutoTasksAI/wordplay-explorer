@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { playLizard } from "@/lib/speech";
 
 /**
- * Milestone celebration (80 stars, 160 stars...): the biggest one yet — a
+ * Milestone celebration (80 stars, 160 stars...): the biggest one yet, a
  * giant neobrutalist lizard zips in from the left, swoops all over the
  * screen (with a sparkle trail and cartoon chirps along the way), then
  * rockets off the right edge.

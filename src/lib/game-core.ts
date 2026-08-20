@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 export type ModuleId = "words" | "numbers" | "patterns";
 
-/** Rounds per session — sized for a 5-year-old's attention span. */
+/** Rounds per session, sized for a 5-year-old's attention span. */
 export const SESSION_LENGTH = 8;
 
 /** How many correct answers mark an item as "known". */
@@ -76,7 +76,7 @@ export function shuffle<T>(items: T[]): T[] {
  * Pick the next session's targets using a spaced-repetition-style score:
  *
  * - Items still being learned (correct < MASTERY_COUNT) are kept in rotation
- *   with extra weight for missed attempts — repetition is how sight words
+ *   with extra weight for missed attempts, repetition is how sight words
  *   stick. Jitter keeps the exact lineup varied between sessions.
  * - Known items are scheduled for spaced review: the longer it's been since
  *   they were last seen, the sooner they come back (capped so nothing waits
@@ -109,7 +109,7 @@ export function pickTargets<T>(
     } else if (daysSince === Infinity) {
       score = 600 + Math.random() * 40;
     } else {
-      // Known: spaced review — up to 10 days of backlog, 60 pts per day.
+      // Known: spaced review, up to 10 days of backlog, 60 pts per day.
       score = Math.min(daysSince, 10) * 60 + Math.random() * 40;
     }
     return { item, score };

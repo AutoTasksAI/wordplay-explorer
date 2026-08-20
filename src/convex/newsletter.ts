@@ -11,9 +11,9 @@ import { v } from "convex/values";
  * child and never from inside the game. The child plays in guest mode with no
  * account and no email.
  *
- * Env vars (set in the project's Keys tab — never in .env):
- *   EMAILOCTOPUS_API_KEY — EmailOctopus API key (free tier: 2,500 subs)
- *   EMAILOCTOPUS_LIST_ID — the list id for parent subscribers
+ * Env vars (set in the project's Keys tab, never in .env):
+ *   EMAILOCTOPUS_API_KEY, EmailOctopus API key (free tier: 2,500 subs)
+ *   EMAILOCTOPUS_LIST_ID, the list id for parent subscribers
  */
 const API_KEY = process.env.EMAILOCTOPUS_API_KEY;
 const LIST_ID = process.env.EMAILOCTOPUS_LIST_ID;

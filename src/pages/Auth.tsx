@@ -204,7 +204,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       Continue as Guest
                     </Button>
                     <p className="mt-3 text-center text-sm font-medium text-muted-foreground">
-                      For a 5-year-old, guest mode is perfect — one tap and
+                      For a 5-year-old, guest mode is perfect. One tap and
                       they&apos;re exploring.
                     </p>
                   </div>
