@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { MASTERY_COUNT, type ModuleId } from "@/lib/game-core";
 import { MODULES } from "@/lib/modules";
 import { speak, warmUpAudio } from "@/lib/speech";
+import { SaveProgressDialog } from "@/components/SaveProgressDialog";
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { LogOut, Volume2 } from "lucide-react";
@@ -69,14 +70,17 @@ export default function GameHub() {
             Read with Rex
           </span>
         </div>
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="nb-btn flex items-center gap-1.5 bg-white px-3 py-2 text-sm font-semibold"
-        >
-          <LogOut className="size-4" />
-          <span className="hidden sm:inline">Bye!</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <SaveProgressDialog />
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="nb-btn flex items-center gap-1.5 bg-white px-3 py-2 text-sm font-semibold"
+          >
+            <LogOut className="size-4" />
+            <span className="hidden sm:inline">Bye!</span>
+          </button>
+        </div>
       </header>
 
       <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-8 px-4 py-10">
