@@ -1,5 +1,10 @@
 ## Overview
 
+> **Status: NOT yet public.** Built and deploy-ready, but needs the owner's
+> accounts (Convex, Resend, EmailOctopus, domain, hosting) to go live.
+> Start here: **`LAUNCH.md`** (go-public checklist) and **`HANDOFF.md`**
+> (full project state + what's left to do).
+
 This project uses the following tech stack:
 - Vite
 - Typescript

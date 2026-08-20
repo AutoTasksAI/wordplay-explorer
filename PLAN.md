@@ -163,20 +163,28 @@ paywalling the current free modules (kills word-of-mouth).
 | Service | Purpose | Env vars | Cost |
 |---|---|---|---|
 | EmailOctopus | Parent email list | `EMAILOCTOPUS_API_KEY` | Free to 2,500 subs |
+| Resend | OTP verification emails (auth) | `RESEND_API_KEY`, `EMAIL_FROM` | Free tier |
 | Stripe | Premium subscriptions | `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` | 2.9% + 30¢ |
 | Plausible | Site analytics | `PLAUSIBLE_DOMAIN`, `PLAUSIBLE_API_KEY` | ~$9/mo after trial |
 | ElevenLabs | Cartoon voice (in use) | `ELEVENLABS_API_KEY` | Free tier |
-| Vercel | Hosting | `VITE_CONVEX_URL=https://hushed-herring-277.convex.cloud` | Free tier |
+| Convex | Backend/DB/auth | `VITE_CONVEX_URL` (client) + `SITE_URL`, `JWKS`, `JWT_PRIVATE_KEY` (server) | Free tier |
+| Cloudflare Pages | Hosting | `VITE_CONVEX_URL` at build time | Free tier |
 
 Keys live in the project's **Keys/API keys** tab (never in `.env` files).
 
 ## Roadmap
 
-- [ ] **Now**: register `readwithrex.com` → deploy → update the canonical
-      domain in index.html/robots.txt/sitemap.xml → privacy policy → Search Console
-- [ ] **Week 1**: email signup form (EmailOctopus) + Plausible
-      (SEO technical pass is already in the repo)
-- [ ] **Month 1–2**: parent articles + printables + affiliate links
+- [x] **Code built** (Aug 2026): parent email capture, llms.txt, sight-words
+      printable, 3 SEO content pages, parent progress save/restore, privacy +
+      terms pages, Cloudflare `_redirects`. All pushed to `main`.
+- [ ] **Now (owner actions)**: register `readwithrex.com` → create Convex
+      account/project → create Resend/EmailOctopus/ElevenLabs accounts →
+      deploy to Cloudflare Pages → set keys → Search Console.
+      See `LAUNCH.md` for the full checklist.
+- [ ] **Auth blocker**: swap `src/convex/auth/emailOtp.ts` from Freebuff's OTP
+      service to Resend (owner must have a Resend key first).
+- [ ] **Week 1**: make email signup live (EmailOctopus keys) + Plausible
+- [ ] **Month 1–2**: more parent articles + printables + affiliate links
 - [ ] **When traffic is real (~1k+ visitors/mo)**: Stripe premium tier +
       parent dashboard
 

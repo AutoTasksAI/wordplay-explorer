@@ -5,6 +5,75 @@
 
 ---
 
+## ⚠️ READ FIRST — Status as of Aug 20, 2026 (build session 2)
+
+The project is **NOT deployed or public yet**. It was scaffolded in Freebuff and
+enhanced in a follow-up build session. All code changes are committed and
+pushed to `main` on GitHub (`AutoTasksAI/wordplay-explorer`). The app builds,
+but needs the HUMAN tasks below before it can go live. Full launch checklist:
+**`LAUNCH.md`**.
+
+### What's been built & committed (all on `main`)
+- `1e37503` — Parent email capture: `src/convex/newsletter.ts` (EmailOctopus
+  action), `src/components/ForParentsSignup.tsx`, "For parents" section +
+  nav/footer on the Landing page, `public/llms.txt`, `.env.example` keys.
+- `3b24110` — First SEO page: `src/pages/SightWords.tsx` at `/sight-words`
+  (50 sight words printable, print stylesheet, Article + HowTo + ItemList
+  schema). Added to routing, sitemap, llms.txt.
+- `2f2a353` — **Parent progress save/restore** (cross-device sync):
+  `savedProgress` table, `src/convex/savedProgress.ts` (actions: saveProgress
+  w/ newsletter opt-in, loadProgress), `savedProgressCore.ts` (internal
+  queries/mutations + getLinkStatus), `src/components/SaveProgressDialog.tsx`,
+  wired into the GameHub header.
+- `bc8d2f9` — Three SEO content pages via shared `src/components/ContentLayout.tsx`:
+  `/reading-milestones`, `/how-to-teach-a-5-year-old-to-read`,
+  `/first-words-order` (Article + HowTo + FAQ + ItemList schema each).
+  Sitemap + llms.txt updated. Privacy/Terms links in footers.
+- `64dfda0` — Legal + launch: `src/pages/Privacy.tsx` (COPPA-aware),
+  `src/pages/Terms.tsx`, and **`LAUNCH.md`** (the go-public checklist).
+- `6947b12` — `public/_redirects` for Cloudflare Pages SPA routing.
+
+### The one critical blocker (auth email)
+`src/convex/auth/emailOtp.ts` sends OTP codes through **Freebuff's service**
+(`https://auth.freebuff.app/send_otp` with a hardcoded key). This only works
+inside Freebuff's cloud. To go public, swap this to a real email provider
+(Resend) — a small code change once the owner has a Resend API key. The file
+header says "DO NOT MODIFY" — that applies to the Freebuff scaffold; it MUST be
+changed for production. Also `auth.config.ts` has a Freebuff `customJwt`
+provider and `main.tsx` imports `@vly-ai/integrations` + `VlyToolbar` — all
+Freebuff-only scaffolding that should be removed for a clean production build.
+
+### Tasks ONLY the human can do (owner has NO accounts/credentials yet)
+See `LAUNCH.md` for detail. High-level order:
+1. Buy domain `readwithrex.com` (~$10–12/yr).
+2. Create Convex account + project; run `npx convex dev` to get
+   `VITE_CONVEX_URL` (repo currently references Freebuff's
+   `https://hushed-herring-277.convex.cloud` — NOT the owner's).
+3. Create Resend account (free) for OTP emails.
+4. Create EmailOctopus account (free), make a "Parents" list → API key + list id.
+5. Create ElevenLabs account (free) for the cartoon voice (optional; browser
+   speech is the fallback).
+6. Connect repo to Cloudflare Pages (build: `npm install && npm run build`,
+   output `dist`, env `VITE_CONVEX_URL`).
+7. Point the domain at Cloudflare Pages.
+8. Set Convex env vars: `SITE_URL`, `JWKS`, `JWT_PRIVATE_KEY`, `RESEND_API_KEY`,
+   `EMAILOCTOPUS_API_KEY`, `EMAILOCTOPUS_LIST_ID`, `ELEVENLABS_API_KEY`.
+9. Google Search Console: verify domain, submit `sitemap.xml`. (Optional:
+   Plausible analytics ~$9/mo.)
+
+### Things the next agent can do without the owner (ask before large changes)
+- Swap email OTP Freebuff → Resend.
+- Remove Freebuff scaffolding (VlyToolbar, `@vly-ai/integrations`, customJwt).
+- Add Plausible script.
+- Draft parent welcome / lead-magnet emails.
+
+### Verification note
+Local syntax checks pass on all files. Full typecheck/build requires Convex
+codegen (`npx convex dev` / `bun convex dev --once`) which needs the owner's
+Convex account — `src/convex/_generated/` is NOT in the repo (generated).
+
+---
+
 ## What This App Is
 
 **Read with Rex** is a voice-first, gamified reading app for a 5-year-old (and children ages 4–6). It teaches first sight words, counting 1–10, and simple patterns. The child plays alone — no account management, no ads, no data collection from kids. Rex the T-Rex is the mascot/guide.
@@ -265,23 +334,37 @@ free reading games for kids, reading games for kindergarten, learn to read, firs
 - ✅ Brand rename (WordPlay Explorer → Read with Rex)
 - ✅ PLAN.md with full launch/monetization roadmap
 - ✅ Vercel deploy config
+- ✅ Parent email capture (ForParentsSignup + EmailOctopus action) — needs keys
+- ✅ `public/llms.txt` (AI/LLM discovery)
+- ✅ Parent progress save/restore (cross-device sync, COPPA-safe) — needs keys
+- ✅ 3 SEO content pages (sight-words printable, milestones, how-to-teach,
+      first-words order) with structured data
+- ✅ Privacy policy + Terms pages (COPPA-aware)
+- ✅ `public/_redirects` for Cloudflare Pages
+- ✅ `LAUNCH.md` go-public checklist
 
 ## What's NOT Done (from PLAN.md)
 
-### Phase 0 — Deploy
-- [ ] Register `readwithrex.com` domain
-- [ ] Deploy to Vercel (config exists, just needs push)
+### Phase 0 — Deploy (BLOCKED on the owner's accounts)
+- [ ] Register `readwithrex.com` domain (owner action)
+- [ ] Create Convex account/project + get `VITE_CONVEX_URL` (owner action)
+- [ ] Swap email OTP from Freebuff → Resend (code change; needs Resend key)
+- [ ] Remove Freebuff scaffolding (VlyToolbar / `@vly-ai/integrations` / customJwt)
+- [ ] Deploy to Cloudflare Pages (owner action; build config documented)
 - [ ] Update canonical URL if domain differs from `readwithrex.com`
-- [ ] Privacy policy + terms (COPPA-compliant)
+- [ ] Set Convex env vars (SITE_URL, JWKS, JWT_PRIVATE_KEY, RESEND_API_KEY,
+      EMAILOCTOPUS_*, ELEVENLABS_API_KEY)
 - [ ] Google Search Console setup
 
 ### Phase 1 — SEO Growth
-- [ ] Plausible Analytics integration
-- [ ] Parent blog articles + printables (5–10 articles targeting parent search keywords)
+- [x] Parent blog articles + printables (3 published: sight-words, milestones,
+      how-to-teach, first-words-order) — add more (5–10 total)
+- [ ] Plausible Analytics integration (optional)
 - [ ] Prerender landing page for crawlers (optional)
 
 ### Phase 2 — Monetization
-- [ ] EmailOctopus parent email list (free tier, lead magnet: "50 sight-word flashcards")
+- [ ] EmailOctopus list LIVE (code done; needs account + keys)
+- [ ] Parent welcome email + lead-magnet delivery (draft needed)
 - [ ] Stripe premium tier (~$29.99/yr): new modules, parent dashboard
 - [ ] Amazon Associates affiliate on blog articles
 - [ ] Display ads on parent-facing pages only (never in-game)
