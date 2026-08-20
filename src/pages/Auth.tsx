@@ -299,17 +299,8 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
               </form>
             </>
           )}
-
           <div className="py-4 px-6 text-xs text-center text-muted-foreground bg-paper border-t-[3px] border-ink">
-            Secured by{" "}
-            <a
-              href="https://freebuff.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline font-semibold hover:text-tomato transition-colors"
-            >
-              freebuff.com
-            </a>
+            Made by a dad, for his 5-year-old.
           </div>
         </Card>
       </div>

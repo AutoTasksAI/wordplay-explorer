@@ -1,13 +1,11 @@
-import '@vly-ai/integrations';
 import { Toaster } from "@/components/ui/sonner";
 import { RequireAuth } from "@/components/RequireAuth";
-import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
 import { setSpeechClient } from "@/lib/speech";
-import React, { StrictMode, useEffect, lazy, Suspense } from "react";
+import React, { StrictMode, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import "./index.css";
 
 // Lazy load route components for better code splitting
@@ -32,25 +30,7 @@ function RouteLoading() {
   );
 }
 
-/** Silent error boundary — if VlyToolbar crashes it renders nothing instead of
- *  crashing the whole app (e.g. hook errors in WebContainer environment). */
-class ToolbarErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean }
-> {
-  state = { hasError: false };
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-  componentDidCatch(err: Error) {
-    console.warn("[VlyToolbar] Caught error, toolbar disabled:", err.message);
-  }
-  render() {
-    return this.state.hasError ? null : this.props.children;
-  }
-}
-
-/** Hard guard so runtime errors never leave the preview as a blank page. */
+/** Hard guard so runtime errors never leave the app as a blank page. */
 class RootErrorBoundary extends React.Component<
   { children: React.ReactNode },
   { hasError: boolean; message: string; stack: string }
@@ -64,22 +44,17 @@ class RootErrorBoundary extends React.Component<
     };
   }
   componentDidCatch(err: Error) {
-    console.error("[WebContainer preview] Root crash:", err);
+    console.error("App runtime error:", err);
   }
   render() {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-background text-foreground p-6">
           <div className="max-w-lg text-center">
-            <p className="text-sm font-semibold">Preview runtime error</p>
+            <p className="text-sm font-semibold">Something went wrong</p>
             <p className="mt-2 text-xs text-muted-foreground break-words">
               {this.state.message}
             </p>
-            {this.state.stack && (
-              <pre className="mt-3 text-left text-[10px] leading-4 text-muted-foreground/80 max-h-40 overflow-auto rounded border border-border/60 p-2">
-                {this.state.stack}
-              </pre>
-            )}
           </div>
         </div>
       );
@@ -88,85 +63,77 @@ class RootErrorBoundary extends React.Component<
   }
 }
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+const convexUrl = import.meta.env.VITE_CONVEX_URL as string | undefined;
 
-// Give the speech helpers the Convex client so they can fetch the cached
-// cartoon TTS audio for words and phrases (with browser speech as fallback).
-setSpeechClient(convex);
-
-
-
-function RouteSyncer() {
-  const location = useLocation();
-  useEffect(() => {
-    window.parent.postMessage(
-      { type: "iframe-route-change", path: location.pathname },
-      "*",
-    );
-  }, [location.pathname]);
-
-  useEffect(() => {
-    function handleMessage(event: MessageEvent) {
-      if (event.data?.type === "navigate") {
-        if (event.data.direction === "back") window.history.back();
-        if (event.data.direction === "forward") window.history.forward();
-      }
-    }
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, []);
-
-  return null;
+/** Friendly screen when the app is opened before the backend is configured. */
+function BackendMissing() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+      <div className="max-w-md text-center">
+        <h1 className="font-bold text-2xl">Read with Rex</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          This app isn&apos;t fully set up yet. Please try again later.
+        </p>
+      </div>
+    </div>
+  );
 }
 
+function App() {
+  if (!convexUrl) return <BackendMissing />;
+  const convex = new ConvexReactClient(convexUrl);
+  // Give the speech helpers the Convex client so they can fetch the cached
+  // cartoon TTS audio for words and phrases (with browser speech as fallback).
+  setSpeechClient(convex);
+
+  return (
+    <ConvexAuthProvider client={convex}>
+      <BrowserRouter>
+        <Suspense fallback={<RouteLoading />}>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/sight-words" element={<SightWords />} />
+            <Route path="/reading-milestones" element={<ReadingMilestones />} />
+            <Route
+              path="/how-to-teach-a-5-year-old-to-read"
+              element={<HowToTeach />}
+            />
+            <Route path="/first-words-order" element={<FirstWordsOrder />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route
+              path="/auth"
+              element={<AuthPage redirectAfterAuth="/game" />}
+            />
+            <Route
+              path="/game"
+              element={
+                <RequireAuth>
+                  <GameHub />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/game/:module"
+              element={
+                <RequireAuth>
+                  <ModulePage />
+                </RequireAuth>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+      <Toaster />
+    </ConvexAuthProvider>
+  );
+}
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RootErrorBoundary>
-      <ToolbarErrorBoundary>
-        <VlyToolbar />
-      </ToolbarErrorBoundary>
-      <ConvexAuthProvider client={convex}>
-        <BrowserRouter>
-          <RouteSyncer />
-          <Suspense fallback={<RouteLoading />}>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/sight-words" element={<SightWords />} />
-              <Route path="/reading-milestones" element={<ReadingMilestones />} />
-              <Route
-                path="/how-to-teach-a-5-year-old-to-read"
-                element={<HowToTeach />}
-              />
-              <Route path="/first-words-order" element={<FirstWordsOrder />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route
-                path="/auth"
-                element={<AuthPage redirectAfterAuth="/game" />}
-              />
-              <Route
-                path="/game"
-                element={
-                  <RequireAuth>
-                    <GameHub />
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/game/:module"
-                element={
-                  <RequireAuth>
-                    <ModulePage />
-                  </RequireAuth>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-        <Toaster />
-      </ConvexAuthProvider>
+      <App />
     </RootErrorBoundary>
   </StrictMode>,
 );

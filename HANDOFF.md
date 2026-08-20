@@ -5,80 +5,120 @@
 
 ---
 
-## ⚠️ READ FIRST — Status as of Aug 20, 2026 (build session 2)
+## ⚠️ READ FIRST — Status as of Aug 20, 2026 (build session 3)
 
-The project is **NOT deployed or public yet**. It was scaffolded in Freebuff and
-enhanced in a follow-up build session. All code changes are committed and
-pushed to `main` on GitHub (`AutoTasksAI/wordplay-explorer`). The app builds,
-but needs the HUMAN tasks below before it can go live. Full launch checklist:
-**`LAUNCH.md`**.
+The project is **NOT deployed or public yet** — but it is now fully buildable
+and running against the owner's real backend. All code is on GitHub
+(`AutoTasksAI/wordplay-explorer`, branch `main`). The remaining work to go
+public is **owner account creation + keys + deploy** (Resend, EmailOctopus,
+ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
 
-### What's been built & committed (all on `main`)
-- `1e37503` — Parent email capture: `src/convex/newsletter.ts` (EmailOctopus
-  action), `src/components/ForParentsSignup.tsx`, "For parents" section +
-  nav/footer on the Landing page, `public/llms.txt`, `.env.example` keys.
-- `3b24110` — First SEO page: `src/pages/SightWords.tsx` at `/sight-words`
-  (50 sight words printable, print stylesheet, Article + HowTo + ItemList
-  schema). Added to routing, sitemap, llms.txt.
-- `2f2a353` — **Parent progress save/restore** (cross-device sync):
-  `savedProgress` table, `src/convex/savedProgress.ts` (actions: saveProgress
-  w/ newsletter opt-in, loadProgress), `savedProgressCore.ts` (internal
-  queries/mutations + getLinkStatus), `src/components/SaveProgressDialog.tsx`,
-  wired into the GameHub header.
-- `bc8d2f9` — Three SEO content pages via shared `src/components/ContentLayout.tsx`:
-  `/reading-milestones`, `/how-to-teach-a-5-year-old-to-read`,
-  `/first-words-order` (Article + HowTo + FAQ + ItemList schema each).
-  Sitemap + llms.txt updated. Privacy/Terms links in footers.
-- `64dfda0` — Legal + launch: `src/pages/Privacy.tsx` (COPPA-aware),
-  `src/pages/Terms.tsx`, and **`LAUNCH.md`** (the go-public checklist).
-- `6947b12` — `public/_redirects` for Cloudflare Pages SPA routing.
+### What happened in session 3 (2026-08-20) — Freebuff cleanup + first real backend
 
-### The one critical blocker (auth email)
-`src/convex/auth/emailOtp.ts` sends OTP codes through **Freebuff's service**
-(`https://auth.freebuff.app/send_otp` with a hardcoded key). This only works
-inside Freebuff's cloud. To go public, swap this to a real email provider
-(Resend) — a small code change once the owner has a Resend API key. The file
-header says "DO NOT MODIFY" — that applies to the Freebuff scaffold; it MUST be
-changed for production. Also `auth.config.ts` has a Freebuff `customJwt`
-provider and `main.tsx` imports `@vly-ai/integrations` + `VlyToolbar` — all
-Freebuff-only scaffolding that should be removed for a clean production build.
+**Owner actions completed:**
+- Bought the domain **`readwithrex.com`** on Namecheap.
+- Created a **Convex account** (team `josh-a2865`) and project
+  `wordplay-explorer`; ran `npx convex dev --once` which created the dev
+  deployment **`https://calculating-basilisk-420.convex.cloud`**, pushed the
+  schema (all tables + indexes + auth tables), and regenerated
+  `src/convex/_generated/`.
 
-### Tasks ONLY the human can do (owner has NO accounts/credentials yet)
-See `LAUNCH.md` for detail. High-level order:
-1. Buy domain `readwithrex.com` (~$10–12/yr).
-2. Create Convex account + project; run `npx convex dev` to get
-   `VITE_CONVEX_URL` (repo currently references Freebuff's
-   `https://hushed-herring-277.convex.cloud` — NOT the owner's).
-3. Create Resend account (free) for OTP emails.
-4. Create EmailOctopus account (free), make a "Parents" list → API key + list id.
-5. Create ElevenLabs account (free) for the cartoon voice (optional; browser
-   speech is the fallback).
-6. Connect repo to Cloudflare Pages (build: `npm install && npm run build`,
-   output `dist`, env `VITE_CONVEX_URL`).
-7. Point the domain at Cloudflare Pages.
-8. Set Convex env vars: `SITE_URL`, `JWKS`, `JWT_PRIVATE_KEY`, `RESEND_API_KEY`,
-   `EMAILOCTOPUS_API_KEY`, `EMAILOCTOPUS_LIST_ID`, `ELEVENLABS_API_KEY`.
-9. Google Search Console: verify domain, submit `sitemap.xml`. (Optional:
-   Plausible analytics ~$9/mo.)
+**Code changes made by the agent (all in the working tree, NOT yet committed):**
+- `src/convex/auth/emailOtp.ts` — **Freebuff OTP → Resend**. The hardcoded
+  Freebuff API key / `auth.freebuff.app/send_otp` call is gone. It now POSTs to
+  Resend's API using `RESEND_API_KEY` + `EMAIL_FROM` env vars and emails the
+  parent a friendly 6-digit code (15-min expiry). Reads keys from the Convex
+  Keys tab, so no secret lives in the repo.
+- `src/convex/auth.config.ts` — removed the Freebuff `customJwt` provider;
+  only the standard Convex OIDC provider remains.
+- `src/main.tsx` — removed `@vly-ai/integrations`, `VlyToolbar` +
+  `ToolbarErrorBoundary`, and the iframe `RouteSyncer` (postMessage to
+  window.parent). Convex client init moved into an `App()` component that shows
+  a friendly "not set up yet" screen if `VITE_CONVEX_URL` is missing instead of
+  crashing.
+- `src/pages/Auth.tsx` — removed the "Secured by freebuff.com" footer.
+- `vite.config.ts` — removed `vlyPlugin()` and its react-dedupe note.
+- `package.json` — removed `@vly-ai/integrations`, `@zumer/snapdom`, `axios`.
+  `package-lock.json` pruned via `npm install`.
+- Deleted: `vly-toolbar-readonly.tsx`, `src/lib/vly-integrations.ts`,
+  `src/instrumentation.tsx`, `integrations.md`.
+- `tsconfig.app.json` — dropped the deleted `vly-toolbar-readonly.tsx` include.
+- Docs updated to current reality: `LAUNCH.md`, `HANDOFF.md`, `PLAN.md`
+  (real Convex URL, checked-off steps), `.env.example`.
 
-### Things the next agent can do without the owner (ask before large changes)
-- Swap email OTP Freebuff → Resend.
-- Remove Freebuff scaffolding (VlyToolbar, `@vly-ai/integrations`, customJwt).
-- Add Plausible script.
-- Draft parent welcome / lead-magnet emails.
+**Verified this session:**
+- `npm run build` passes (tsc + vite, 0 errors). Note: earlier this session the
+  build was blocked only on missing `_generated/`; it now exists.
+- `npm run preview` smoke test: `/`, `/sight-words`, `/game/words`, `/privacy`,
+  `/auth` all return HTTP 200 with the correct title + canonical URL.
+- `eslint` on all changed files: 0 errors (the repo has 14 pre-existing lint
+  errors elsewhere — see "Open items" below).
 
-### Verification note
-Local syntax checks pass on all files. Full typecheck/build requires Convex
-codegen (`npx convex dev` / `bun convex dev --once`) which needs the owner's
-Convex account — `src/convex/_generated/` is NOT in the repo (generated).
+### The exact next step for a new thread
+
+1. Have the owner create the remaining free accounts and paste keys into the
+   Convex dashboard → Project Settings → Environment Variables:
+   - **Resend** → `RESEND_API_KEY` + `EMAIL_FROM` (e.g. `Read with Rex
+     <hello@readwithrex.com>`; swap to the real domain later).
+   - **EmailOctopus** → create a "Parents" list → `EMAILOCTOPUS_API_KEY` +
+     `EMAILOCTOPUS_LIST_ID`.
+   - **ElevenLabs** (optional) → `ELEVENLABS_API_KEY` (browser speech is the
+     fallback until then).
+   - `SITE_URL`, `JWKS`, `JWT_PRIVATE_KEY` are also listed in LAUNCH.md for
+     auth; confirm they're set for the dev deployment.
+2. **Deploy** to Cloudflare Pages: connect the GitHub repo → build
+   `npm install && npm run build`, output `dist`, env
+   `VITE_CONVEX_URL=https://calculating-basilisk-420.convex.cloud` → point
+   `readwithrex.com` (set Namecheap nameservers at Cloudflare). `public/
+   _redirects` already handles SPA routes. (Vercel alternative: `vercel.json`
+   is configured.)
+3. Verify email OTP live: sign in at `/auth` with a parent email and confirm
+   the code arrives via Resend.
+4. Google Search Console: verify the domain, submit `sitemap.xml`.
+
+### Open items for the next agent (ask before large changes)
+- Commit + push the session-3 working-tree changes to `main` (owner approval —
+  see Git note below).
+- Add the Plausible analytics script to `index.html` (owner account needed).
+- Draft the parent welcome email + sight-word lead-magnet delivery copy.
+- Fix the 14 pre-existing lint errors (`npm run lint`: `use-mobile.ts`
+  setState-in-effect, `savedProgressCore.ts` unused import, several
+  "impure function during render" / setState-in-effect in game components).
+- Remove the stray tracked `isolate/` directory (stale Freebuff build artifact
+  committed by accident) — confirm with the owner first.
+- Optionally create a production Convex deployment (`npx convex deploy`) and
+  update `VITE_CONVEX_URL` to its URL before or at launch.
+
+### Git note
+The session-3 changes are in the working tree but **not committed or pushed**
+as of this handoff. Run `git status` to see the list (modified: `package.json`,
+`package-lock.json`, `src/main.tsx`, `src/pages/Auth.tsx`, `src/convex/auth.ts`,
+`src/convex/auth.config.ts`, `src/convex/auth/emailOtp.ts`, `vite.config.ts`,
+`tsconfig.app.json`, `.env.example`, `LAUNCH.md`, `HANDOFF.md`, `PLAN.md`;
+deleted: `vly-toolbar-readonly.tsx`, `src/lib/vly-integrations.ts`,
+`src/instrumentation.tsx`, `integrations.md`). `.env.local` and
+`src/convex/_generated/` are gitignored (generated/secret — never commit).
+
+### Handoff checklist
+- [x] Current status and owner are updated.
+- [x] Changed files are listed.
+- [x] Checks actually run are recorded with their real result.
+- [x] Blockers and approvals are explicit.
+- [x] Exact next action is written for the next agent.
+- [ ] Commit + push for another device to resume — pending owner approval.
 
 ---
 
 ## What This App Is
 
-**Read with Rex** is a voice-first, gamified reading app for a 5-year-old (and children ages 4–6). It teaches first sight words, counting 1–10, and simple patterns. The child plays alone — no account management, no ads, no data collection from kids. Rex the T-Rex is the mascot/guide.
+**Read with Rex** is a voice-first, gamified reading app for a 5-year-old (and
+children ages 4–6). It teaches first sight words, counting 1–10, and simple
+patterns. The child plays alone — no account management, no ads, no data
+collection from kids. Rex the T-Rex is the mascot/guide.
 
-The app was built by a dad for his son. It started as "WordPlay Explorer" and was rebranded to "Read with Rex" for SEO (the word "read" in the name is critical for discoverability).
+The app was built by a dad for his son. It started as "WordPlay Explorer" and
+was rebranded to "Read with Rex" for SEO (the word "read" in the name is
+critical for discoverability).
 
 ---
 
@@ -86,13 +126,13 @@ The app was built by a dad for his son. It started as "WordPlay Explorer" and wa
 
 | Layer | Tech | Notes |
 |-------|------|-------|
-| Frontend | Vite 7, React 19, TypeScript 5.9, Tailwind v4 | `bun` is the package manager |
+| Frontend | Vite 7, React 19, TypeScript 5.9, Tailwind v4 | `npm` is the package manager (bun optional) |
 | UI | shadcn/ui + Lucide Icons | Neobrutalism Minimalism theme |
 | Animation | Framer Motion 12 | Used everywhere — celebrations, transitions, micro-interactions |
 | Backend/DB | Convex | Serverless, reactive queries/mutations |
-| Auth | Convex Auth (`@convex-dev/auth`) | Guest (anonymous) + email OTP |
+| Auth | Convex Auth (`@convex-dev/auth`) | Guest (anonymous) + email OTP (Resend) |
 | Voice | ElevenLabs cartoon voice via Convex action | Fallback to browser speechSynthesis |
-| Deploy | Vercel (config already in `vercel.json`) | SPA with Bun build |
+| Deploy | Cloudflare Pages (recommended; `public/_redirects` added) or Vercel (`vercel.json`) | SPA |
 
 ---
 
@@ -101,42 +141,59 @@ The app was built by a dad for his son. It started as "WordPlay Explorer" and wa
 ```
 /
 ├── index.html                  # SEO-optimized: meta tags, OG, JSON-LD
-├── vercel.json                 # Vercel deploy config (SPA rewrites, Bun)
+├── vercel.json                 # Vercel deploy config (SPA rewrites)
 ├── package.json                # All deps (React 19, Convex, Framer Motion, etc.)
 ├── PLAN.md                     # Full launch/SEO/monetization plan
-├── integrations.md             # Vly integration docs (AI, email, payments)
+├── LAUNCH.md                   # Go-public checklist
+├── HANDOFF.md                  # This file
 ├── public/
 │   ├── manifest.webmanifest    # PWA manifest
 │   ├── robots.txt              # Crawler instructions
-│   └── sitemap.xml             # Static sitemap
+│   ├── sitemap.xml             # Static sitemap
+│   ├── llms.txt                # AI/LLM discovery
+│   └── _redirects              # Cloudflare Pages SPA fallback
 ├── src/
-│   ├── main.tsx                # App entry: providers, routes, error boundaries
+│   ├── main.tsx                # App entry: providers, routes, error boundary
 │   ├── index.css               # Neobrutalism theme tokens, Tailwind config
 │   ├── pages/
-│   │   ├── Landing.tsx         # Marketing/SEO landing page (huge — ~400 lines)
+│   │   ├── Landing.tsx         # Marketing/SEO landing page
 │   │   ├── Auth.tsx            # Sign in/up page (guest + email OTP)
-│   │   ├── GameHub.tsx         # Module selector (3 cards)
+│   │   ├── GameHub.tsx         # Module selector (3 cards) + Save Progress
 │   │   ├── ModulePage.tsx      # Loads module data, renders ModuleShell
+│   │   ├── SightWords.tsx      # /sight-words (50-word printable + schema)
+│   │   ├── ReadingMilestones.tsx / HowToTeach.tsx / FirstWordsOrder.tsx
+│   │   ├── Privacy.tsx / Terms.tsx   # COPPA-aware legal pages
 │   │   └── NotFound.tsx        # 404 page
 │   ├── components/
 │   │   ├── ModuleShell.tsx     # THE CORE: game loop, rounds, scoring, celebrations
 │   │   ├── RequireAuth.tsx     # Auth guard (redirects to /auth?returnTo=...)
 │   │   ├── LogoDropdown.tsx    # Brand logo/nav dropdown
-│   │   ├── SpiderCelebration.tsx  # 20-star milestone
-│   │   ├── BatCelebration.tsx     # 40-star milestone
-│   │   ├── OctopusCelebration.tsx # 60-star milestone (ink transition to next module)
-│   │   └── LizardCelebration.tsx  # 80-star milestone (biggest)
+│   │   ├── ContentLayout.tsx   # Shared layout for the SEO content pages
+│   │   ├── ForParentsSignup.tsx  # Parent email capture (EmailOctopus)
+│   │   ├── SaveProgressDialog.tsx # Parent save/restore w/ 4-digit PIN
+│   │   ├── SpiderCelebration.tsx / BatCelebration.tsx / OctopusCelebration.tsx / LizardCelebration.tsx
+│   │   └── ui/                 # shadcn/ui components
 │   └── lib/
-│       ├── game-core.ts        # Shared types, SESSION_LENGTH, MASTERY_COUNT, pickTargets (spaced repetition), pickOptions, buildProgressMap
+│       ├── game-core.ts        # Types, SESSION_LENGTH, MASTERY_COUNT, pickTargets (spaced repetition), pickOptions, buildProgressMap
 │       ├── words.tsx           # 39 sight words with emoji, WORDS_MODULE config
 │       ├── numbers.tsx         # Numbers 1–10, NUMBERS_MODULE config
 │       ├── patterns.tsx        # 5 pattern types (AB, AABB, ABB, AAB, ABC), PATTERNS_MODULE config
 │       ├── modules.ts          # MODULE_IDS array, MODULES registry, isModuleId()
 │       └── speech.ts           # TTS queue, ElevenLabs + browser fallback, sound effects
 └── src/convex/
-    ├── schema.ts               # Tables: users, itemProgress, playerStats, audioCache
-    └── auth/
-        └── emailOtp.ts         # DO NOT MODIFY
+    ├── schema.ts               # Tables: users, itemProgress, playerStats, savedProgress, audioCache + authTables
+    ├── auth.ts                 # convexAuth with [emailOtp, Anonymous]
+    ├── auth.config.ts          # OIDC provider (Freebuff customJwt removed)
+    ├── http.ts                 # auth HTTP routes
+    ├── auth/emailOtp.ts        # Resend-powered OTP (was Freebuff)
+    ├── game.ts                 # itemProgress/playerStats queries + mutations
+    ├── users.ts                # user helpers
+    ├── newsletter.ts           # EmailOctopus subscribe action (env keys)
+    ├── savedProgress.ts        # saveProgress/loadProgress actions (parent sync)
+    ├── savedProgressCore.ts    # internal queries/mutations + getLinkStatus
+    ├── speech.ts               # ElevenLabs synthesizeSpeech action (env key)
+    ├── speechCache.ts          # audioCache get/store (internal + public)
+    └── _generated/             # GENERATED by `npx convex dev` — gitignored
 ```
 
 ---
@@ -145,7 +202,12 @@ The app was built by a dad for his son. It started as "WordPlay Explorer" and wa
 
 | Route | Component | Auth? | Description |
 |-------|-----------|-------|-------------|
-| `/` | `Landing.tsx` | No | Marketing page, SEO content, FAQ |
+| `/` | `Landing.tsx` | No | Marketing page, SEO content, FAQ, parent signup |
+| `/sight-words` | `SightWords.tsx` | No | 50 sight words printable |
+| `/reading-milestones` | `ReadingMilestones.tsx` | No | SEO content |
+| `/how-to-teach-a-5-year-old-to-read` | `HowToTeach.tsx` | No | SEO content |
+| `/first-words-order` | `FirstWordsOrder.tsx` | No | SEO content |
+| `/privacy` `/terms` | `Privacy.tsx` / `Terms.tsx` | No | COPPA-aware legal |
 | `/auth` | `Auth.tsx` | No | Guest mode + email OTP sign-in |
 | `/game` | `GameHub.tsx` | Yes | Module selector (3 cards) |
 | `/game/:module` | `ModulePage.tsx` | Yes | The actual game (words/numbers/patterns) |
@@ -158,17 +220,20 @@ The app was built by a dad for his son. It started as "WordPlay Explorer" and wa
 ## Convex Schema
 
 ### Tables
-- **users** — standard Convex Auth table (name, image, email, isAnonymous, role)
-- **itemProgress** — per-item mastery: `(userId, module, item) → {correct, wrong, lastPlayedAt}`. Indexes: `by_user`, `by_user_module_item`
-- **playerStats** — lifetime stars + sessions per user. Index: `by_user`
-- **audioCache** — cached TTS audio (base64 mp3) keyed by normalized text. Index: `by_key`
+- **users** — standard Convex Auth table (name, image, email, isAnonymous, role). Index `email`.
+- **itemProgress** — per-item mastery: `(userId, module, item) → {correct, wrong, lastPlayedAt}`. Indexes: `by_user`, `by_user_module_item`.
+- **playerStats** — lifetime stars + sessions per user; `linkedEmail` + `lastSyncedAt` for parent sync. Index `by_user`.
+- **savedProgress** — parent-saved progress snapshot (keyed by PARENT email, protected by 4-digit PIN hash) for cross-device restore. Index `by_email`.
+- **audioCache** — cached TTS audio (base64 mp3) keyed by normalized text. Index `by_key`.
+- Plus `authTables()`: authAccounts, authSessions, authRefreshTokens, authVerificationCodes, authVerifiers, authRateLimits.
 
-### Convex Functions (not in `_generated` — hand-written)
-The app references these API functions that must exist in `src/convex/`:
-- `api.speechCache.getAudio` — query, fetches cached TTS by key
-- `api.speech.synthesizeSpeech` — action, generates TTS via ElevenLabs API
-
-> **Note**: These files were likely created during development but may not be in the repo currently (only `emailOtp.ts` shows in the glob). If they're missing, the app will still work via browser speechSynthesis fallback, but the cartoon voice won't be available. Check `src/convex/speechCache.ts` and `src/convex/speech.ts`.
+### Convex Functions (hand-written in `src/convex/`)
+- `api.game.*` — itemProgress + playerStats queries/mutations.
+- `api.speechCache.getAudio` — query, fetches cached TTS by key.
+- `api.speech.synthesizeSpeech` — action, generates TTS via ElevenLabs (needs `ELEVENLABS_API_KEY`).
+- `api.newsletter.subscribeEmail` — action, adds a PARENT email to EmailOctopus (needs keys).
+- `api.savedProgress.saveProgress` / `loadProgress` — actions for parent sync.
+- Auth via `@convex-dev/auth`: `emailOtp` (Resend) + `Anonymous` (guest).
 
 ---
 
@@ -193,7 +258,8 @@ The app references these API functions that must exist in `src/convex/`:
 6. Can PLAY AGAIN or go back to All Games
 
 ### Key Rule: speech never cuts off
-`speak()` returns a Promise that resolves when audio finishes. Praise waits for speech completion before advancing to the next round.
+`speak()` returns a Promise that resolves when audio finishes. Praise waits for
+speech completion before advancing to the next round.
 
 ### Duplicate speech prevention
 The queue coalesces identical phrases — rapid taps won't loop the same line.
@@ -235,7 +301,8 @@ When lifetime stars cross a 20-star boundary, a celebration plays on session end
 
 The cycle repeats: 100 = spider, 120 = bat, 140 = octopus, 160 = lizard.
 
-The **octopus** is special — after the ink covers the screen, `onDone` fires and the app navigates to the next module in rotation.
+The **octopus** is special — after the ink covers the screen, `onDone` fires and
+the app navigates to the next module in rotation.
 
 ---
 
@@ -282,7 +349,7 @@ Custom utility classes: `.nb-border`, `.nb-shadow`, `.nb-shadow-sm`, `.nb-shadow
 - Title: "Read with Rex — Free Reading Games for Kids Ages 4-6"
 - Meta description with keywords
 - Open Graph + Twitter Card tags
-- Canonical URL: `https://readwithrex.com`
+- Canonical URL: `https://readwithrex.com` (domain now registered on Namecheap)
 - JSON-LD: `WebApplication` + `LearningResource` (audience 4–6, teaches first sight words) + `FAQPage`
 
 ### Keywords Baked In (Natural, Not Stuffed)
@@ -295,8 +362,9 @@ free reading games for kids, reading games for kindergarten, learn to read, firs
 
 ### Crawler Files
 - `public/robots.txt` — allows all, points to sitemap
-- `public/sitemap.xml` — lists `/`, `/auth`, `/game`
+- `public/sitemap.xml` — lists all public pages
 - `public/manifest.webmanifest` — PWA manifest
+- `public/llms.txt` — plain-text page index for LLMs
 
 ---
 
@@ -304,16 +372,18 @@ free reading games for kids, reading games for kindergarten, learn to read, firs
 
 | Variable | Where | Purpose |
 |----------|-------|---------|
-| `VITE_CONVEX_URL` | Client (build time) | Convex backend URL: `https://hushed-herring-277.convex.cloud` |
-| `ELEVENLABS_API_KEY` | Convex server (Keys tab) | Cartoon voice TTS |
-| `EMAILOCTOPUS_API_KEY` | Convex server (Keys tab) | **NOT YET INTEGRATED** — planned for parent email list |
-| `STRIPE_SECRET_KEY` | Convex server (Keys tab) | **NOT YET INTEGRATED** — planned for premium tier |
-| `STRIPE_PUBLISHABLE_KEY` | Convex server (Keys tab) | **NOT YET INTEGRATED** |
-| `STRIPE_WEBHOOK_SECRET` | Convex server (Keys tab) | **NOT YET INTEGRATED** |
-| `PLAUSIBLE_DOMAIN` | Convex server (Keys tab) | **NOT YET INTEGRATED** — planned for analytics |
-| `PLAUSIBLE_API_KEY` | Convex server (Keys tab) | **NOT YET INTEGRATED** |
+| `VITE_CONVEX_URL` | Client (build time) | Convex backend URL: `https://calculating-basilisk-420.convex.cloud` |
+| `RESEND_API_KEY` | Convex Keys tab | OTP emails (code done; key needed) |
+| `EMAIL_FROM` | Convex Keys tab | Verified sender for OTP emails (code done; value needed) |
+| `EMAILOCTOPUS_API_KEY` | Convex Keys tab | Parent newsletter (code done; key needed) |
+| `EMAILOCTOPUS_LIST_ID` | Convex Keys tab | Parent newsletter list (code done; id needed) |
+| `ELEVENLABS_API_KEY` | Convex Keys tab | Cartoon voice TTS (optional; browser speech falls back) |
+| `SITE_URL`, `JWKS`, `JWT_PRIVATE_KEY` | Convex Keys tab | Auth URLs/JWT config |
+| `STRIPE_*` | Convex Keys tab | **NOT YET INTEGRATED** — future premium tier |
+| `PLAUSIBLE_*` | Convex Keys tab | **NOT YET INTEGRATED** — optional analytics |
 
-**Never edit .env files.** Keys are managed through the project's Keys/API keys tab.
+**Never edit .env files / commit secrets.** Keys are managed through the Convex
+dashboard → Project Settings → Environment Variables (Keys tab).
 
 ---
 
@@ -327,38 +397,35 @@ free reading games for kids, reading games for kindergarten, learn to read, firs
 - ✅ Confetti bursts, rain confetti, sound effects
 - ✅ Neobrutalism Minimalism theme (complete)
 - ✅ Mobile responsive
-- ✅ Auth (guest + email OTP)
+- ✅ Auth (guest + email OTP via Resend — code done)
 - ✅ Protected routes
-- ✅ SEO: title, meta, OG, JSON-LD, robots, sitemap
+- ✅ SEO: title, meta, OG, JSON-LD, robots, sitemap, llms.txt
 - ✅ Landing page with FAQ, E-E-A-T sections
 - ✅ Brand rename (WordPlay Explorer → Read with Rex)
 - ✅ PLAN.md with full launch/monetization roadmap
-- ✅ Vercel deploy config
+- ✅ Vercel + Cloudflare Pages deploy configs
 - ✅ Parent email capture (ForParentsSignup + EmailOctopus action) — needs keys
-- ✅ `public/llms.txt` (AI/LLM discovery)
 - ✅ Parent progress save/restore (cross-device sync, COPPA-safe) — needs keys
-- ✅ 3 SEO content pages (sight-words printable, milestones, how-to-teach,
-      first-words order) with structured data
+- ✅ 4 SEO content pages with structured data (sight-words, milestones, how-to-teach, first-words order)
 - ✅ Privacy policy + Terms pages (COPPA-aware)
-- ✅ `public/_redirects` for Cloudflare Pages
-- ✅ `LAUNCH.md` go-public checklist
+- ✅ LAUNCH.md go-public checklist
+- ✅ Freebuff removal (OTP→Resend, toolbar, integrations, customJwt, axios)
+- ✅ Real Convex backend (dev deployment live, schema pushed, build passing)
 
 ## What's NOT Done (from PLAN.md)
 
-### Phase 0 — Deploy (BLOCKED on the owner's accounts)
-- [ ] Register `readwithrex.com` domain (owner action)
-- [ ] Create Convex account/project + get `VITE_CONVEX_URL` (owner action)
-- [ ] Swap email OTP from Freebuff → Resend (code change; needs Resend key)
-- [ ] Remove Freebuff scaffolding (VlyToolbar / `@vly-ai/integrations` / customJwt)
-- [ ] Deploy to Cloudflare Pages (owner action; build config documented)
-- [ ] Update canonical URL if domain differs from `readwithrex.com`
-- [ ] Set Convex env vars (SITE_URL, JWKS, JWT_PRIVATE_KEY, RESEND_API_KEY,
-      EMAILOCTOPUS_*, ELEVENLABS_API_KEY)
-- [ ] Google Search Console setup
+### Phase 0 — Deploy (remaining = owner keys + hosting)
+- [x] Register `readwithrex.com` domain (Namecheap)
+- [x] Create Convex account/project + get `VITE_CONVEX_URL`
+- [x] Swap email OTP from Freebuff → Resend (code)
+- [x] Remove Freebuff scaffolding
+- [ ] Set Convex env vars (RESEND_*, EMAILOCTOPUS_*, ELEVENLABS_API_KEY, SITE_URL, JWKS, JWT_PRIVATE_KEY)
+- [ ] Deploy to Cloudflare Pages (or Vercel) + point the domain
+- [ ] (Optional) Production Convex deployment via `npx convex deploy`
+- [ ] Google Search Console setup (verify domain, submit sitemap)
 
 ### Phase 1 — SEO Growth
-- [x] Parent blog articles + printables (3 published: sight-words, milestones,
-      how-to-teach, first-words-order) — add more (5–10 total)
+- [x] Parent blog articles + printables (4 pages live) — add more (5–10 total)
 - [ ] Plausible Analytics integration (optional)
 - [ ] Prerender landing page for crawlers (optional)
 
@@ -380,15 +447,44 @@ free reading games for kids, reading games for kindergarten, learn to read, firs
 
 ## Known Issues / Gotchas
 
-1. **Convex TTS functions may be missing**: The glob only found `emailOtp.ts` in `src/convex/`. The `speechCache` and `speech` modules referenced in `speech.ts` (`api.speechCache.getAudio`, `api.speech.synthesizeSpeech`) need to exist. If missing, the app works but uses browser speech only.
+1. **OTP email is only testable once keys are set**: without `RESEND_API_KEY` +
+   `EMAIL_FROM` in the Keys tab, the Resend action throws a clear error and the
+   user can't finish email sign-in (guest mode still works). This is expected
+   until the owner adds the keys.
 
-2. **Domain references**: `index.html`, `robots.txt`, and `sitemap.xml` use `https://readwithrex.com`. Update these when the real domain is registered.
+2. **Domain references**: `index.html`, `robots.txt`, and `sitemap.xml` use
+   `https://readwithrex.com`. The domain is registered on Namecheap; update
+   references only if the final domain differs (e.g. a different TLD).
 
-3. **Voice can still cut off in rare cases**: The Chrome speechSynthesis bug workarounds are solid but not 100%. The ElevenLabs path (mp3 playback) is more reliable.
+3. **Voice can still cut off in rare cases**: The Chrome speechSynthesis bug
+   workarounds are solid but not 100%. The ElevenLabs path (mp3 playback) is
+   more reliable.
 
-4. **The octopus celebration navigates away**: After the ink covers the screen, `handleOctopusDone` navigates to the next module. If the celebration is interrupted, the navigation might not fire.
+4. **The octopus celebration navigates away**: After the ink covers the screen,
+   `handleOctopusDone` navigates to the next module. If the celebration is
+   interrupted, the navigation might not fire.
 
-5. **Pattern module answer logic**: The answer for "what comes next?" is `cycle[6 % cycle.length]` (the 7th position, which is the start of the next cycle). For "what is missing?", it's `cycle[2 % cycle.length]`. This was debugged — make sure any changes preserve this logic.
+5. **Pattern module answer logic**: The answer for "what comes next?" is
+   `cycle[6 % cycle.length]` (the 7th position, which is the start of the next
+   cycle). For "what is missing?", it's `cycle[2 % cycle.length]`. This was
+   debugged — make sure any changes preserve this logic.
+
+6. **Convex CLI needs an interactive terminal**: `npx convex login` / `dev`
+   refuse non-interactive (agent) shells ("Cannot prompt for input in
+   non-interactive terminals"). The owner must run these themselves; agents can
+   run `npm run build`, `npm run preview`, and `eslint` freely.
+
+7. **`isolate/` is a stale build artifact** committed by the Freebuff scaffold
+   (old hashed bundles). Harmless but dead weight; removing it needs owner OK.
+
+8. **Vite build emits an empty `convex-vendor` chunk warning** — harmless
+   (no top-level `convex` import to bundle there).
+
+9. **Pre-existing lint debt**: 14 ESLint errors (not from the cleanup) in
+   `src/hooks/use-mobile.ts`, `src/convex/savedProgressCore.ts`, and several
+   game components (`setState in effect` / `impure function during render`).
+   Not build-blocking (`npm run build` doesn't lint), but worth fixing before
+   launch.
 
 ---
 
@@ -413,17 +509,29 @@ free reading games for kids, reading games for kindergarten, learn to read, firs
 
 ## How to Work on This Project
 
-1. Open in Freebuff (desktop or mobile) — the workspace has the live dev server
-2. Files in `src/` are the source of truth
-3. Convex backend code lives in `src/convex/` (run `bun convex dev --once` after changes)
-4. Typecheck with `bun tsc -b --noEmit`
-5. The preview updates automatically on file save — never start/stop dev servers manually
-6. For deploy: push to Vercel with `VITE_CONVEX_URL=https://hushed-herring-277.convex.cloud`
+1. `npm install` then `npm run dev` for the Vite dev server.
+2. Files in `src/` are the source of truth.
+3. Convex backend code lives in `src/convex/`. After changing it, the owner (or
+   a terminal with an active login) runs `npx convex dev` to push + regenerate
+   `src/convex/_generated/`. Agents without an interactive terminal can still
+   run `npm run build` since `_generated/` is now present in the working tree.
+4. Typecheck: `npm run build` (runs `tsc -b`). Lint: `npm run lint`.
+5. Local preview of the production bundle: `npm run preview`.
+6. Deploy: Cloudflare Pages (recommended) or Vercel — set
+   `VITE_CONVEX_URL=https://calculating-basilisk-420.convex.cloud` as a build
+   env var (dev deployment; swap for the production URL when created).
 
 ---
 
 ## Author's Note
 
-This app started as a personal project for one kid and is now being prepared for public release. The owner's son loves it and plays regularly. The next big milestone is getting a domain, deploying to Vercel, and starting the SEO/content flywheel. Monetization is secondary — the priority is getting parents to find and use the free app.
+This app started as a personal project for one kid and is now being prepared
+for public release. The owner's son loves it and plays regularly. The next big
+milestone is getting the remaining free accounts + keys, deploying to Cloudflare
+Pages, pointing the Namecheap domain, and starting the SEO/content flywheel.
+Monetization is secondary — the priority is getting parents to find and use the
+free app.
 
-The owner is budget-conscious. Most of the monetization plan uses free tiers (EmailOctopus, Plausible trial, Vercel free). Paid services (Stripe) only come when there's real traffic.
+The owner is budget-conscious. Most of the monetization plan uses free tiers
+(EmailOctopus, Plausible trial, Vercel/Cloudflare free). Paid services (Stripe)
+only come when there's real traffic.

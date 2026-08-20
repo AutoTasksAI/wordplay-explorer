@@ -17,7 +17,7 @@
   (spider → bat → octopus → lizard, ladder repeats every 80).
 - **Already deploy-ready**: `vercel.json` (Vite + Bun, SPA rewrites) exists and
   the production build was verified. Backend URL:
-  `https://hushed-herring-277.convex.cloud` (set as `VITE_CONVEX_URL` at build time).
+  `https://calculating-basilisk-420.convex.cloud` (set as `VITE_CONVEX_URL` at build time).
 
 ## The rule that shapes everything: COPPA
 
@@ -41,7 +41,7 @@ The app is directed at children under 13, so the COPPA rules apply:
    - Push/export this project (Vly manages version control — use the
      platform's export/GitHub flow) and import into Vercel, or deploy with the
      CLI: `vercel login && vercel --prod`.
-   - Set env var in Vercel (Production): `VITE_CONVEX_URL=https://hushed-herring-277.convex.cloud`
+   - Set env var in Vercel (Production): `VITE_CONVEX_URL=https://calculating-basilisk-420.convex.cloud`
    - Point the domain at Vercel. `vercel.json` already handles SPA routes
      (`/game`, `/auth`, `/game/words` …) and forces `bun install` / `bun run build`.
    - The dev preview link (`*.vly.sh`) only works while the workspace session

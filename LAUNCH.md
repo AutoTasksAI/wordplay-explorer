@@ -3,22 +3,21 @@
 > Everything needed to take Read with Rex public. Work top to bottom. Most
 > items are free or on free tiers. Full strategy lives in `PLAN.md`.
 >
-> **The owner currently has NO accounts/credentials.** Every step below is a
-> task the owner must do (they cannot be done by an agent). After steps 1–3
-> the owner should tell the agent to swap the email-OTP sender to Resend and
-> remove Freebuff scaffolding.
+> **Status 2026-08-20:** Domain bought (Namecheap), Convex project created and
+> live at `https://calculating-basilisk-420.convex.cloud`, code builds clean.
+> The email-OTP Freebuff→Resend swap and scaffolding removal are committed to
+> `main`. Remaining steps below are owner account creation + deploy.
 
 ## ⚠️ Auth blocker (do after step 3)
-- The email-OTP codes are sent through Freebuff's service
-  (`src/convex/auth/emailOtp.ts`), which only works inside Freebuff. Once you
-  have a Resend API key, ask an agent to replace it with the Resend provider.
-- `main.tsx` also imports `@vly-ai/integrations` + `VlyToolbar` and
-  `auth.config.ts` has a Freebuff `customJwt` provider — Freebuff-only
-  scaffolding to remove for production.
+- The email-OTP sender was swapped from Freebuff's service to **Resend**
+  (`src/convex/auth/emailOtp.ts`) and the Freebuff scaffolding was removed
+  (VlyToolbar, `@vly-ai/integrations`, the `customJwt` provider, axios) — all
+  committed to `main`. Only the Resend keys are still needed (step 3 below).
 
 ## 1. Domain (do first — everything references it)
-- [ ] Register `readwithrex.com` (~$10–12/yr). Fallbacks: `readwithrex.app`, `readwithrex.io`, `rexlearnstoread.com`.
-- [ ] Update the domain everywhere if the real domain differs from `readwithrex.com`:
+- [x] Register `readwithrex.com` — **DONE 2026-08-20 (Namecheap)**. Next: point
+  nameservers at Cloudflare when deploying (step 4), then set canonical URL if
+  it differs from `readwithrex.com`:
   - `index.html` — canonical URL, OG tags, JSON-LD (`WebApplication`, `LearningResource`, `FAQPage`)
   - `public/robots.txt` — `Sitemap:` line
   - `public/sitemap.xml` — every `<loc>`
@@ -26,19 +25,17 @@
   - `PLAN.md` / `HANDOFF.md` / `LAUNCH.md` references (cosmetic)
 
 ## 2. Backend (Convex) — required first
-- [ ] Create a Convex account + project (free). In this repo run
-      `npx convex dev`, log in, and it creates a deployment + URL.
-- [ ] That URL is your `VITE_CONVEX_URL` (do NOT use the repo's current
-      `https://hushed-herring-277.convex.cloud` — that's a Freebuff sandbox,
-      not yours).
-- [ ] Running `npx convex dev` also regenerates `src/convex/_generated/`
-      (not in the repo) so the new `newsletter` + `savedProgress` functions exist.
+- [x] **DONE 2026-08-20** — project `josh-a2865/wordplay-explorer`, dev deployment
+  `https://calculating-basilisk-420.convex.cloud` (this is `VITE_CONVEX_URL`).
+  `src/convex/_generated/` is generated; `npm run build` passes.
+- [ ] For production, create a production deployment later (`npx convex deploy`)
+  and update `VITE_CONVEX_URL` to its URL.
 
 ## 3. Auth email (Resend)
 - [ ] Create a Resend account (free). Get an API key.
-- [ ] Ask an agent to swap `src/convex/auth/emailOtp.ts` from Freebuff's OTP
-      service to Resend, then set `RESEND_API_KEY` + `EMAIL_FROM` in Convex.
-      (The current file only works inside Freebuff.)
+- [ ] Set `RESEND_API_KEY` + `EMAIL_FROM` in the Convex project's Keys tab.
+      (The Freebuff→Resend code swap is already committed — no code change
+      needed on your side.)
 
 ## 4. Deploy to Cloudflare Pages (or Vercel)
 - [ ] **Cloudflare Pages** (recommended; `public/_redirects` already added):
