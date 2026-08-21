@@ -1,9 +1,9 @@
 ## Overview
 
-> **Status: NOT yet public.** Built and deploy-ready, but needs the owner's
-> accounts (Convex, Resend, EmailOctopus, domain, hosting) to go live.
-> Start here: **`LAUNCH.md`** (go-public checklist) and **`HANDOFF.md`**
-> (full project state + what's left to do).
+> **Status: LIVE at https://readwithrex.com.** Deployed to Cloudflare Pages,
+> connected to the owner's Convex backend, and all keys (Resend, EmailOctopus,
+> ElevenLabs) are set. Start here: **`LAUNCH.md`** (remaining QA/growth
+> checklist) and **`HANDOFF.md`** (full project state).
 
 This project uses the following tech stack:
 - Vite

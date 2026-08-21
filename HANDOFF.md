@@ -5,13 +5,16 @@
 
 ---
 
-## ⚠️ READ FIRST: Status as of Aug 20, 2026 (build session 3)
+## ⚠️ READ FIRST: Status as of Aug 21, 2026 (build session 4)
 
-The project is **NOT deployed or public yet**, but it is now fully buildable
-and running against the owner's real backend. All code is on GitHub
-(`AutoTasksAI/wordplay-explorer`, branch `main`). The remaining work to go
-public is **owner account creation + keys + deploy** (Resend, EmailOctopus,
-ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
+The project is **LIVE at https://readwithrex.com** (and
+https://www.readwithrex.com). All code is on GitHub
+(`AutoTasksAI/wordplay-explorer`, branch `main`, **public**). All Convex
+Keys are set: `ELEVENLABS_API_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`,
+`EMAILOCTOPUS_API_KEY`, and `EMAILOCTOPUS_LIST_ID`. Cloudflare Pages is
+serving the site from the `wordplay-explorer` project and both the apex
+domain and `www` are active with SSL. Git auto-deploy is reconnected so
+future pushes to `main` will redeploy automatically.
 
 ### What happened in session 3 (2026-08-20): Freebuff cleanup + first real backend
 
@@ -114,37 +117,82 @@ ElevenLabs, Cloudflare Pages, domain pointing). Full checklist: **`LAUNCH.md`**.
 - `npm run preview` smoke test: `/`, `/sight-words`, `/game/words`, `/privacy`,
   `/auth`, `/terms` all return HTTP 200 with the correct title.
 
+### Session 4 (2026-08-21): Deploy to production
+
+**What was broken:** `readwithrex.com` returned Cloudflare **522** and
+`www.readwithrex.com` returned **525**. The Pages project existed and
+`wordplay-explorer.pages.dev` returned 200, but no custom domains were
+attached. DNS was still pointing at leftover Namecheap records (apex A record
+to `162.255.119.78`, `www` CNAME to `parkingpage.namecheap.com`).
+
+**What was fixed:**
+- Fixed the local Playwright MCP config (reverted to the official
+  `npx @playwright/mcp@latest` command) so the agent could drive the browser.
+- In Cloudflare Pages → `wordplay-explorer` → Custom domains:
+  - Added `readwithrex.com`. Cloudflare replaced the bad A record with a
+    CNAME to `wordplay-explorer.pages.dev`.
+  - Added `www.readwithrex.com`. Cloudflare replaced the Namecheap parking
+    CNAME with a CNAME to `wordplay-explorer.pages.dev`.
+  - Clicked **Complete DNS setup** for `www`; both domains now show
+    **Active** with SSL enabled.
+- Fixed Git auto-deploy:
+  - The Cloudflare GitHub app was only granted access to
+    `claude-second-brain` and `saaspartan-site`.
+  - Granted access to **All repositories** (which includes
+    `AutoTasksAI/wordplay-explorer`).
+  - The Cloudflare warning “This project is disconnected from your Git
+    account” is now gone.
+
+**Verified:**
+- `curl -I https://readwithrex.com` → `200 OK`.
+- `curl -I https://www.readwithrex.com` → `200 OK`.
+- Browser screenshot confirms the Read with Rex homepage loads correctly.
+- Cloudflare custom-domains tab shows both domains **Active**.
+- Cloudflare Settings tab no longer shows the Git disconnect warning.
+
 ### The exact next step for a new thread
 
-1. Have the owner create the remaining free accounts and paste keys into the
-   Convex dashboard → Project Settings → Environment Variables:
-   - **Resend** → `RESEND_API_KEY` + `EMAIL_FROM` (e.g. `Read with Rex
-     <hello@readwithrex.com>`; swap to the real domain later).
-   - **EmailOctopus** → create a "Parents" list → `EMAILOCTOPUS_API_KEY` +
-     `EMAILOCTOPUS_LIST_ID`.
-   - **ElevenLabs** (optional) → `ELEVENLABS_API_KEY` (browser speech is the
-     fallback until then).
-   - `SITE_URL`, `JWKS`, `JWT_PRIVATE_KEY` are also listed in LAUNCH.md for
-     auth; confirm they're set for the dev deployment.
-2. **Deploy** to Cloudflare Pages: connect the GitHub repo → build
-   `npm install && npm run build`, output `dist`, env
-   `VITE_CONVEX_URL=https://calculating-basilisk-420.convex.cloud` → point
-   `readwithrex.com` (set Namecheap nameservers at Cloudflare). `public/
-   _redirects` already handles SPA routes. (Vercel alternative: `vercel.json`
-   is configured.)
-3. Verify email OTP live: sign in at `/auth` with a parent email and confirm
-   the code arrives via Resend.
-4. Google Search Console: verify the domain, submit `sitemap.xml`.
+1. **Post-launch QA** (high priority):
+   - Test guest mode at `/auth` on a real phone/tablet.
+   - Test email OTP with a parent email and confirm the code arrives via Resend.
+   - Test save/restore progress with a parent email + 4-digit PIN.
+   - Test the For-Parents newsletter signup lands in EmailOctopus.
+2. **Google Search Console**: verify `readwithrex.com` and submit
+   `sitemap.xml`.
+3. **Plausible**: create the Plausible site for `readwithrex.com` so the
+   already-added script starts recording.
+4. **Optional production Convex**: run `npx convex deploy` and update
+   `VITE_CONVEX_URL` in Cloudflare Pages environment variables.
+
+### Troubleshooting notes
+
+- `public/_redirects` handles SPA routing on Cloudflare Pages.
+- If future Cloudflare Pages builds fail because the repo is disconnected,
+  check GitHub → Settings → Applications → Cloudflare Workers and Pages →
+  Configure, and ensure `AutoTasksAI/wordplay-explorer` is granted access
+  (or switch back to "All repositories").
+- The accidental `wordplay-explorer` Cloudflare Worker was not found in the
+  current dashboard; the working Pages project is named `wordplay-explorer`.
+  If a stray Worker ever appears and interferes, delete it from Workers &
+  Pages.
 
 ### Open items for the next agent (ask before large changes)
 - ✅ ~~Add the Plausible analytics script to `index.html`~~, done in `45f3c53`.
   Still needs the owner to create the Plausible site for `readwithrex.com`.
-- ✅ ~~Draft the parent welcome email + sight-word lead-magnet delivery copy~~ , 
+- ✅ ~~Draft the parent welcome email + sight-word lead-magnet delivery copy~~,
   done in `docs/email-templates.md` (`45f3c53`).
 - ✅ ~~Fix the 14 pre-existing lint errors~~, done in `45f3c53`.
 - ✅ ~~Remove the stray tracked `isolate/` directory~~, done in `45f3c53`.
+- ✅ ~~Set Resend + EmailOctopus + ElevenLabs keys in Convex~~, done by owner.
+- ✅ ~~Deploy to Cloudflare Pages and point `readwithrex.com`~~, done in
+  session 4 (2026-08-21). Both apex and `www` are active with SSL; Git
+  auto-deploy is reconnected.
+- 🔄 **Post-launch QA**: test guest/email OTP, save/restore, and newsletter
+  signup on real devices.
+- 🔄 **Google Search Console**: verify domain and submit `sitemap.xml`.
+- 🔄 **Plausible**: create the site for `readwithrex.com` to activate analytics.
 - Optionally create a production Convex deployment (`npx convex deploy`) and
-  update `VITE_CONVEX_URL` to its URL before or at launch.
+  update `VITE_CONVEX_URL` to its URL.
 
 ### Git note
 The session-3 changes are **committed and pushed to `main`** as `fc6da9d`
@@ -152,10 +200,11 @@ The session-3 changes are **committed and pushed to `main`** as `fc6da9d`
 build cleanup is **committed and pushed to `main`** as `45f3c53` ("chore: fix
 lint errors, remove isolate artifact, add Plausible + email templates"). The
 auth + copy cleanup is **committed and pushed to `main`** as `9c32251`
-("fix(auth): stop guest/email sign-in from spinning forever + remove em dashes"),
-and the working tree is clean. `.env.local` is gitignored; `src/convex/_generated/`
-is now tracked so Cloudflare Pages can build without an authenticated Convex
-CLI step. Regenerate it with `npx convex dev --once` after schema changes.
+("fix(auth): stop guest/email sign-in from spinning forever + remove em dashes").
+The session-4 deploy docs update will be committed separately. `.env.local` is
+gitignored; `src/convex/_generated/` is now tracked so Cloudflare Pages can
+build without an authenticated Convex CLI step. Regenerate it with
+`npx convex dev --once` after schema changes.
 
 ### Handoff checklist
 - [x] Current status and owner are updated.
@@ -472,13 +521,14 @@ dashboard → Project Settings → Environment Variables (Keys tab).
 
 ## What's NOT Done (from PLAN.md)
 
-### Phase 0, Deploy (remaining = owner keys + hosting)
+### Phase 0, Deploy
 - [x] Register `readwithrex.com` domain (Namecheap)
 - [x] Create Convex account/project + get `VITE_CONVEX_URL`
 - [x] Swap email OTP from Freebuff → Resend (code)
 - [x] Remove Freebuff scaffolding
-- [ ] Set Convex env vars (RESEND_*, EMAILOCTOPUS_*, ELEVENLABS_API_KEY, SITE_URL, JWKS, JWT_PRIVATE_KEY)
-- [ ] Deploy to Cloudflare Pages (or Vercel) + point the domain
+- [x] Set Convex env vars (RESEND_*, EMAILOCTOPUS_*, ELEVENLABS_API_KEY, SITE_URL, JWKS, JWT_PRIVATE_KEY)
+- [x] Deploy to Cloudflare Pages + point the domain (`readwithrex.com` and `www`)
+- [x] Reconnect Git auto-deploy
 - [ ] (Optional) Production Convex deployment via `npx convex deploy`
 - [ ] Google Search Console setup (verify domain, submit sitemap)
 
@@ -532,17 +582,12 @@ dashboard → Project Settings → Environment Variables (Keys tab).
    non-interactive terminals"). The owner must run these themselves; agents can
    run `npm run build`, `npm run preview`, and `eslint` freely.
 
-7. **`isolate/` is a stale build artifact** committed by the Freebuff scaffold
-   (old hashed bundles). Harmless but dead weight; removing it needs owner OK.
+7. ✅ ~~`isolate/` was a stale build artifact~~ removed in `45f3c53`.
 
 8. **Vite build emits an empty `convex-vendor` chunk warning**, harmless
    (no top-level `convex` import to bundle there).
 
-9. **Pre-existing lint debt**: 14 ESLint errors (not from the cleanup) in
-   `src/hooks/use-mobile.ts`, `src/convex/savedProgressCore.ts`, and several
-   game components (`setState in effect` / `impure function during render`).
-   Not build-blocking (`npm run build` doesn't lint), but worth fixing before
-   launch.
+9. ✅ ~~Pre-existing lint debt: 14 ESLint errors~~ fixed in `45f3c53`.
 
 ---
 
@@ -584,12 +629,12 @@ dashboard → Project Settings → Environment Variables (Keys tab).
 
 ## Author's Note
 
-This app started as a personal project for one kid and is now being prepared
-for public release. The owner's son loves it and plays regularly. The next big
-milestone is getting the remaining free accounts + keys, deploying to Cloudflare
-Pages, pointing the Namecheap domain, and starting the SEO/content flywheel.
-Monetization is secondary, the priority is getting parents to find and use the
-free app.
+This app started as a personal project for one kid and is now publicly live
+at `https://readwithrex.com`. The owner's son loves it and plays regularly.
+The next big milestones are post-launch QA (guest/email OTP, save/restore,
+newsletter signup), Google Search Console verification, and starting the
+SEO/content flywheel. Monetization is secondary; the priority is getting
+parents to find and use the free app.
 
 The owner is budget-conscious. Most of the monetization plan uses free tiers
 (EmailOctopus, Plausible trial, Vercel/Cloudflare free). Paid services (Stripe)

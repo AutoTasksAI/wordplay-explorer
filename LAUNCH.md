@@ -3,19 +3,21 @@
 > Everything needed to take Read with Rex public. Work top to bottom. Most
 > items are free or on free tiers. Full strategy lives in `PLAN.md`.
 >
-> **Status 2026-08-20:** Domain bought (Namecheap), Convex project created and
+> **Status 2026-08-21:** Domain bought (Namecheap), Convex project created and
 > live at `https://calculating-basilisk-420.convex.cloud`, code builds clean,
 > all pre-existing lint errors are fixed, guest/email sign-in no longer spins,
 > all em dashes are removed from copy, and the stale `isolate/` build artifact
-> is removed. The email-OTP Freebuff→Resend swap, scaffolding removal, Plausible
-> script, email-template drafts, and `_generated/` tracking are committed to
-> `main` (`9c32251`). Remaining steps below are owner account creation + deploy.
+> is removed. GitHub repo is public and all Convex Keys are set (Resend,
+> EmailOctopus, ElevenLabs). The site is **LIVE** at `https://readwithrex.com`
+> (and `https://www.readwithrex.com`) via Cloudflare Pages, SSL is active, and
+> Git auto-deploy is reconnected.
 
-## ⚠️ Auth blocker (do after step 3)
+## ⚠️ Auth note
 - The email-OTP sender was swapped from Freebuff's service to **Resend**
   (`src/convex/auth/emailOtp.ts`) and the Freebuff scaffolding was removed
   (VlyToolbar, `@vly-ai/integrations`, the `customJwt` provider, axios), all
-  committed to `main`. Only the Resend keys are still needed (step 3 below).
+  committed to `main`. Resend keys are set; verify email delivery in post-launch
+  QA.
 
 ## 1. Domain (do first, everything references it)
 - [x] Register `readwithrex.com`, **DONE 2026-08-20 (Namecheap)**. Next: point
@@ -35,18 +37,22 @@
   and update `VITE_CONVEX_URL` to its URL.
 
 ## 3. Auth email (Resend)
-- [ ] Create a Resend account (free). Get an API key.
-- [ ] Set `RESEND_API_KEY` + `EMAIL_FROM` in the Convex project's Keys tab.
+- [x] Create a Resend account (free). Get an API key.
+- [x] Set `RESEND_API_KEY` + `EMAIL_FROM` in the Convex project's Keys tab.
       (The Freebuff→Resend code swap is already committed, no code change
       needed on your side.)
+- [x] Verify `EMAIL_FROM` is set.
+- [ ] Test email OTP delivery with a real parent email.
 
 ## 4. Deploy to Cloudflare Pages (or Vercel)
-- [ ] **Cloudflare Pages** (recommended; `public/_redirects` already added):
-      create a Pages project → connect the GitHub repo → Build command
-      `npm install && npm run build` (bun is not available on Cloudflare) →
-      Output directory `dist` → env var `VITE_CONVEX_URL` → point the domain.
-- [ ] **Vercel alternative**: `vercel.json` is already configured (Vite + Bun,
-      SPA rewrites). Set `VITE_CONVEX_URL`, add the domain.
+- [x] **Cloudflare Pages** (recommended; `public/_redirects` already added):
+      Pages project `wordplay-explorer` is connected to the GitHub repo,
+      builds with `npm install && npm run build`, outputs `dist`, and has
+      `VITE_CONVEX_URL=https://calculating-basilisk-420.convex.cloud`.
+      - [x] Custom domain `readwithrex.com` active with SSL.
+      - [x] Custom domain `www.readwithrex.com` active with SSL.
+      - [x] Git auto-deploy reconnected; pushes to `main` redeploy.
+- [ ] **Vercel alternative**: not needed; Cloudflare Pages is live.
 
 ## 5. Legal (required for a kids-directed site)
 - [ ] Publish the Privacy + Terms pages (already built at `/privacy` and `/terms`).
@@ -62,9 +68,9 @@
 - [ ] Bing Webmaster Tools (free, small extra traffic), optional.
 
 ## 7. Keys & integrations (project Keys tab, never `.env`)
-- [ ] `ELEVENLABS_API_KEY`, already in use for the cartoon voice.
-- [ ] `EMAILOCTOPUS_API_KEY` + `EMAILOCTOPUS_LIST_ID`, parent newsletter (free to 2,500 subs). Create a list; paste the list id.
-- [ ] `RESEND_API_KEY` + `EMAIL_FROM`, OTP emails after the Resend swap.
+- [x] `ELEVENLABS_API_KEY`, set for the cartoon voice.
+- [x] `EMAILOCTOPUS_API_KEY` + `EMAILOCTOPUS_LIST_ID`, set for parent newsletter.
+- [x] `RESEND_API_KEY` + `EMAIL_FROM`, set for OTP emails.
 - [ ] `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` / `STRIPE_WEBHOOK_SECRET`, **only when the Plus tier ships**.
 - [ ] `PLAUSIBLE_DOMAIN` / `PLAUSIBLE_API_KEY`, when Plausible is added.
 
