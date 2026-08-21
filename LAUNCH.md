@@ -3,21 +3,23 @@
 > Everything needed to take Read with Rex public. Work top to bottom. Most
 > items are free or on free tiers. Full strategy lives in `PLAN.md`.
 >
-> **Status 2026-08-21:** Domain bought (Namecheap), Convex project created and
-> live at `https://calculating-basilisk-420.convex.cloud`, code builds clean,
-> all pre-existing lint errors are fixed, guest/email sign-in no longer spins,
-> all em dashes are removed from copy, and the stale `isolate/` build artifact
-> is removed. GitHub repo is public and all Convex Keys are set (Resend,
-> EmailOctopus, ElevenLabs). The site is **LIVE** at `https://readwithrex.com`
-> (and `https://www.readwithrex.com`) via Cloudflare Pages, SSL is active, and
-> Git auto-deploy is reconnected.
+> **Status 2026-08-21 (session 5):** The site is **LIVE** at
+> `https://readwithrex.com` via Cloudflare Pages with SSL on apex + www and
+> Git auto-deploy working. Post-launch QA passed end-to-end: guest sign-in,
+> save/restore progress, email OTP delivery through Resend (domain verified),
+> and the For-Parents newsletter signup into EmailOctopus. Google Search
+> Console is verified with `sitemap.xml` submitted (7 URLs, Success).
+> Plausible analytics is live. The favicon is the yellow + green T-Rex.
+> ElevenLabs TTS confirmed working. New: adaptive word levels (Starter →
+> My World → Big Kid), numbers 1-20, and an 8-creature milestone ladder
+> every 20 stars with a creature-pals collection on the Game Hub.
 
 ## ⚠️ Auth note
 - The email-OTP sender was swapped from Freebuff's service to **Resend**
   (`src/convex/auth/emailOtp.ts`) and the Freebuff scaffolding was removed
   (VlyToolbar, `@vly-ai/integrations`, the `customJwt` provider, axios), all
-  committed to `main`. Resend keys are set; verify email delivery in post-launch
-  QA.
+  committed to `main`. Resend keys are set; email delivery verified in
+  session 5 QA.
 
 ## 1. Domain (do first, everything references it)
 - [x] Register `readwithrex.com`, **DONE 2026-08-20 (Namecheap)**. Next: point
@@ -41,8 +43,11 @@
 - [x] Set `RESEND_API_KEY` + `EMAIL_FROM` in the Convex project's Keys tab.
       (The Freebuff→Resend code swap is already committed, no code change
       needed on your side.)
-- [x] Verify `EMAIL_FROM` is set.
-- [ ] Test email OTP delivery with a real parent email.
+- [x] Verify `EMAIL_FROM` is set. Session 5: now
+      `Read with Rex <rex@readwithrex.com>` with the `readwithrex.com` domain
+      verified in Resend (DNS via Cloudflare Domain Connect).
+- [x] Test email OTP delivery with a real parent email. Session 5 QA: code
+      delivered and accepted end-to-end.
 
 ## 4. Deploy to Cloudflare Pages (or Vercel)
 - [x] **Cloudflare Pages** (recommended; `public/_redirects` already added):
@@ -55,7 +60,7 @@
 - [ ] **Vercel alternative**: not needed; Cloudflare Pages is live.
 
 ## 5. Legal (required for a kids-directed site)
-- [ ] Publish the Privacy + Terms pages (already built at `/privacy` and `/terms`).
+- [x] Publish the Privacy + Terms pages (live at `/privacy` and `/terms`).
 - [ ] For a stronger formal policy later, generate a COPPA-aware policy via Termly/iubenda and replace the page content. Non-negotiable points:
   - No child data collected
   - No ads in-game
@@ -63,8 +68,11 @@
 
 ## 6. Analytics & search
 - [x] Add the Plausible script tag to `index.html` (`data-domain="readwithrex.com"`).
-- [ ] Create a Plausible Analytics account (~$9/mo after trial; cookie-free, no consent banner) for `readwithrex.com` to activate it (or use GA4 for $0).
-- [ ] Google Search Console, verify `readwithrex.com`, submit `sitemap.xml`.
+- [x] Create a Plausible Analytics account for `readwithrex.com` to activate it.
+      Session 5: account created and the per-site snippet is installed; data
+      flows on the next visit. Cookie-free, no consent banner needed.
+- [x] Google Search Console, verify `readwithrex.com`, submit `sitemap.xml`.
+      Session 5: domain property verified, sitemap submitted (7 URLs, Success).
 - [ ] Bing Webmaster Tools (free, small extra traffic), optional.
 
 ## 7. Keys & integrations (project Keys tab, never `.env`)
@@ -75,10 +83,17 @@
 - [ ] `PLAUSIBLE_DOMAIN` / `PLAUSIBLE_API_KEY`, when Plausible is added.
 
 ## 8. Pre-launch QA
-- [ ] Test on a phone + tablet (the app is mobile-first; verify taps, voice, and layout).
-- [ ] Voice check: ElevenLabs cartoon voice vs. browser speech fallback (no key = fallback).
-- [ ] Save/restore flow: play a few rounds → Save with parent email + 4-digit code → open in another browser → Restore → progress returns.
-- [ ] Newsletter: submit the For-Parents form and confirm the subscriber lands in EmailOctopus (free tier).
+- [ ] Test on a real phone + tablet (agent QA ran in a 390px viewport and
+      passed; one real-device pass for audio + touch feel is still worth it).
+- [x] Voice check: ElevenLabs cartoon voice works (owner fixed the key in
+      session 5; `synthesizeSpeech` succeeds and caches), browser speech
+      remains the fallback.
+- [x] Save/restore flow: play a session → Save with parent email + 4-digit
+      code → fresh guest on another device → Restore → progress returns.
+      Session 5 QA passed end-to-end.
+- [x] Newsletter: submit the For-Parents form. Session 5 QA passed (contact
+      created in EmailOctopus). Remaining owner step: build the EmailOctopus
+      automation that actually emails the flashcards to new subscribers.
 
 ## 9. Share it (free growth)
 - [ ] Share with the family/playgroup and a few parenting groups, the first 20 families are the seed.

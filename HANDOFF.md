@@ -1,11 +1,11 @@
 # Read with Rex, Complete Project Handoff
 
-> This document is a complete snapshot of the project as of August 20, 2026.
+> This document is a complete snapshot of the project as of August 21, 2026.
 > Written so any LLM can pick up where we left off with zero context loss.
 
 ---
 
-## ⚠️ READ FIRST: Status as of Aug 21, 2026 (build session 4)
+## ⚠️ READ FIRST: Status as of Aug 21, 2026 (build session 5)
 
 The project is **LIVE at https://readwithrex.com** (and
 https://www.readwithrex.com). All code is on GitHub
@@ -13,11 +13,78 @@ https://www.readwithrex.com). All code is on GitHub
 `C:\Users\DELL\Documents\GitHub\wordplay-explorer`. A second-brain backup
 is at `C:\Users\DELL\Documents\Codex\2026-07-27\prior-conversation-with-codex-conversation-role\work\pycache\Users\DELL\Documents\GitHub\claude-second-brain\projects\read-with-rex\`.
 
-All Convex Keys are set: `ELEVENLABS_API_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`,
-`EMAILOCTOPUS_API_KEY`, and `EMAILOCTOPUS_LIST_ID`. Cloudflare Pages is
-serving the site from the `wordplay-explorer` project and both the apex
-domain and `www` are active with SSL. Git auto-deploy is reconnected so
-future pushes to `main` will redeploy automatically.
+**Post-launch QA is complete and passing**: guest sign-in, save/restore with
+parent email + PIN, email OTP delivery end-to-end (real inbox), and the
+For-Parents newsletter signup. Google Search Console is verified
+(`sc-domain:readwithrex.com`) with `sitemap.xml` submitted (7 URLs, Success).
+Plausible is live (per-site script installed). The favicon is now the yellow +
+green T-Rex. ElevenLabs TTS is confirmed working (`synthesizeSpeech`
+succeeds and caches).
+
+### Session 5 (2026-08-21): QA, production fixes, adaptive levels + gamification
+
+**Production bugs found by QA and fixed:**
+1. **Convex WebSocket 404**: `VITE_CONVEX_URL` in Cloudflare Pages had a
+   trailing slash, producing `convex.cloud//api/...`. Fixed the env var in the
+   Pages dashboard AND made `src/main.tsx` strip trailing slashes defensively
+   (commit `b30423c`).
+2. **Missing auth keys**: guest sign-in failed with "Missing environment
+   variable `JWT_PRIVATE_KEY`". Generated an RS256 keypair with `jose`
+   (same format as `@convex-dev/auth`'s own generator) and set
+   `JWT_PRIVATE_KEY` + `JWKS` in the Convex Keys tab. Secrets are NOT in the
+   repo.
+3. **Missing `SITE_URL`**: email OTP needs it; set to
+   `https://readwithrex.com`.
+4. **Resend sender broken twice over**: `EMAIL_FROM` was just
+   `"Read with Rex"` (no address → 422). Fixed to
+   `Read with Rex <rex@readwithrex.com>`. Then Resend rejected sends because
+   the old API key belonged to a different Resend account where the domain
+   wasn't verified. Fixed by verifying `readwithrex.com` in the current
+   Resend account (Cloudflare Domain Connect auto-added the MX/DKIM/SPF
+   records) and creating a fresh API key (`wordplay-explorer-convex`) that is
+   now in the Convex Keys tab.
+5. **EmailOctopus subscribe 400**: the action sent a form-encoded body with
+   lowercase `status` and a JSON-string `tags` value. Rewritten to a JSON
+   body with `status: "SUBSCRIBED"` and a real tags array, plus
+   `MEMBER_EXISTS_WITH_EMAIL_ADDRESS` treated as success (commit `4b0a009`,
+   pushed to the deployment via `npx convex deploy` with a deploy key).
+
+**New features (commit `82a7369`):**
+- **Adaptive word levels**: Word Safari now has three tiers,
+  Starter Words (39) → My World Words (28 environmental words: colors,
+  family, food, clothes, home) → Big Kid Words (26 blends/digraph words).
+  A tier unlocks when 80% of it is mastered (`computeLevel` in
+  `game-core.ts`); fast learners graduate quickly and always have harder
+  words waiting, while mastered words keep cycling back via spaced review.
+  The start screen shows the current level and how many items remain to the
+  next unlock, and unlocking plays a fanfare + spoken announcement.
+- **Number Jungle extended to 1-20**: Counting 1 to 10, then Teen Numbers
+  11-20 as level 2.
+- **Milestone ladder doubled**: creature celebrations every 20 stars now run
+  spider(20) → bat(40) → octopus(60) → lizard(80) → dragon(100) →
+  unicorn(120) → whale(140) → Rex party(160), then repeat, each one more
+  elaborate (`src/lib/milestones.ts` registry + four new celebration
+  components).
+- **Creature pals collection** on the Game Hub: one tile per milestone with
+  a mystery "?" for the next pal, so the long-term reward is visible to kids.
+
+**Other changes:**
+- Favicon replaced with a yellow-background green T-Rex (`public/logo.svg`,
+  commit `830746e`). The old Freebuff logo is gone.
+- Plausible script swapped for the per-site snippet (commit `2fff603`).
+- Mobile UX fixes (commit `1b91904`): landing/printables/content headers fit
+  on one line at 390px, and the save-progress dialog scrolls within the
+  viewport so its close button is reachable on phones.
+
+**Verified this session:**
+- `npm run lint`: 0 errors (14 harmless fast-refresh warnings).
+- `npm run build`: passes.
+- Live QA on readwithrex.com: guest sign-in ✅, full game session (8/8 stars
+  + celebration) ✅, save with email+PIN ✅, restore on a fresh guest ✅,
+  email OTP delivered and verified ✅, newsletter signup success toast ✅,
+  sitemap submitted ✅, Plausible site created ✅.
+- Convex logs show `speech:synthesizeSpeech` succeeding after the owner
+  fixed the ElevenLabs key.
 
 ### What happened in session 3 (2026-08-20): Freebuff cleanup + first real backend
 
@@ -155,16 +222,18 @@ to `162.255.119.78`, `www` CNAME to `parkingpage.namecheap.com`).
 
 ### The exact next step for a new thread
 
-1. **Post-launch QA** (high priority):
-   - Test guest mode at `/auth` on a real phone/tablet.
-   - Test email OTP with a parent email and confirm the code arrives via Resend.
-   - Test save/restore progress with a parent email + 4-digit PIN.
-   - Test the For-Parents newsletter signup lands in EmailOctopus.
-2. **Google Search Console**: verify `readwithrex.com` and submit
-   `sitemap.xml`.
-3. **Plausible**: create the Plausible site for `readwithrex.com` so the
-   already-added script starts recording.
-4. **Optional production Convex**: run `npx convex deploy` and update
+1. **Owner-only follow-ups** (agent cannot do these):
+   - Configure the EmailOctopus automation that delivers the sight-word
+     flashcards + welcome email to new subscribers (the API subscribe works;
+     the delivery email is an EmailOctopus-side automation).
+   - Spot-check the app on a real phone/tablet (agent QA ran in a 390px
+     viewport; real-device audio + touch feel still worth one pass).
+   - Plausible account: registered with a temporary inbox
+     (`rexqa91826@westcast-systems.com`, password shared privately in the
+     session chat). Sign in and switch the account email to the owner's.
+2. **Growth**: watch Search Console weekly, publish 5-10 more parent blog
+   pages for winning queries (see PLAN.md Phase 1).
+3. **Optional production Convex**: run `npx convex deploy` and update
    `VITE_CONVEX_URL` in Cloudflare Pages environment variables.
 
 ### Troubleshooting notes
@@ -178,22 +247,31 @@ to `162.255.119.78`, `www` CNAME to `parkingpage.namecheap.com`).
   current dashboard; the working Pages project is named `wordplay-explorer`.
   If a stray Worker ever appears and interferes, delete it from Workers &
   Pages.
+- Convex function pushes can be done non-interactively with a deploy key:
+  `CONVEX_DEPLOY_KEY=<key> npx convex deploy`. A key named
+  `agent-qa-session` exists on the dev deployment for this; rotate or delete
+  it in the dashboard if it is no longer needed.
 
 ### Open items for the next agent (ask before large changes)
-- ✅ ~~Add the Plausible analytics script to `index.html`~~, done in `45f3c53`.
-  Still needs the owner to create the Plausible site for `readwithrex.com`.
+
+- ✅ ~~Add the Plausible analytics script to `index.html`~~, done in `45f3c53`
+  and swapped to the per-site snippet in `2fff603`; site created in Plausible.
 - ✅ ~~Draft the parent welcome email + sight-word lead-magnet delivery copy~~,
-  done in `docs/email-templates.md` (`45f3c53`).
+  done in `docs/email-templates.md` (`45f3c53`). EmailOctopus automation still
+  needs owner setup.
 - ✅ ~~Fix the 14 pre-existing lint errors~~, done in `45f3c53`.
 - ✅ ~~Remove the stray tracked `isolate/` directory~~, done in `45f3c53`.
-- ✅ ~~Set Resend + EmailOctopus + ElevenLabs keys in Convex~~, done by owner.
+- ✅ ~~Set Resend + EmailOctopus + ElevenLabs keys in Convex~~, done by owner
+  (ElevenLabs re-fixed by owner in session 5; TTS confirmed working).
 - ✅ ~~Deploy to Cloudflare Pages and point `readwithrex.com`~~, done in
-  session 4 (2026-08-21). Both apex and `www` are active with SSL; Git
-  auto-deploy is reconnected.
-- 🔄 **Post-launch QA**: test guest/email OTP, save/restore, and newsletter
-  signup on real devices.
-- 🔄 **Google Search Console**: verify domain and submit `sitemap.xml`.
-- 🔄 **Plausible**: create the site for `readwithrex.com` to activate analytics.
+  session 4. Both apex and `www` are active with SSL; Git auto-deploy works.
+- ✅ ~~Post-launch QA~~, done in session 5: guest/email OTP, save/restore,
+  newsletter all pass end-to-end.
+- ✅ ~~Google Search Console~~, verified in session 5; sitemap submitted
+  (7 URLs, Success).
+- ✅ ~~Plausible site created~~ in session 5; analytics recording.
+- 🔄 **EmailOctopus flashcard delivery automation** (owner).
+- 🔄 **Real-device spot check** (owner).
 - Optionally create a production Convex deployment (`npx convex deploy`) and
   update `VITE_CONVEX_URL` to its URL.
 
