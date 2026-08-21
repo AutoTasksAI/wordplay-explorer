@@ -77,7 +77,7 @@ export function SaveProgressDialog() {
           Save progress
         </Button>
       </DialogTrigger>
-      <DialogContent className="border-[3px] border-ink bg-white p-0 shadow-none sm:max-w-md">
+      <DialogContent className="max-h-[92dvh] overflow-y-auto border-[3px] border-ink bg-white p-0 shadow-none sm:max-w-md">
         <DialogHeader className="border-b-[3px] border-ink bg-paper p-6 pb-4">
           <DialogTitle className="text-2xl font-bold tracking-tight">
             Save progress for grown-ups

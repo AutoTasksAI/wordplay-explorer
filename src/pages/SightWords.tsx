@@ -23,16 +23,16 @@ export default function SightWords() {
     <div className="min-h-screen bg-paper text-ink">
       {/* ===== Nav ===== */}
       <header className="print:hidden sticky top-0 z-40 border-b-[3px] border-ink bg-paper">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6">
           <Link to="/" className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-base leading-none shadow-[3px_3px_0_0_#141414]">
+            <span className="flex size-9 shrink-0 items-center justify-center border-[3px] border-ink bg-sun text-base leading-none shadow-[3px_3px_0_0_#141414]">
               🦖
             </span>
-            <span className="text-2xl font-bold tracking-tight">
+            <span className="whitespace-nowrap text-xl font-bold tracking-tight sm:text-2xl">
               Read with Rex
             </span>
           </Link>
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-3 sm:gap-4">
             <Link
               to="/"
               className="hidden text-sm font-semibold underline decoration-[3px] underline-offset-4 hover:text-tomato sm:block"
@@ -41,7 +41,7 @@ export default function SightWords() {
             </Link>
             <Link
               to={PLAY_URL}
-              className="nb-btn bg-ink px-4 py-2 text-sm font-bold text-paper"
+              className="nb-btn whitespace-nowrap bg-ink px-3 py-2 text-sm font-bold text-paper sm:px-4"
             >
               ▶ Play now
             </Link>
