@@ -1,6 +1,10 @@
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
 import { MASTERY_COUNT, type ModuleId } from "@/lib/game-core";
+import {
+  creatureForMilestone,
+  MILESTONE_STEP,
+} from "@/lib/milestones";
 import { MODULES } from "@/lib/modules";
 import { speak, warmUpAudio } from "@/lib/speech";
 import { SaveProgressDialog } from "@/components/SaveProgressDialog";
@@ -24,6 +28,13 @@ export default function GameHub() {
     }
     return c;
   }, [playerState]);
+
+  // Creature pals: one collected per 20 lifetime stars. Kids can see their
+  // collection grow, which makes the long-term reward easy to understand.
+  const lifetimeStars = playerState?.stars ?? 0;
+  const creaturesEarned = Math.floor(lifetimeStars / MILESTONE_STEP);
+  const nextCreatureAt =
+    (creaturesEarned + 1) * MILESTONE_STEP - lifetimeStars;
 
   const handleSignOut = async () => {
     speak("Bye bye!");
@@ -118,6 +129,51 @@ export default function GameHub() {
             <Volume2 className="size-4" />
             Hear the choices
           </button>
+        </div>
+
+        {/* creature pals: a new friend joins the crew every 20 stars */}
+        <div className="flex w-full max-w-2xl flex-col items-center gap-3">
+          <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+            My creature pals
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
+            {Array.from({ length: creaturesEarned + 1 }).map((_, i) => {
+              const earned = i < creaturesEarned;
+              const creature = creatureForMilestone(i);
+              return (
+                <motion.span
+                  key={i}
+                  initial={{ scale: 0, rotate: -20 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{
+                    delay: earned ? 0.05 * i : 0,
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 12,
+                  }}
+                  title={
+                    earned
+                      ? `${(i + 1) * MILESTONE_STEP} stars!`
+                      : `${nextCreatureAt} more stars!`
+                  }
+                  className={`flex size-12 items-center justify-center border-[3px] border-ink nb-shadow-xs sm:size-14 ${
+                    earned ? "bg-white text-3xl" : "bg-paper opacity-45"
+                  }`}
+                >
+                  {earned ? (
+                    creature.emoji
+                  ) : (
+                    <span className="text-xs font-bold">?</span>
+                  )}
+                </motion.span>
+              );
+            })}
+          </div>
+          <p className="text-xs font-semibold text-muted-foreground">
+            {creaturesEarned === 0
+              ? `Earn ${nextCreatureAt} stars to meet your first pal!`
+              : `${nextCreatureAt} more stars until a new pal arrives!`}
+          </p>
         </div>
 
         <div className="grid w-full gap-5 sm:grid-cols-3">

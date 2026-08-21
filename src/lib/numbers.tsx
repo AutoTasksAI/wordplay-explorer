@@ -1,7 +1,9 @@
 import {
   SESSION_LENGTH,
+  computeLevel,
   pickOptions,
   pickTargets,
+  type LevelSpec,
   type ModuleConfig,
   type ProgressMap,
   type Round,
@@ -9,11 +11,14 @@ import {
 
 export interface NumberItem {
   value: number;
+  /** Curriculum tier: 1 = counting 1-10, 2 = teen numbers 11-20. */
+  tier: number;
 }
 
-/** Numbers 1–10, the classic first counting range for a 5-year-old. */
-export const NUMBERS: NumberItem[] = Array.from({ length: 10 }, (_, i) => ({
+/** Numbers 1-10 are the classic first counting range; 11-20 unlock next. */
+export const NUMBERS: NumberItem[] = Array.from({ length: 20 }, (_, i) => ({
   value: i + 1,
+  tier: i < 10 ? 1 : 2,
 }));
 
 export const NUMBER_NAMES: Record<number, string> = {
@@ -27,6 +32,23 @@ export const NUMBER_NAMES: Record<number, string> = {
   8: "eight",
   9: "nine",
   10: "ten",
+  11: "eleven",
+  12: "twelve",
+  13: "thirteen",
+  14: "fourteen",
+  15: "fifteen",
+  16: "sixteen",
+  17: "seventeen",
+  18: "eighteen",
+  19: "nineteen",
+  20: "twenty",
+};
+
+export const NUMBERS_LEVELS: LevelSpec = {
+  names: ["Counting 1 to 10", "Teen Numbers"],
+  emojis: ["🧮", "🚀"],
+  tierOf: (itemKey) => (Number(itemKey) <= 10 ? 1 : 2),
+  sizeOf: (tier) => (tier === 1 ? 10 : 10),
 };
 
 /** The same counting emoji is used across a round's options so the task is
@@ -64,11 +86,14 @@ function CountGrid({
 /**
  * Rounds alternate between counting a row of objects and picking the numeral
  * ("Find the number. Three.") and seeing the numeral and picking the matching
- * count ("Find the picture. Three.").
+ * count ("Find the picture. Three."). Teen numbers unlock once counting to
+ * ten is mostly mastered.
  */
 function buildRounds(progress: ProgressMap): Round[] {
+  const level = computeLevel(progress, NUMBERS_LEVELS);
+  const pool = NUMBERS.filter((n) => n.tier <= level.tier);
   const targets = pickTargets(
-    NUMBERS,
+    pool,
     progress,
     (n) => String(n.value),
     SESSION_LENGTH,
@@ -83,7 +108,7 @@ function buildRounds(progress: ProgressMap): Round[] {
     const name = NUMBER_NAMES[n.value];
     const options = pickOptions(
       n,
-      NUMBERS,
+      pool,
       (x) => String(x.value),
       3,
     );
@@ -131,4 +156,5 @@ export const NUMBERS_MODULE: ModuleConfig = {
   unitLabel: "numbers",
   startHint: "Tap PLAY and count with Rex! 👂",
   buildRounds,
+  level: NUMBERS_LEVELS,
 };

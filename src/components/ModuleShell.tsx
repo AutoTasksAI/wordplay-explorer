@@ -2,6 +2,8 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   MASTERY_COUNT,
   SESSION_LENGTH,
+  computeLevel,
+  type LevelInfo,
   type ModuleConfig,
   type ProgressMap,
   type Round,
@@ -18,10 +20,15 @@ import {
   warmUpSpeech,
 } from "@/lib/speech";
 import { MODULE_IDS } from "@/lib/modules";
+import { creatureForMilestone, MILESTONE_STEP } from "@/lib/milestones";
 import { BatCelebration } from "./BatCelebration";
+import { DragonCelebration } from "./DragonCelebration";
 import { LizardCelebration } from "./LizardCelebration";
 import { OctopusCelebration } from "./OctopusCelebration";
+import { RexPartyCelebration } from "./RexPartyCelebration";
 import { SpiderCelebration } from "./SpiderCelebration";
+import { UnicornCelebration } from "./UnicornCelebration";
+import { WhaleCelebration } from "./WhaleCelebration";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, LogOut, Volume2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -174,11 +181,12 @@ export function ModuleShell({
   const burstIdRef = useRef(0);
 
   // Star milestones: when the lifetime total crosses a 20-star boundary, a
-  // creature celebration plays on the next session end. Each one is bigger
-  // than the last: 20 spider → 40 bat → 60 octopus → 80 lizard, then the
-  // ladder repeats every 80 stars (100 spider, 120 bat, 140 octopus...).
+  // creature celebration plays on the next session end. Each creature in the
+  // roster throws a bigger party than the last (spider → bat → octopus →
+  // lizard → dragon → unicorn → whale → Rex's own party), then the ladder
+  // repeats so there is always another friend to meet.
   const [celebration, setCelebration] = useState<{
-    kind: "spider" | "bat" | "octopus" | "lizard";
+    kind: string;
     value: number;
   } | null>(null);
   const lastStarsRef = useRef<number | null>(null);
@@ -190,27 +198,22 @@ export function ModuleShell({
       return;
     }
     const prev = lastStarsRef.current;
-    if (stars > prev && Math.floor(stars / 20) > Math.floor(prev / 20)) {
+    if (
+      stars > prev &&
+      Math.floor(stars / MILESTONE_STEP) >
+        Math.floor(prev / MILESTONE_STEP)
+    ) {
       if (celebration === null) {
-        const hit = Math.floor(stars / 20) * 20;
-        const kinds = ["spider", "bat", "octopus", "lizard"] as const;
-        const kind = kinds[((hit / 20 - 1) % 4 + 4) % 4];
-        const timeout =
-          kind === "lizard"
-            ? 14500
-            : kind === "octopus"
-              ? 11000
-              : kind === "bat"
-                ? 13500
-                : 9000;
+        const hit = Math.floor(stars / MILESTONE_STEP) * MILESTONE_STEP;
+        const creature = creatureForMilestone(hit / MILESTONE_STEP - 1);
         // Defer the state update so it doesn't happen synchronously inside
         // the effect body (avoids a cascading render warning).
         const startTimer = window.setTimeout(() => {
-          setCelebration({ kind, value: hit });
+          setCelebration({ kind: creature.kind, value: hit });
           playBoing();
           celebrationTimeoutRef.current = window.setTimeout(
             () => setCelebration(null),
-            timeout,
+            creature.durationMs,
           );
         }, 0);
         return () => window.clearTimeout(startTimer);
@@ -242,6 +245,30 @@ export function ModuleShell({
         .length,
     [progressMap],
   );
+
+  // Curriculum level for this module (null when the module has no levels).
+  const level: LevelInfo | null = useMemo(
+    () => (meta.level ? computeLevel(progressMap, meta.level) : null),
+    [meta, progressMap],
+  );
+
+  // Announce a fresh unlock with a fanfare the first time the new level is
+  // seen (progress refetches right after a session ends).
+  const lastLevelTierRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!level) return;
+    if (lastLevelTierRef.current === null) {
+      lastLevelTierRef.current = level.tier;
+      return;
+    }
+    if (level.tier > lastLevelTierRef.current) {
+      lastLevelTierRef.current = level.tier;
+      playFanfare();
+      speak(`Wow! You unlocked ${level.name}!`);
+    } else {
+      lastLevelTierRef.current = level.tier;
+    }
+  }, [level]);
 
   const currentRound = roundIndex < rounds.length ? rounds[roundIndex] : null;
 
@@ -430,6 +457,27 @@ export function ModuleShell({
                 </span>
               )}
             </div>
+
+            {level && (
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="flex items-center gap-2 border-[3px] border-ink bg-sun px-4 py-1.5 nb-shadow-xs">
+                  <span className="text-xl leading-none">{level.emoji}</span>
+                  <span className="text-sm font-bold uppercase tracking-wide">
+                    Level {level.tier} · {level.name}
+                  </span>
+                </div>
+                {level.remainingToNext !== null ? (
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    {level.remainingToNext} more to unlock{" "}
+                    <span className="text-ink">{level.nextName}</span>!
+                  </p>
+                ) : (
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    Every level unlocked. Rex is amazed! 🏆
+                  </p>
+                )}
+              </div>
+            )}
 
             <button
               type="button"
@@ -631,6 +679,18 @@ export function ModuleShell({
         )}
         {celebration?.kind === "lizard" && (
           <LizardCelebration key="lizard" milestone={celebration.value} />
+        )}
+        {celebration?.kind === "dragon" && (
+          <DragonCelebration key="dragon" milestone={celebration.value} />
+        )}
+        {celebration?.kind === "unicorn" && (
+          <UnicornCelebration key="unicorn" milestone={celebration.value} />
+        )}
+        {celebration?.kind === "whale" && (
+          <WhaleCelebration key="whale" milestone={celebration.value} />
+        )}
+        {celebration?.kind === "rex" && (
+          <RexPartyCelebration key="rex" milestone={celebration.value} />
         )}
       </AnimatePresence>
     </main>

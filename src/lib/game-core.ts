@@ -61,6 +61,8 @@ export interface ModuleConfig {
   unitLabel: string;
   startHint: string;
   buildRounds: (progress: ProgressMap) => Round[];
+  /** Optional curriculum levels; modules without one are single-tier. */
+  level?: LevelSpec;
 }
 
 export function shuffle<T>(items: T[]): T[] {
@@ -167,4 +169,78 @@ export function buildProgressMap(
     }
   }
   return map;
+}
+
+/**
+ * Level (curriculum tier) system.
+ *
+ * A module's pool is split into ordered tiers, e.g. Word Safari goes
+ * Starter Words → My World Words → Big Kid Words. The active tier is the
+ * first one a player has not yet graduated from; graduating means mastering
+ * (`MASTERY_COUNT` correct answers) at least `graduation` of the tier's
+ * items. Fast learners blow through the 80% gate quickly and always have
+ * fresh, harder words waiting, while earlier tiers keep coming back through
+ * the normal spaced-review schedule so nothing is forgotten.
+ */
+export interface LevelSpec {
+  /** Display name per tier, index 0 = tier 1. */
+  names: string[];
+  /** Emoji per tier, same indexing. */
+  emojis: string[];
+  /** Which tier (1-based) an item key belongs to. */
+  tierOf: (itemKey: string) => number;
+  /** How many pool items live in a tier (1-based). */
+  sizeOf: (tier: number) => number;
+  /** Fraction of a tier that must be mastered to unlock the next one. */
+  graduation?: number;
+}
+
+export interface LevelInfo {
+  /** Active tier, 1-based. */
+  tier: number;
+  name: string;
+  emoji: string;
+  masteredInTier: number;
+  tierSize: number;
+  /** Items still needed in this tier before the next level unlocks. */
+  remainingToNext: number | null;
+  nextName: string | null;
+}
+
+export function computeLevel(
+  progress: ProgressMap,
+  spec: LevelSpec,
+): LevelInfo {
+  const graduation = spec.graduation ?? 0.8;
+  const masteredIn = (tier: number) => {
+    let count = 0;
+    for (const [key, p] of Object.entries(progress)) {
+      if (spec.tierOf(key) === tier && p.correct >= MASTERY_COUNT) count += 1;
+    }
+    return count;
+  };
+
+  let tier = spec.names.length;
+  for (let t = 1; t <= spec.names.length; t++) {
+    const need = Math.ceil(spec.sizeOf(t) * graduation);
+    if (masteredIn(t) < need) {
+      tier = t;
+      break;
+    }
+  }
+
+  const mastered = masteredIn(tier);
+  const tierSize = spec.sizeOf(tier);
+  const need = Math.ceil(tierSize * graduation);
+  const hasNext = tier < spec.names.length;
+
+  return {
+    tier,
+    name: spec.names[tier - 1],
+    emoji: spec.emojis[tier - 1],
+    masteredInTier: mastered,
+    tierSize,
+    remainingToNext: hasNext ? Math.max(need - mastered, 0) : null,
+    nextName: hasNext ? spec.names[tier] : null,
+  };
 }
