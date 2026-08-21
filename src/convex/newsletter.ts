@@ -35,12 +35,14 @@ export const subscribeEmail = action({
       };
     }
 
-    const body = new URLSearchParams({
+    // EmailOctopus expects a JSON body: status must be uppercase and tags
+    // must be a real array (a form-encoded string fails INVALID_PARAMETERS).
+    const body = JSON.stringify({
       api_key: API_KEY,
       email_address: email,
-      status: "subscribed",
+      status: "SUBSCRIBED",
       // Send the parent the printable flashcard lead magnet automatically.
-      tags: JSON.stringify(["lead-magnet-sight-words"]),
+      tags: ["lead-magnet-sight-words"],
     });
 
     try {
@@ -48,17 +50,17 @@ export const subscribeEmail = action({
         `https://emailoctopus.com/api/1.6/lists/${LIST_ID}/contacts`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: body.toString(),
+          headers: { "Content-Type": "application/json" },
+          body,
         },
       );
 
-      // 200 = created, 409 = already subscribed (treat as success).
-      if (response.ok || response.status === 409) {
+      const detail = await response.text().catch(() => "");
+      // Already on the list is just as good as subscribed.
+      if (response.ok || detail.includes("MEMBER_EXISTS_WITH_EMAIL_ADDRESS")) {
         return { ok: true };
       }
 
-      const detail = await response.text().catch(() => "");
       console.error(
         `EmailOctopus subscribe failed (${response.status}): ${detail}`,
       );
