@@ -9,8 +9,11 @@
 
 The project is **LIVE at https://readwithrex.com** (and
 https://www.readwithrex.com). All code is on GitHub
-(`AutoTasksAI/wordplay-explorer`, branch `main`, **public**). All Convex
-Keys are set: `ELEVENLABS_API_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`,
+(`AutoTasksAI/wordplay-explorer`, branch `main`, **public**). Local path:
+`C:\Users\DELL\Documents\GitHub\wordplay-explorer`. A second-brain backup
+is at `C:\Users\DELL\Documents\Codex\2026-07-27\prior-conversation-with-codex-conversation-role\work\pycache\Users\DELL\Documents\GitHub\claude-second-brain\projects\read-with-rex\`.
+
+All Convex Keys are set: `ELEVENLABS_API_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`,
 `EMAILOCTOPUS_API_KEY`, and `EMAILOCTOPUS_LIST_ID`. Cloudflare Pages is
 serving the site from the `wordplay-explorer` project and both the apex
 domain and `www` are active with SSL. Git auto-deploy is reconnected so
