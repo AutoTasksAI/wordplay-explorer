@@ -63,7 +63,10 @@ class RootErrorBoundary extends React.Component<
   }
 }
 
-const convexUrl = import.meta.env.VITE_CONVEX_URL as string | undefined;
+const convexUrl = (import.meta.env.VITE_CONVEX_URL as string | undefined)?.replace(
+  /\/+$/,
+  "",
+);
 
 /** Friendly screen when the app is opened before the backend is configured. */
 function BackendMissing() {
