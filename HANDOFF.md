@@ -1,7 +1,83 @@
 # Read with Rex, Complete Project Handoff
 
-> This document is a complete snapshot of the project as of August 21, 2026.
+> This document is a complete snapshot of the project as of August 22, 2026.
 > Written so any LLM can pick up where we left off with zero context loss.
+
+---
+
+## ⚠️ READ FIRST: Status as of Aug 22, 2026 (build session 7)
+
+The project is **LIVE at https://readwithrex.com** (and
+https://www.readwithrex.com). All code is on GitHub
+(`AutoTasksAI/wordplay-explorer`, branch `main`, **public**). Local path:
+`C:\Users\DELL\Documents\GitHub\wordplay-explorer`. A second-brain backup
+is at `C:\Users\DELL\Documents\Codex\2026-07-27\prior-conversation-with-codex-conversation-role\work\pycache\Users\DELL\Documents\GitHub\claude-second-brain\projects\read-with-rex\`.
+
+**Everything from sessions 5-6 is still green** (guest/OTP/save-restore/
+newsletter QA, GSC verified, Plausible live, ElevenLabs TTS working) and on
+top of that:
+
+1. **EmailOctopus welcome automation is LIVE and tested end to end.**
+   Automation "Welcome email: sight-word flashcards" (id
+   `c6d2280e-9de5-11f1-abc1-0704e8fa8797`): trigger = contact added to the
+   Read With Rex list, then sends the lead-magnet email
+   ("Lead-magnet: sight-word flashcards" step, id
+   `c6d33b5e-9de5-11f1-8ad7-0704e8fa8797`) from
+   **Josh (Read with Rex) <josh@readwithrex.com>**, subject
+   "Your free sight-word flashcards are here 🦖", preview
+   "50 printable cards + 3 quick games to play this week.", body = the
+   section-1 lead-magnet copy from `docs/email-templates.md`. The
+   `readwithrex.com` domain was **verified as a sender** in EmailOctopus
+   (Domain Connect added `eo._domainkey`, `eom`, `eot`, `113088059` CNAMEs
+   and replaced the `_dmarc` TXT with `v=DMARC1; p=none;` in Cloudflare DNS;
+   all records confirmed live via 1.1.1.1). Test: subscribed
+   `josh+rexwelcome@autotasks.co` on readwithrex.com, the contact appeared
+   in the list (3 subscribed), and the automation report shows
+   **1 email sent** with the correct from/subject/body. The owner should
+   check that inbox for delivery and can delete the test contact.
+   Note: `josh@readwithrex.com` has no mailbox/forwarding yet (no MX on the
+   domain), so replies to the automation email currently bounce; set up
+   Cloudflare Email Routing (free) to forward it if replies are wanted.
+2. **Google re-indexing requested** for `https://readwithrex.com/` via GSC
+   URL Inspection ("Indexing requested, added to a priority crawl queue")
+   so the new favicon/OG image get picked up.
+3. **PageSpeed re-run confirms the font fix**: Mobile **89 Performance**,
+   Desktop **100 Performance**, Accessibility 93, Best Practices 100,
+   SEO 100 (up from 82 before the self-hosted font; the remaining ~77 KiB
+   unused-JS note is React+Convex core, TBT already 10 ms).
+
+### Session 7 (2026-08-22): EmailOctopus welcome automation + re-index + PageSpeed
+
+**EmailOctopus setup (dashboard work, no code changes):**
+- Created automation "Welcome email: sight-word flashcards" from the Simple
+  welcome template: Trigger "Contact added" (no filters) → Send email
+  "Lead-magnet: sight-word flashcards". Automation is **Active**.
+- Email step configured: from `Josh (Read with Rex) <josh@readwithrex.com>`,
+  subject + preview + body per `docs/email-templates.md` section 1 (title,
+  intro, flashcards link, 3 numbered games, weekly-email note, game link,
+  sign-off, P.S., unsubscribe footer).
+- Verified the `readwithrex.com` sending domain via the "Add records
+  automatically" Domain Connect flow (see status block above). EmailOctopus
+  originally warned the sender address was unverified; it is now resolved.
+- The existing list is `4d9ee6ae-9ca3-11f1-a433-df8a60f1b56a` (3 subscribed:
+  josh@autotasks.co, rexqa91826@westcast-systems.com from session-5 QA, and
+  josh+rexwelcome@autotasks.co from this session's test).
+- Contacts added BEFORE the automation started (e.g. josh@autotasks.co) did
+  not receive the email, which is expected trigger behavior.
+
+**Verified this session:**
+- Live subscribe on readwithrex.com → success toast → contact in list →
+  automation report "1 sent" with correct from/subject/rendered body.
+- DNS: `eom`, `eo._domainkey`, `eot`, `113088059` CNAMEs + `_dmarc` TXT all
+  resolve via 1.1.1.1; EmailOctopus shows the domain **Verified**.
+- GSC: URL Inspection on `https://readwithrex.com/` shows "URL is on
+  Google" / "Page is indexed"; re-index request accepted.
+- PageSpeed Insights (Aug 22): Mobile 89 / Desktop 100 performance.
+- `npm run lint`: 0 errors (14 harmless fast-refresh warnings).
+- `npm run build`: passes.
+
+**Owner items still open (from session 5-6):** switch the Plausible account
+email to the owner's, and do a real-device spot check.
 
 ---
 
@@ -313,7 +389,16 @@ to `162.255.119.78`, `www` CNAME to `parkingpage.namecheap.com`).
 - ✅ ~~Google Search Console~~, verified in session 5; sitemap submitted
   (7 URLs, Success).
 - ✅ ~~Plausible site created~~ in session 5; analytics recording.
-- 🔄 **EmailOctopus flashcard delivery automation** (owner).
+- ✅ ~~EmailOctopus flashcard delivery automation~~, done in session 7:
+  "Welcome email: sight-word flashcards" automation is active and tested
+  end to end (subscribe → contact added → email sent); sender domain
+  `readwithrex.com` verified in EmailOctopus.
+- 🔄 **Confirm the automation email landed in the inbox** (owner): check
+  the inbox for `josh+rexwelcome@autotasks.co` (plus-address of
+  josh@autotasks.co) and optionally delete the test contact from the list.
+- 🔄 **Set up replies for josh@readwithrex.com** (owner, optional): the
+  domain has no MX record, so replies to automation emails bounce; Cloudflare
+  Email Routing is free and can forward to josh@autotasks.co.
 - 🔄 **Real-device spot check** (owner).
 - Optionally create a production Convex deployment (`npx convex deploy`) and
   update `VITE_CONVEX_URL` to its URL.
@@ -325,10 +410,15 @@ build cleanup is **committed and pushed to `main`** as `45f3c53` ("chore: fix
 lint errors, remove isolate artifact, add Plausible + email templates"). The
 auth + copy cleanup is **committed and pushed to `main`** as `9c32251`
 ("fix(auth): stop guest/email sign-in from spinning forever + remove em dashes").
-The session-4 deploy docs update will be committed separately. `.env.local` is
-gitignored; `src/convex/_generated/` is now tracked so Cloudflare Pages can
-build without an authenticated Convex CLI step. Regenerate it with
-`npx convex dev --once` after schema changes.
+The session-4 deploy docs update will be committed separately. Session 5 was
+committed as `775e1ab` (docs), `2fff603`, `830746e`, `1b91904`, `82a7369`,
+`4b0a009`, `b30423c` (code). Session 6 was committed as `0fb7ddf`
+("perf+seo: self-host Fredoka, preload font, PNG icons, OG share image,
+JSON-LD logo") and `12fa3c4` (docs). Session 7 had no code changes; this
+handoff update will be committed and pushed to `main` as the session-7 docs
+commit. `.env.local` is gitignored; `src/convex/_generated/` is now tracked
+so Cloudflare Pages can build without an authenticated Convex CLI step.
+Regenerate it with `npx convex dev --once` after schema changes.
 
 ### Handoff checklist
 - [x] Current status and owner are updated.

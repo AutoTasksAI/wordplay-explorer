@@ -3,16 +3,20 @@
 > Everything needed to take Read with Rex public. Work top to bottom. Most
 > items are free or on free tiers. Full strategy lives in `PLAN.md`.
 >
-> **Status 2026-08-21 (session 5):** The site is **LIVE** at
+> **Status 2026-08-22 (session 7):** The site is **LIVE** at
 > `https://readwithrex.com` via Cloudflare Pages with SSL on apex + www and
 > Git auto-deploy working. Post-launch QA passed end-to-end: guest sign-in,
 > save/restore progress, email OTP delivery through Resend (domain verified),
 > and the For-Parents newsletter signup into EmailOctopus. Google Search
-> Console is verified with `sitemap.xml` submitted (7 URLs, Success).
-> Plausible analytics is live. The favicon is the yellow + green T-Rex.
-> ElevenLabs TTS confirmed working. New: adaptive word levels (Starter →
-> My World → Big Kid), numbers 1-20, and an 8-creature milestone ladder
-> every 20 stars with a creature-pals collection on the Game Hub.
+> Console is verified with `sitemap.xml` submitted (7 URLs, Success) and the
+> homepage re-index was requested after the favicon/OG image update.
+> Plausible analytics is live. ElevenLabs TTS confirmed working. Adaptive
+> word levels (Starter → My World → Big Kid), numbers 1-20, and an
+> 8-creature milestone ladder every 20 stars shipped. PageSpeed: Mobile 89 /
+> Desktop 100 after self-hosting the Fredoka font. The EmailOctopus welcome
+> automation ("Welcome email: sight-word flashcards") is **active and tested
+> end to end**: contact added → lead-magnet email sent from
+> `josh@readwithrex.com` (domain verified as sender in EmailOctopus).
 
 ## ⚠️ Auth note
 - The email-OTP sender was swapped from Freebuff's service to **Resend**
@@ -73,6 +77,8 @@
       flows on the next visit. Cookie-free, no consent banner needed.
 - [x] Google Search Console, verify `readwithrex.com`, submit `sitemap.xml`.
       Session 5: domain property verified, sitemap submitted (7 URLs, Success).
+      Session 7: re-index requested for the homepage after the favicon/OG
+      image update ("Indexing requested", priority crawl queue).
 - [ ] Bing Webmaster Tools (free, small extra traffic), optional.
 
 ## 7. Keys & integrations (project Keys tab, never `.env`)
@@ -92,8 +98,9 @@
       code → fresh guest on another device → Restore → progress returns.
       Session 5 QA passed end-to-end.
 - [x] Newsletter: submit the For-Parents form. Session 5 QA passed (contact
-      created in EmailOctopus). Remaining owner step: build the EmailOctopus
-      automation that actually emails the flashcards to new subscribers.
+      created in EmailOctopus); session 7 built and activated the EmailOctopus
+      automation that emails the flashcards, tested with a real subscribe
+      (contact added → lead-magnet email sent from josh@readwithrex.com).
 
 ## 9. Share it (free growth)
 - [ ] Share with the family/playgroup and a few parenting groups, the first 20 families are the seed.
