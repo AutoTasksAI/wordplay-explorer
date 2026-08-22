@@ -4,7 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/icons/icon-48.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="preload" href="/fonts/fredoka-latin-var.woff2" as="font" type="font/woff2" crossorigin />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Primary SEO -->
@@ -28,12 +31,23 @@
     content="Free reading games for kids ages 4–6. First sight words, numbers, and patterns are spoken aloud by Rex the T-Rex. No ads, no timers."
   />
   <meta property="og:url" content="https://readwithrex.com/" />
-  <meta name="twitter:card" content="summary" />
+  <meta
+    property="og:image"
+    content="https://readwithrex.com/og-image.png"
+  />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta
+    property="og:image:alt"
+    content="Rex the T-Rex next to the words Read with Rex, free reading games for kids ages 4 to 6."
+  />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Read with Rex, Free Reading Games for Kids Ages 4-6" />
   <meta
     name="twitter:description"
     content="Free reading games for kids ages 4–6: first sight words, numbers, and patterns, spoken aloud. No ads, no timers."
   />
+  <meta name="twitter:image" content="https://readwithrex.com/og-image.png" />
 
   <meta name="theme-color" content="#fff8e7" />
 
@@ -50,6 +64,8 @@
           "operatingSystem": "Web",
           "browserRequirements": "Requires JavaScript",
           "inLanguage": "en",
+          "image": "https://readwithrex.com/og-image.png",
+          "logo": "https://readwithrex.com/logo.svg",
           "description": "Free reading games for kids ages 4-6 that turn first sight words, numbers, and patterns into a dinosaur adventure. Everything is spoken aloud by Rex the T-Rex.",
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
           "audience": {
