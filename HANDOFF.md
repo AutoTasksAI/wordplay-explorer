@@ -86,6 +86,42 @@ succeeds and caches).
 - Convex logs show `speech:synthesizeSpeech` succeeding after the owner
   fixed the ElevenLabs key.
 
+## ⚠️ READ FIRST: Status as of Aug 22, 2026 (build session 6)
+
+The project is **LIVE at https://readwithrex.com** (and
+https://www.readwithrex.com). All code is on GitHub
+(`AutoTasksAI/wordplay-explorer`, branch `main`, **public**). Local path:
+`C:\Users\DELL\Documents\GitHub\wordplay-explorer`. A second-brain backup
+is at `C:\Users\DELL\Documents\Codex\2026-07-27\prior-conversation-with-codex-conversation-role\work\pycache\Users\DELL\Documents\GitHub\claude-second-brain\projects\read-with-rex\`.
+
+**Post-launch QA is complete and passing**: guest sign-in, save/restore with
+parent email + PIN, email OTP delivery end-to-end (real inbox), and the
+For-Parents newsletter signup. Google Search Console is verified
+(`sc-domain:readwithrex.com`) with `sitemap.xml` submitted (7 URLs, Success).
+Plausible is live (per-site script installed). ElevenLabs TTS confirmed working.
+
+### Session 6 (2026-08-22): PageSpeed + share/SEO polish
+
+**Performance (commit `0fb7ddf`):**
+- Self-hosted the Fredoka variable font: `public/fonts/fredoka-latin-var.woff2`
+  (latin subset, weights 400-700 in one 29 KB file). Removed the Google Fonts
+  `@import` from `src/index.css`, added `@font-face` AFTER the Tailwind
+  imports (ordering matters), and added `<link rel="preload">` in index.html.
+  This removes two render-blocking round trips (~800 ms of the old FCP/LCP).
+  PageSpeed was 82 performance / FCP 3.4s / LCP 3.5s before; re-run the test
+  to confirm the improvement.
+- Note: remaining "reduce unused JavaScript" (~77 KiB) is the React+Convex
+  core; TBT is already 10 ms so this is low priority.
+
+**Share/search polish (same commit):**
+- Created `public/og-image.png` (1200x630 branded share card) + PNG icons
+  (`public/icons/icon-48.png`, `public/icons/apple-touch-icon.png` 180px),
+  generated from logo.svg via headless screenshots.
+- index.html: added PNG icon links, apple-touch-icon, font preload,
+  `og:image` + `twitter:card summary_large_image` with ABSOLUTE image URL,
+  and `logo`/`image` on the WebApplication JSON-LD.
+- manifest.webmanifest icons now include the PNGs alongside logo.svg.
+
 ### What happened in session 3 (2026-08-20): Freebuff cleanup + first real backend
 
 **Owner actions completed:**
@@ -222,19 +258,26 @@ to `162.255.119.78`, `www` CNAME to `parkingpage.namecheap.com`).
 
 ### The exact next step for a new thread
 
-1. **Owner-only follow-ups** (agent cannot do these):
-   - Configure the EmailOctopus automation that delivers the sight-word
-     flashcards + welcome email to new subscribers (the API subscribe works;
-     the delivery email is an EmailOctopus-side automation).
-   - Spot-check the app on a real phone/tablet (agent QA ran in a 390px
-     viewport; real-device audio + touch feel still worth one pass).
-   - Plausible account: registered with a temporary inbox
-     (`rexqa91826@westcast-systems.com`, password shared privately in the
-     session chat). Sign in and switch the account email to the owner's.
-2. **Growth**: watch Search Console weekly, publish 5-10 more parent blog
-   pages for winning queries (see PLAN.md Phase 1).
-3. **Optional production Convex**: run `npx convex deploy` and update
-   `VITE_CONVEX_URL` in Cloudflare Pages environment variables.
+1. **Finish the EmailOctopus welcome automation** (owner already logged into
+   the dashboard; account "Read With Rex" has the Automations feature):
+   - Go to Automations → create one. Trigger: contact added to the parent
+     list. Email 1, sent immediately: subject
+     "Your free sight-word flashcards are here 🦖", body from
+     `docs/email-templates.md` (section 1), linking to
+     https://readwithrex.com/sight-words.
+   - Test by subscribing a real address via the landing-page form and
+     checking the inbox (a temp mail.gw inbox was used before:
+     rexqa91826@westcast-systems.com, token in agent temp files).
+   - Note: sending may require verifying a from-address/domain inside
+     EmailOctopus first (rex@readwithrex.com or similar); follow the wizard.
+2. **Ask Google to re-crawl** so the new favicon + OG image show in search /
+   share previews: GSC → URL inspection → https://readwithrex.com/ → Request
+   indexing. Also run PageSpeed again to confirm the font fix.
+3. **Owner-only leftovers**: switch the Plausible account email from the temp
+   inbox to the owner's; build the weekly tips cadence later (template in
+   docs/email-templates.md section 3).
+4. Optional: production Convex deployment (`npx convex deploy` + swap
+   `VITE_CONVEX_URL`), Bing Webmaster Tools.
 
 ### Troubleshooting notes
 
