@@ -1,9 +1,25 @@
 # Read with Rex, Complete Project Handoff
 
-> This document is a complete snapshot of the project as of August 22, 2026.
+> This document is a complete snapshot of the project as of September 3, 2026.
 > Written so any LLM can pick up where we left off with zero context loss.
 
 ---
+
+## READ FIRST: Status as of Sep 3, 2026 (build session 8)
+
+The project is LIVE at https://readwithrex.com. Session 8 shipped three gameplay fixes reported from real use, committed as d3580e7 and pushed to main, which triggered the Cloudflare Pages production deploy.
+
+1. App sometimes hangs or gets stuck.
+   Root cause: browser speechSynthesis can fail to fire onend or onerror, stalling the speech queue and the current round. Fix in src/lib/speech.ts: call resume() after cancel() for a clean engine start, raise the pre-speak delay from 30ms to 100ms, and drop the utterance-never-started watchdog from 20s to 6s so a stuck round auto-advances in seconds instead of hanging.
+
+2. On mobile the counting items were too small and cluttered.
+   Fix in src/lib/numbers.tsx and src/components/ModuleShell.tsx: bigger display emojis with explicit grid rows (two rows of five for 1-10, four rows of five for teen numbers so 11-20 no longer crowds or wraps), bigger option-tile emojis, option numerals bumped one size step, and tap tiles now have a min-height of 88px on phones instead of small aspect-square boxes.
+
+3. No difficulty drop-back when a child keeps failing a tier.
+   New computeStruggleTier() in src/lib/game-core.ts: aggregates lifetime per-tier correct and wrong counts, then walks backward from the active tier while the tier wrong rate is 55 percent or higher with at least 5 attempts. The round pool in words.tsx and numbers.tsx is now capped by this struggle tier instead of only the forward-unlocked level, so a child failing teen numbers gets 1-10 again and stays there until accuracy recovers. Persistent across sessions via the existing Convex itemProgress data, no schema change. Level-up fanfares and the start-screen level display are untouched. Pattern Path is single-tier so this does not apply there.
+
+Verified: npm run lint 0 errors (14 pre-existing fast-refresh warnings) and npm run build passes. Owner follow-ups: real-device spot check of mobile sizing and the struggle drop-back; optionally finish the Cloudflare Email Routing destination verification left pending in session 7.
+
 
 ## ⚠️ READ FIRST: Status as of Aug 22, 2026 (build session 7)
 
