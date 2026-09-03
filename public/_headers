@@ -1,0 +1,18 @@
+# Long-lived caching for static assets.
+# Fingerprinted files are safe to cache for a year.
+# Cloudflare Pages reads /public/_headers at deploy time.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/og-image.png
+  Cache-Control: public, max-age=604800
+
+/logo.svg
+  Cache-Control: public, max-age=604800
+
