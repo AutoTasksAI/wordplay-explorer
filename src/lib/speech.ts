@@ -218,6 +218,11 @@ function playItem(item: QueueItem): Promise<void> {
       try {
         const synth = window.speechSynthesis;
         synth.cancel();
+        // Chrome sometimes leaves the synth in a broken state after cancel();
+        // A short delay and a resume attempt give it a clean start.
+        window.setTimeout(() => {
+          try { synth.resume(); } catch { /* ignore */ }
+        }, 50);
         utterance = new SpeechSynthesisUtterance(item.text);
         const voice = pickVoice();
         if (voice) utterance.voice = voice;
@@ -226,9 +231,12 @@ function playItem(item: QueueItem): Promise<void> {
         utterance.volume = 1;
         utterance.onend = finish;
         utterance.onerror = finish;
-        // Chrome drops an utterance spoken immediately after cancel(); a tick fixes it.
-        window.setTimeout(() => synth.speak(utterance!), 30);
-        timer = window.setTimeout(finish, 20000);
+        // Chrome drops an utterance spoken immediately after cancel(); a longer tick fixes it.
+        window.setTimeout(() => synth.speak(utterance!), 100);
+        // If the browser never starts speaking (no voice, broken synth),
+        // don't hang forever. The 20s timer is a last resort; this 6s timer
+        // catches the common "utterance queued but never spoken" case.
+        timer = window.setTimeout(finish, 6000);
         // Chrome has a known bug where speechSynthesis gets "stuck" speaking
         // or loops a phrase; a gentle pause/resume heartbeat keeps it moving.
         heartbeat = window.setInterval(() => {

@@ -1,6 +1,6 @@
 import {
   SESSION_LENGTH,
-  computeLevel,
+  computeStruggleTier,
   pickOptions,
   pickTargets,
   type LevelSpec,
@@ -147,8 +147,8 @@ export const WORDS_LEVELS: LevelSpec = {
  * always matches the player's level while mastered words keep cycling back.
  */
 function buildRounds(progress: ProgressMap): Round[] {
-  const level = computeLevel(progress, WORDS_LEVELS);
-  const pool = WORDS.filter((w) => w.tier <= level.tier);
+  const maxTier = computeStruggleTier(progress, WORDS_LEVELS);
+  const pool = WORDS.filter((w) => w.tier <= maxTier);
   const targets = pickTargets(pool, progress, (w) => w.word, SESSION_LENGTH);
   return targets.map((w, i) => {
     const showPicture = i % 2 === 0;

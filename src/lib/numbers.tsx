@@ -1,6 +1,6 @@
 import {
   SESSION_LENGTH,
-  computeLevel,
+  computeStruggleTier,
   pickOptions,
   pickTargets,
   type LevelSpec,
@@ -55,7 +55,7 @@ export const NUMBERS_LEVELS: LevelSpec = {
  *  pure counting, not recognizing different pictures. */
 const COUNT_EMOJIS = ["🦖", "🍎", "🐝", "⭐", "🎈", "🌼", "🍓"];
 
-/** A row of `value` emojis, used as the display or as an option tile. */
+/** A grid of `value` emojis, used as the display or as an option tile. */
 function CountGrid({
   value,
   emoji,
@@ -65,15 +65,20 @@ function CountGrid({
   emoji: string;
   small?: boolean;
 }) {
+  // Stay finger-friendly: 1-10 as two rows of five, 11-20 as four rows of five.
+  const rows = Math.ceil(value / 5);
   return (
-    <div className="grid grid-cols-5 gap-1 sm:gap-1.5">
+    <div
+      className={"grid gap-1 sm:gap-1.5 " + (small ? "grid-cols-4" : "grid-cols-5")}
+      style={small ? undefined : { gridTemplateRows: "repeat(" + rows + ", minmax(0, 1fr))" }}
+    >
       {Array.from({ length: value }).map((_, i) => (
         <span
           key={i}
           className={
             small
-              ? "text-xl leading-none sm:text-2xl"
-              : "text-4xl leading-none sm:text-6xl"
+              ? "text-2xl leading-none sm:text-3xl"
+              : "text-3xl leading-none sm:text-5xl md:text-6xl"
           }
         >
           {emoji}
@@ -90,8 +95,8 @@ function CountGrid({
  * ten is mostly mastered.
  */
 function buildRounds(progress: ProgressMap): Round[] {
-  const level = computeLevel(progress, NUMBERS_LEVELS);
-  const pool = NUMBERS.filter((n) => n.tier <= level.tier);
+  const maxTier = computeStruggleTier(progress, NUMBERS_LEVELS);
+  const pool = NUMBERS.filter((n) => n.tier <= maxTier);
   const targets = pickTargets(
     pool,
     progress,
@@ -129,7 +134,7 @@ function buildRounds(progress: ProgressMap): Round[] {
       options: options.map((o) => ({
         key: String(o.value),
         node: showCount ? (
-          <span className="text-4xl font-bold sm:text-6xl">{o.value}</span>
+          <span className="text-5xl font-bold sm:text-6xl">{o.value}</span>
         ) : (
           <CountGrid value={o.value} emoji={emoji} small />
         ),

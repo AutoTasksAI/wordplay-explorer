@@ -133,6 +133,49 @@ export function pickTargets<T>(
   return result;
 }
 
+
+/**
+ * Detect when a player is struggling in the current tier and temporarily
+ * drop them back to an easier tier until they show mastery again.
+ *
+ * - Uses the per-item lifetime wrong rate inside each tier.
+ * - Walks backward from the active tier while the tier wrong rate is
+ *   above wrongRateThreshold and there are enough attempts.
+ * - Persists until the child masters enough items in the higher tier
+ *   (i.e., the wrong rate drops below the threshold).
+ */
+export function computeStruggleTier(
+  progress: ProgressMap,
+  spec: LevelSpec,
+  wrongRateThreshold = 0.55,
+  minAttempts = 5,
+): number {
+  const active = computeLevel(progress, spec);
+  let tier = active.tier;
+
+  // Aggregate per-tier lifetime stats from per-item progress.
+  const stats: Record<number, { correct: number; wrong: number }> = {};
+  for (const [key, p] of Object.entries(progress)) {
+    const itemTier = spec.tierOf(key);
+    if (itemTier > active.tier) continue; // ignore tiers above current
+    if (!stats[itemTier]) stats[itemTier] = { correct: 0, wrong: 0 };
+    stats[itemTier].correct += p.correct;
+    stats[itemTier].wrong += p.wrong;
+  }
+
+  while (tier > 1) {
+    const s = stats[tier];
+    const attempts = s ? s.correct + s.wrong : 0;
+    if (attempts < minAttempts) break; // not enough data yet
+    const wrongRate = s ? s.wrong / attempts : 0;
+    if (wrongRate < wrongRateThreshold) break; // doing okay
+    tier--;
+  }
+
+  return tier;
+}
+
+
 /**
  * Build the 3 options for a round: the target plus two random distractors
  * from the pool, shuffled so the target isn't always first.

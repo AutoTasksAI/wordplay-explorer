@@ -557,7 +557,7 @@ export function ModuleShell({
                           : { x: 0 }
                     }
                     transition={{ duration: isWrongFlash ? 0.4 : 0.3 }}
-                    className={`relative flex aspect-square w-full items-center justify-center overflow-hidden border-[3px] border-ink p-1.5 nb-shadow-sm ${
+                    className={`relative flex min-h-[88px] w-full items-center justify-center overflow-hidden border-[3px] border-ink p-1.5 nb-shadow-sm sm:aspect-square sm:min-h-0 ${
                       isCorrect
                         ? "bg-grass"
                         : isWrongFlash
