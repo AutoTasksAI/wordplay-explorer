@@ -516,7 +516,7 @@ export function ModuleShell({
               <span className="border-[3px] border-ink bg-sky px-4 py-1 text-sm font-bold uppercase tracking-widest text-white nb-shadow-xs">
                 {currentRound.prompt}
               </span>
-              <div className="relative flex w-full items-center justify-center border-[3px] border-ink bg-white px-6 py-10 nb-shadow sm:py-14">
+              <div className="relative flex w-full items-center justify-center border-[3px] border-ink bg-white px-3 py-8 nb-shadow sm:px-6 sm:py-14">
                 <motion.div
                   key={roundIndex}
                   initial={{ scale: 0.6, opacity: 0 }}
@@ -557,7 +557,7 @@ export function ModuleShell({
                           : { x: 0 }
                     }
                     transition={{ duration: isWrongFlash ? 0.4 : 0.3 }}
-                    className={`relative flex min-h-[88px] w-full items-center justify-center overflow-hidden border-[3px] border-ink p-1.5 nb-shadow-sm sm:aspect-square sm:min-h-0 ${
+                    className={`relative flex min-h-[110px] w-full items-center justify-center overflow-hidden border-[3px] border-ink p-1.5 nb-shadow-sm sm:aspect-square sm:min-h-0 ${
                       isCorrect
                         ? "bg-grass"
                         : isWrongFlash

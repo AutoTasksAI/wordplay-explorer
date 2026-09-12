@@ -55,7 +55,9 @@ export const NUMBERS_LEVELS: LevelSpec = {
  *  pure counting, not recognizing different pictures. */
 const COUNT_EMOJIS = ["🦖", "🍎", "🐝", "⭐", "🎈", "🌼", "🍓"];
 
-/** A grid of `value` emojis, used as the display or as an option tile. */
+/** A grid of `value` emojis, used as the display or as an option tile.
+ *  Emoji size shrinks as the count grows so teen numbers (11-20) stay
+ *  countable on a 390px phone instead of jumbling together. */
 function CountGrid({
   value,
   emoji,
@@ -65,21 +67,35 @@ function CountGrid({
   emoji: string;
   small?: boolean;
 }) {
-  // Stay finger-friendly: 1-10 as two rows of five, 11-20 as four rows of five.
-  const rows = Math.ceil(value / 5);
+  // Display (prompt): 5 columns, generous gaps, smaller glyphs for big counts.
+  // Option tiles (small): same 5-col layout so the shape matches the prompt,
+  // sized to fit a ~110px phone tile even at 20 items (4 rows x ~16px).
+  const sizeClass = small
+    ? value <= 5
+      ? "text-2xl leading-none sm:text-3xl"
+      : value <= 10
+        ? "text-xl leading-none sm:text-2xl"
+        : value <= 15
+          ? "text-lg leading-none sm:text-2xl"
+          : "text-base leading-none sm:text-xl"
+    : value <= 5
+      ? "text-5xl leading-none sm:text-6xl"
+      : value <= 10
+        ? "text-4xl leading-none sm:text-5xl"
+        : value <= 15
+          ? "text-3xl leading-none sm:text-4xl"
+          : "text-2xl leading-none sm:text-4xl";
+  const gapClass = small ? "gap-1 sm:gap-1.5" : "gap-2 sm:gap-3";
   return (
     <div
-      className={"grid gap-1 sm:gap-1.5 " + (small ? "grid-cols-4" : "grid-cols-5")}
-      style={small ? undefined : { gridTemplateRows: "repeat(" + rows + ", minmax(0, 1fr))" }}
+      className={
+        "grid grid-cols-5 place-items-center justify-items-center " + gapClass
+      }
     >
       {Array.from({ length: value }).map((_, i) => (
         <span
           key={i}
-          className={
-            small
-              ? "text-2xl leading-none sm:text-3xl"
-              : "text-3xl leading-none sm:text-5xl md:text-6xl"
-          }
+          className={"inline-flex items-center justify-center " + sizeClass}
         >
           {emoji}
         </span>
