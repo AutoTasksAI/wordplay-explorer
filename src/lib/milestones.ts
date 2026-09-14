@@ -79,7 +79,7 @@ export const MILESTONE_CREATURES: MilestoneCreature[] = [
   { kind: "shark", emoji: "🦈", durationMs: 9000, style: "orbit" },
   { kind: "starfish", emoji: "⭐", durationMs: 8500, style: "spin" },
   { kind: "rocket", emoji: "🚀", durationMs: 9500, style: "zoom" },
-  { kind: "rainbow", emoji: "🌈", durationMs: 10000, style: "rain" },
+  { kind: "rain", emoji: "🌧️", durationMs: 14000, style: "custom" },
 ];
 
 /** Stars needed to unlock every pal in the roster (50 × 20). */
