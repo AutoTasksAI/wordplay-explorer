@@ -78,6 +78,14 @@ async function fetchAudio(key: string): Promise<string | null> {
 const warmQueue: string[] = [];
 let warming = false;
 
+/** Drop in-memory TTS audio so a fresh session does not reuse old clips. */
+export function clearSpeechCache() {
+  audioCache.clear();
+  pendingFetches.clear();
+  warmQueue.length = 0;
+  warming = false;
+}
+
 async function drainWarmQueue() {
   if (warming) return;
   warming = true;

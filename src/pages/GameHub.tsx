@@ -9,6 +9,7 @@ import {
 import { MODULES } from "@/lib/modules";
 import { speak, warmUpAudio } from "@/lib/speech";
 import { SaveProgressDialog } from "@/components/SaveProgressDialog";
+import { StartOverDialog } from "@/components/StartOverDialog";
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { LogOut, Volume2 } from "lucide-react";
@@ -87,6 +88,7 @@ export default function GameHub() {
         </div>
         <div className="flex items-center gap-2">
           <SaveProgressDialog />
+          <StartOverDialog />
           <button
             type="button"
             onClick={handleSignOut}
