@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { MASTERY_COUNT, type ModuleId } from "@/lib/game-core";
 import {
   creatureForMilestone,
+  MILESTONE_CREATURES,
   MILESTONE_STEP,
 } from "@/lib/milestones";
 import { MODULES } from "@/lib/modules";
@@ -33,8 +34,11 @@ export default function GameHub() {
   // collection grow, which makes the long-term reward easy to understand.
   const lifetimeStars = playerState?.stars ?? 0;
   const creaturesEarned = Math.floor(lifetimeStars / MILESTONE_STEP);
-  const nextCreatureAt =
-    (creaturesEarned + 1) * MILESTONE_STEP - lifetimeStars;
+  const rosterFull = creaturesEarned >= MILESTONE_CREATURES.length;
+  const nextCreatureAt = rosterFull
+    ? 0
+    : (creaturesEarned + 1) * MILESTONE_STEP - lifetimeStars;
+  const palTileCount = rosterFull ? creaturesEarned : creaturesEarned + 1;
 
   const handleSignOut = async () => {
     speak("Bye bye!");
@@ -137,7 +141,7 @@ export default function GameHub() {
             My creature pals
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2.5">
-            {Array.from({ length: creaturesEarned + 1 }).map((_, i) => {
+            {Array.from({ length: palTileCount }).map((_, i) => {
               const earned = i < creaturesEarned;
               const creature = creatureForMilestone(i);
               return (
@@ -172,7 +176,9 @@ export default function GameHub() {
           <p className="text-xs font-semibold text-muted-foreground">
             {creaturesEarned === 0
               ? `Earn ${nextCreatureAt} stars to meet your first pal!`
-              : `${nextCreatureAt} more stars until a new pal arrives!`}
+              : creaturesEarned >= MILESTONE_CREATURES.length
+                ? `All ${MILESTONE_CREATURES.length} pals found! Keep playing for encore parties!`
+                : `${creaturesEarned} of ${MILESTONE_CREATURES.length} pals · ${nextCreatureAt} stars until the next one!`}
           </p>
         </div>
 

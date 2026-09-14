@@ -21,14 +21,7 @@ import {
 } from "@/lib/speech";
 import { MODULE_IDS } from "@/lib/modules";
 import { creatureForMilestone, MILESTONE_STEP } from "@/lib/milestones";
-import { BatCelebration } from "./BatCelebration";
-import { DragonCelebration } from "./DragonCelebration";
-import { LizardCelebration } from "./LizardCelebration";
-import { OctopusCelebration } from "./OctopusCelebration";
-import { RexPartyCelebration } from "./RexPartyCelebration";
-import { SpiderCelebration } from "./SpiderCelebration";
-import { UnicornCelebration } from "./UnicornCelebration";
-import { WhaleCelebration } from "./WhaleCelebration";
+import { CelebrationOverlay } from "./CelebrationOverlay";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, LogOut, Volume2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -181,10 +174,8 @@ export function ModuleShell({
   const burstIdRef = useRef(0);
 
   // Star milestones: when the lifetime total crosses a 20-star boundary, a
-  // creature celebration plays on the next session end. Each creature in the
-  // roster throws a bigger party than the last (spider → bat → octopus →
-  // lizard → dragon → unicorn → whale → Rex's own party), then the ladder
-  // repeats so there is always another friend to meet.
+  // creature celebration plays. Fifty unique pals unlock in order; the ladder
+  // only repeats after the full roster is collected.
   const [celebration, setCelebration] = useState<{
     kind: string;
     value: number;
@@ -664,33 +655,13 @@ export function ModuleShell({
 
       <ConfettiBurst burst={burst} />
       <AnimatePresence>
-        {celebration?.kind === "spider" && (
-          <SpiderCelebration key="spider" milestone={celebration.value} />
-        )}
-        {celebration?.kind === "bat" && (
-          <BatCelebration key="bat" milestone={celebration.value} />
-        )}
-        {celebration?.kind === "octopus" && (
-          <OctopusCelebration
-            key="octopus"
+        {celebration && (
+          <CelebrationOverlay
+            key={celebration.kind}
+            kind={celebration.kind}
             milestone={celebration.value}
-            onDone={handleOctopusDone}
+            onOctopusDone={handleOctopusDone}
           />
-        )}
-        {celebration?.kind === "lizard" && (
-          <LizardCelebration key="lizard" milestone={celebration.value} />
-        )}
-        {celebration?.kind === "dragon" && (
-          <DragonCelebration key="dragon" milestone={celebration.value} />
-        )}
-        {celebration?.kind === "unicorn" && (
-          <UnicornCelebration key="unicorn" milestone={celebration.value} />
-        )}
-        {celebration?.kind === "whale" && (
-          <WhaleCelebration key="whale" milestone={celebration.value} />
-        )}
-        {celebration?.kind === "rex" && (
-          <RexPartyCelebration key="rex" milestone={celebration.value} />
         )}
       </AnimatePresence>
     </main>
