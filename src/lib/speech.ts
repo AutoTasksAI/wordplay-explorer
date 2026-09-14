@@ -129,6 +129,10 @@ export function speak(
 ): Promise<void> {
   return new Promise((resolve) => {
     const key = normalize(text);
+    // Coalesce duplicate phrases: if the exact same phrase is already queued
+    // (or playing right now), don't add another copy, resolve together with
+    // it when it finishes. Rapid repeat taps should never make the voice loop
+    // the same line over and over.
     const last = queue[queue.length - 1];
     if (last && last.key === key) {
       const prev = last.resolve;
@@ -167,6 +171,7 @@ async function drain() {
   }
 }
 
+/** Play one phrase to completion (or give up quietly after a timeout). */
 function playItem(item: QueueItem): Promise<void> {
   return new Promise((resolve) => {
     let settled = false;
@@ -188,6 +193,8 @@ function playItem(item: QueueItem): Promise<void> {
       if (utterance) {
         utterance.onend = null;
         utterance.onerror = null;
+        // Stop any ghost utterance the browser may keep looping after onend
+        // or a timeout (a known Chrome speechSynthesis bug).
         try {
           window.speechSynthesis.cancel();
         } catch {
@@ -197,6 +204,7 @@ function playItem(item: QueueItem): Promise<void> {
       resolve();
     };
 
+    /** Play a cached base64 mp3, resolving when it finishes. */
     const playB64 = (b64: string) => {
       try {
         audio = new Audio(`data:audio/mpeg;base64,${b64}`);
@@ -209,6 +217,7 @@ function playItem(item: QueueItem): Promise<void> {
       }
     };
 
+    /** Browser speech fallback, resolving when the utterance ends. */
     const playFallback = () => {
       if (typeof window === "undefined" || !("speechSynthesis" in window)) {
         finish();
@@ -217,6 +226,8 @@ function playItem(item: QueueItem): Promise<void> {
       try {
         const synth = window.speechSynthesis;
         synth.cancel();
+        // Chrome sometimes leaves the synth in a broken state after cancel();
+        // A short delay and a resume attempt give it a clean start.
         window.setTimeout(() => {
           try { synth.resume(); } catch { /* ignore */ }
         }, 50);
@@ -228,8 +239,14 @@ function playItem(item: QueueItem): Promise<void> {
         utterance.volume = 1;
         utterance.onend = finish;
         utterance.onerror = finish;
+        // Chrome drops an utterance spoken immediately after cancel(); a longer tick fixes it.
         window.setTimeout(() => synth.speak(utterance!), 100);
+        // If the browser never starts speaking (no voice, broken synth),
+        // don't hang forever. The 20s timer is a last resort; this 6s timer
+        // catches the common "utterance queued but never spoken" case.
         timer = window.setTimeout(finish, 6000);
+        // Chrome has a known bug where speechSynthesis gets "stuck" speaking
+        // or loops a phrase; a gentle pause/resume heartbeat keeps it moving.
         heartbeat = window.setInterval(() => {
           try {
             if (synth.speaking && !synth.paused) {
@@ -259,10 +276,13 @@ function playItem(item: QueueItem): Promise<void> {
       }
       playFallback();
     };
+    // Never let an unexpected throw leave the queue stalled.
     run().catch(finish);
   });
 }
 
+// Stop speech when the tab is hidden, Chrome can otherwise keep a stuck
+// utterance looping in the background.
 if (typeof window !== "undefined" && "speechSynthesis" in window) {
   const stopSynth = () => {
     try {
@@ -288,6 +308,10 @@ function pickVoice(): SpeechSynthesisVoice | null {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* WebAudio sound effects (unchanged from before)                      */
+/* ------------------------------------------------------------------ */
+
 let audioCtx: AudioContext | null = null;
 
 function getAudioCtx(): AudioContext | null {
@@ -309,6 +333,7 @@ function getAudioCtx(): AudioContext | null {
   }
 }
 
+/** Warm up audio engines after the first user tap. */
 export function warmUpAudio() {
   if (typeof window !== "undefined" && "speechSynthesis" in window) {
     window.speechSynthesis.getVoices();
@@ -339,26 +364,31 @@ function tone(
   osc.stop(start + duration + 0.05);
 }
 
+/** Bright two-note "ding!" for a correct answer. */
 export function playCorrect() {
   tone(660, 0, 0.14, "triangle", 0.25);
   tone(990, 0.09, 0.22, "triangle", 0.25);
 }
 
+/** Soft low "boop" for a wrong answer, gentle, never scary. */
 export function playWrong() {
   tone(220, 0, 0.18, "sine", 0.18);
 }
 
+/** Little sparkle when a star pops. */
 export function playStar() {
   tone(1320, 0, 0.1, "sine", 0.18);
   tone(1760, 0.07, 0.16, "sine", 0.16);
 }
 
+/** Big celebration arpeggio for finishing a session. */
 export function playFanfare() {
   const notes = [523.25, 659.25, 783.99, 1046.5];
   notes.forEach((n, i) => tone(n, i * 0.11, 0.3, "triangle", 0.24));
   tone(1318.5, notes.length * 0.11, 0.5, "triangle", 0.22);
 }
 
+/** Bouncy "boing!" for milestone celebrations (20 stars, 40 stars...). */
 export function playBoing() {
   const ctx = getAudioCtx();
   if (!ctx) return;
@@ -378,6 +408,7 @@ export function playBoing() {
   tone(1568, 0.26, 0.16, "sine", 0.14);
 }
 
+/** Cartoon gecko chirps ("tchk tchk tchk!") for the lizard milestone. */
 export function playLizard() {
   const ctx = getAudioCtx();
   if (!ctx) return;
@@ -397,6 +428,7 @@ export function playLizard() {
     osc.start(start + at);
     osc.stop(start + at + 0.16);
   };
+  // Four quick chirps, like a happy gecko saying hello.
   chirp(0);
   chirp(0.16);
   chirp(0.32);
