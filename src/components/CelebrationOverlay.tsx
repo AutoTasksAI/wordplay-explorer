@@ -14,6 +14,7 @@ import { SimplePalCelebration } from "./SimplePalCelebration";
 import { SpiderCelebration } from "./SpiderCelebration";
 import { TheaterCurtainsCelebration } from "./TheaterCurtainsCelebration";
 import { BlackStallionCelebration } from "./BlackStallionCelebration";
+import { RainFinaleCelebration } from "./RainFinaleCelebration";
 import { WhaleCelebration } from "./WhaleCelebration";
 
 interface CelebrationOverlayProps {
@@ -56,6 +57,8 @@ export function CelebrationOverlay({
       return <GigaLizardCelebration milestone={milestone} />;
     case "theater-curtains":
       return <TheaterCurtainsCelebration milestone={milestone} />;
+    case "rain":
+      return <RainFinaleCelebration milestone={milestone} />;
     default: {
       const creature = findCreature(kind);
       if (creature?.style && creature.style !== "custom") {
