@@ -1,1 +1,1 @@
-@include:/tmp/extract_0.ts
+@file:///tmp/extract_0.ts
