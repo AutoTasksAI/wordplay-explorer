@@ -1,1 +1,1 @@
-PLACEHOLDER_MODULE
+@include:/tmp/extract_1.ts
