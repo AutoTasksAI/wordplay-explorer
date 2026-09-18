@@ -14,7 +14,8 @@ import {
   playFanfare,
   playStar,
   playWrong,
-  randomPraise,
+  buildSessionPraises,
+  formatPraiseUtterance,
   speak,
   warmUpAudio,
   warmUpSpeech,
@@ -170,12 +171,9 @@ export function ModuleShell({
   const starsRef = useRef(0);
   const wrongTriedRef = useRef(false);
   const spokenRoundRef = useRef<number | null>(null);
-  const sessionPraiseRef = useRef("Great job!");
+  const sessionPraisesRef = useRef<string[]>(["Great job!"]);
   const burstIdRef = useRef(0);
 
-  // Star milestones: when the lifetime total crosses a 20-star boundary, a
-  // creature celebration plays. Fifty unique pals unlock in order; the ladder
-  // only repeats after the full roster is collected.
   const [celebration, setCelebration] = useState<{
     kind: string;
     value: number;
@@ -197,8 +195,6 @@ export function ModuleShell({
       if (celebration === null) {
         const hit = Math.floor(stars / MILESTONE_STEP) * MILESTONE_STEP;
         const creature = creatureForMilestone(hit / MILESTONE_STEP - 1);
-        // Defer the state update so it doesn't happen synchronously inside
-        // the effect body (avoids a cascading render warning).
         const startTimer = window.setTimeout(() => {
           setCelebration({ kind: creature.kind, value: hit });
           playBoing();
@@ -213,9 +209,6 @@ export function ModuleShell({
     lastStarsRef.current = stars;
   }, [stars, celebration]);
 
-  // Mirror the phase so late callbacks (like the octopus ink handoff, which
-  // fires seconds after it was created) can tell whether we're still on the
-  // celebration screen before navigating away.
   const phaseRef = useRef<Phase>("start");
   useEffect(() => {
     phaseRef.current = phase;
@@ -237,14 +230,11 @@ export function ModuleShell({
     [progressMap],
   );
 
-  // Curriculum level for this module (null when the module has no levels).
   const level: LevelInfo | null = useMemo(
     () => (meta.level ? computeLevel(progressMap, meta.level) : null),
     [meta, progressMap],
   );
 
-  // Announce a fresh unlock with a fanfare the first time the new level is
-  // seen (progress refetches right after a session ends).
   const lastLevelTierRef = useRef<number | null>(null);
   useEffect(() => {
     if (!level) return;
@@ -263,7 +253,6 @@ export function ModuleShell({
 
   const currentRound = roundIndex < rounds.length ? rounds[roundIndex] : null;
 
-  // Speak the prompt for each new round so a non-reader always knows what to do.
   useEffect(() => {
     if (phase !== "round" || !currentRound) return;
     if (spokenRoundRef.current === roundIndex) return;
@@ -279,7 +268,6 @@ export function ModuleShell({
 
   const startSession = () => {
     warmUpAudio();
-    sessionPraiseRef.current = randomPraise();
     wrongTriedRef.current = false;
     starsRef.current = 0;
     setStarsEarned(0);
@@ -288,12 +276,16 @@ export function ModuleShell({
     setWrongKey(null);
     const nextRounds = meta.buildRounds(progressMap);
     setRounds(nextRounds);
+    sessionPraisesRef.current = buildSessionPraises(nextRounds.length);
     spokenRoundRef.current = null;
-    // Pre-generate this session's phrases in the background so rounds play
-    // with zero lag once the cartoon voice is configured.
-    const praise = sessionPraiseRef.current;
     warmUpSpeech(
-      nextRounds.flatMap((r) => [r.spoken, `${praise} ${r.praiseWord}.`]),
+      nextRounds.flatMap((r, i) => [
+        r.spoken,
+        formatPraiseUtterance(
+          sessionPraisesRef.current[i] ?? "Great job!",
+          r.praiseWord,
+        ),
+      ]),
     );
     speak("Let's play!");
     setPhase("round");
@@ -333,9 +325,10 @@ export function ModuleShell({
     window.setTimeout(() => setBurst(null), 900);
     onRecord(currentRound.itemKey, firstTry);
 
-    // Wait for the praise to finish speaking before moving on, so it never
-    // gets cut off by the next round's prompt.
-    const praiseText = `${sessionPraiseRef.current} ${currentRound.praiseWord}!`;
+    const praiseText = formatPraiseUtterance(
+      sessionPraisesRef.current[roundIndex] ?? "Great job!",
+      currentRound.praiseWord,
+    );
     void speak(praiseText).then(() => {
       window.setTimeout(goNext, 450);
     });
@@ -363,11 +356,8 @@ export function ModuleShell({
   const handlePlayAgain = () => {
     warmUpAudio();
     setPhase("start");
-    // back to start, next PLAY builds a fresh session from updated progress
   };
 
-  // The octopus celebration ends with an ink cover; when it's done, glide the
-  // player over to the next module in the rotation (words → numbers → patterns).
   const handleOctopusDone = () => {
     if (phaseRef.current !== "celebrate") return;
     const idx = MODULE_IDS.indexOf(meta.id);
@@ -377,7 +367,6 @@ export function ModuleShell({
 
   return (
     <main className="kid-ui flex min-h-screen flex-col bg-paper">
-      {/* top bar */}
       <header className="flex items-center justify-between border-b-[3px] border-ink px-4 py-3 sm:px-6">
         <div className="flex items-center gap-2">
           <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-base leading-none shadow-[3px_3px_0_0_#141414]">
@@ -502,7 +491,6 @@ export function ModuleShell({
               </div>
             </div>
 
-            {/* prompt */}
             <div className="relative flex flex-col items-center gap-4">
               <span className="border-[3px] border-ink bg-sky px-4 py-1 text-sm font-bold uppercase tracking-widest text-white nb-shadow-xs">
                 {currentRound.prompt}
@@ -527,7 +515,6 @@ export function ModuleShell({
               </div>
             </div>
 
-            {/* options */}
             <div className="grid grid-cols-3 gap-3 sm:gap-5">
               {currentRound.options.map((option) => {
                 const isWrongFlash = wrongKey === option.key;
