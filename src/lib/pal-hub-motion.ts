@@ -67,6 +67,28 @@ export function palWhileHover(creature: MilestoneCreature) {
   };
 }
 
+/** Variants so idle hover/tap do not fight a constant `animate` rest object. */
+export function palEmojiVariants(creature: MilestoneCreature) {
+  const tap = palTapMotion(creature);
+  return {
+    idle: {
+      x: 0,
+      y: 0,
+      rotate: 0,
+      scale: 1,
+      transition: { duration: 0.12, ease: "easeOut" as const },
+    },
+    hover: {
+      ...palHoverProps(creature),
+      transition: palHoverTransition(creature),
+    },
+    tap: {
+      ...tap.animate,
+      transition: tap.transition,
+    },
+  };
+}
+
 /** One-shot tap / click celebration snippet (matches milestone party vibe). */
 export function palTapMotion(creature: MilestoneCreature): PalTapMotion {
   const style = creature.style ?? "bounce";

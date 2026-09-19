@@ -1,11 +1,7 @@
 import type { MilestoneCreature } from "@/lib/milestones";
-import {
-  palAriaLabel,
-  palTapMotion,
-  palWhileHover,
-} from "@/lib/pal-hub-motion";
+import { palAriaLabel, palEmojiVariants } from "@/lib/pal-hub-motion";
 import { motion } from "framer-motion";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 interface CreaturePalTileProps {
   creature: MilestoneCreature;
@@ -27,7 +23,10 @@ export function CreaturePalTile({
   lockedHint,
 }: CreaturePalTileProps) {
   const [tapPlaying, setTapPlaying] = useState(false);
-  const tap = palTapMotion(creature);
+  const emojiVariants = useMemo(
+    () => palEmojiVariants(creature),
+    [creature],
+  );
 
   const onActivate = useCallback(() => {
     if (!earned || tapPlaying) return;
@@ -69,22 +68,19 @@ export function CreaturePalTile({
       }}
       title={`${starsAt} stars!`}
       aria-label={palAriaLabel(creature, starsAt)}
-      className={`${tileClass} touch-manipulation select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink`}
+      className={`${tileClass} touch-manipulation select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink [@media(hover:hover)]:hover:shadow-[4px_4px_0_0_#141414]`}
       onClick={onActivate}
+      onTap={onActivate}
     >
       <motion.span
-        className="pointer-events-none block text-3xl leading-none"
-        initial={false}
-        animate={
-          tapPlaying
-            ? tap.animate
-            : { x: 0, y: 0, rotate: 0, scale: 1 }
-        }
-        transition={tap.transition}
+        className="block text-3xl leading-none"
+        variants={emojiVariants}
+        initial="idle"
+        animate={tapPlaying ? "tap" : "idle"}
+        whileHover={tapPlaying ? undefined : "hover"}
         onAnimationComplete={() => {
           if (tapPlaying) setTapPlaying(false);
         }}
-        whileHover={tapPlaying ? undefined : palWhileHover(creature)}
       >
         {creature.emoji}
       </motion.span>
