@@ -8,6 +8,7 @@ import {
 } from "@/lib/milestones";
 import { MODULES } from "@/lib/modules";
 import { speak, warmUpAudio } from "@/lib/speech";
+import { CreaturePalTile } from "@/components/CreaturePalTile";
 import { SaveProgressDialog } from "@/components/SaveProgressDialog";
 import { StartOverDialog } from "@/components/StartOverDialog";
 import { useQuery } from "convex/react";
@@ -146,32 +147,16 @@ export default function GameHub() {
             {Array.from({ length: palTileCount }).map((_, i) => {
               const earned = i < creaturesEarned;
               const creature = creatureForMilestone(i);
+              const starsAt = (i + 1) * MILESTONE_STEP;
               return (
-                <motion.span
+                <CreaturePalTile
                   key={i}
-                  initial={{ scale: 0, rotate: -20 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{
-                    delay: earned ? 0.05 * i : 0,
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 12,
-                  }}
-                  title={
-                    earned
-                      ? `${(i + 1) * MILESTONE_STEP} stars!`
-                      : `${nextCreatureAt} more stars!`
-                  }
-                  className={`flex size-12 items-center justify-center border-[3px] border-ink nb-shadow-xs sm:size-14 ${
-                    earned ? "bg-white text-3xl" : "bg-paper opacity-45"
-                  }`}
-                >
-                  {earned ? (
-                    creature.emoji
-                  ) : (
-                    <span className="text-xs font-bold">?</span>
-                  )}
-                </motion.span>
+                  index={i}
+                  creature={creature}
+                  earned={earned}
+                  starsAt={starsAt}
+                  lockedHint={`${nextCreatureAt} more stars!`}
+                />
               );
             })}
           </div>
