@@ -1,5 +1,7 @@
 import {
+  MASTERY_COUNT,
   SESSION_LENGTH,
+  computeLevel,
   computeStruggleTier,
   pickOptions,
   pickTargets,
@@ -11,14 +13,21 @@ import {
 
 export interface NumberItem {
   value: number;
-  /** Curriculum tier: 1 = counting 1-10, 2 = teen numbers 11-20. */
+  /** Curriculum tier — unlock one band at a time (see NUMBERS_LEVELS). */
   tier: number;
 }
 
-/** Numbers 1-10 are the classic first counting range; 11-20 unlock next. */
+function numberTier(value: number): number {
+  if (value <= 6) return 1;
+  if (value <= 10) return 2;
+  if (value <= 15) return 3;
+  return 4;
+}
+
+/** Numbers 1–20 in four bands so 7–10 and teens unlock only after prior band mastery. */
 export const NUMBERS: NumberItem[] = Array.from({ length: 20 }, (_, i) => ({
   value: i + 1,
-  tier: i < 10 ? 1 : 2,
+  tier: numberTier(i + 1),
 }));
 
 export const NUMBER_NAMES: Record<number, string> = {
@@ -45,11 +54,38 @@ export const NUMBER_NAMES: Record<number, string> = {
 };
 
 export const NUMBERS_LEVELS: LevelSpec = {
-  names: ["Counting 1 to 10", "Teen Numbers"],
-  emojis: ["🧮", "🚀"],
-  tierOf: (itemKey) => (Number(itemKey) <= 10 ? 1 : 2),
-  sizeOf: (tier) => (tier === 1 ? 10 : 10),
+  names: [
+    "Counting 1 to 6",
+    "Counting 7 to 10",
+    "Teen Numbers 11–15",
+    "Teen Numbers 16–20",
+  ],
+  emojis: ["🌱", "🧮", "🚀", "⭐"],
+  tierOf: (itemKey) => numberTier(Number(itemKey)),
+  sizeOf: (tier) => NUMBERS.filter((n) => n.tier === tier).length,
+  /** Every number in a band must be mastered before the next band appears in play. */
+  graduation: 1,
 };
+
+/**
+ * Numbers shown this session: only tiers the player has graduated into, capped
+ * at the active curriculum tier (never teasers from the next band).
+ */
+export function numbersPlayPool(progress: ProgressMap): NumberItem[] {
+  const active = computeLevel(progress, NUMBERS_LEVELS);
+  const struggleTier = computeStruggleTier(progress, NUMBERS_LEVELS);
+  const playTier = Math.min(active.tier, struggleTier);
+  return NUMBERS.filter((n) => n.tier <= playTier);
+}
+
+/** Teens (11+) only after 7–10 are each mastered at least once at MASTERY_COUNT. */
+export function teensUnlocked(progress: ProgressMap): boolean {
+  for (const n of NUMBERS.filter((x) => x.tier === 2)) {
+    const p = progress[String(n.value)];
+    if ((p?.correct ?? 0) < MASTERY_COUNT) return false;
+  }
+  return true;
+}
 
 /** The same counting emoji is used across a round's options so the task is
  *  pure counting, not recognizing different pictures. */
@@ -107,12 +143,14 @@ function CountGrid({
 /**
  * Rounds alternate between counting a row of objects and picking the numeral
  * ("Find the number. Three.") and seeing the numeral and picking the matching
- * count ("Find the picture. Three."). Teen numbers unlock once counting to
- * ten is mostly mastered.
+ * count ("Find the picture. Three."). Higher bands unlock only after every
+ * number in the current band is mastered (see NUMBERS_LEVELS.graduation).
  */
 function buildRounds(progress: ProgressMap): Round[] {
-  const maxTier = computeStruggleTier(progress, NUMBERS_LEVELS);
-  const pool = NUMBERS.filter((n) => n.tier <= maxTier);
+  let pool = numbersPlayPool(progress);
+  if (!teensUnlocked(progress)) {
+    pool = pool.filter((n) => n.value <= 10);
+  }
   const targets = pickTargets(
     pool,
     progress,
