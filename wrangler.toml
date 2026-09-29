@@ -1,4 +1,0 @@
-# Cloudflare Pages (Git integration) — build output for SPA deploy.
-name = "wordplay-explorer"
-compatibility_date = "2024-09-23"
-pages_build_output_dir = "dist"
