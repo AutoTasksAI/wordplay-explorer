@@ -1,7 +1,9 @@
 import {
   SESSION_LENGTH,
+  playPoolByTier,
   pickTargets,
   shuffle,
+  type LevelSpec,
   type ModuleConfig,
   type ProgressMap,
   type Round,
@@ -34,6 +36,21 @@ export const PATTERN_TYPES: PatternType[] = [
   { id: "aab", name: "AAB" },
   { id: "abc", name: "ABC" },
 ];
+
+function patternTier(id: string): number {
+  if (id === "ab" || id === "aabb") return 1;
+  if (id === "abb" || id === "aab") return 2;
+  return 3;
+}
+
+export const PATTERNS_LEVELS: LevelSpec = {
+  names: ["Simple Patterns", "Tricky Patterns", "ABC Patterns"],
+  emojis: ["🌱", "🧩", "🚀"],
+  tierOf: (itemKey) => patternTier(itemKey),
+  sizeOf: (tier) =>
+    PATTERN_TYPES.filter((t) => patternTier(t.id) === tier).length,
+  graduation: 1,
+};
 
 /** The repeating unit for the chosen pattern type. */
 function buildCycle(type: PatternType, colors: PatternColor[]): PatternColor[] {
@@ -137,12 +154,13 @@ function buildPatternRound(type: PatternType, isNext: boolean): Round {
 }
 
 function buildRounds(progress: ProgressMap): Round[] {
-  const targets = pickTargets(
+  const pool = playPoolByTier(
     PATTERN_TYPES,
     progress,
-    (t) => t.id,
-    SESSION_LENGTH,
+    PATTERNS_LEVELS,
+    (t) => patternTier(t.id),
   );
+  const targets = pickTargets(pool, progress, (t) => t.id, SESSION_LENGTH);
   return targets.map((type, i) => buildPatternRound(type, i % 2 === 0));
 }
 
@@ -163,4 +181,5 @@ export const PATTERNS_MODULE: ModuleConfig = {
   unitLabel: "patterns",
   startHint: "Tap PLAY and spot the pattern with Rex! 👂",
   buildRounds,
+  level: PATTERNS_LEVELS,
 };
