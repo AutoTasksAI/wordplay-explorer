@@ -92,7 +92,49 @@ export function FireworksCelebration({ milestone }: { milestone: number }) {
           }}
         >
           <span className="absolute inset-0 text-4xl sm:text-5xl">🎆</span>
+          {Array.from({ length: 8 }).map((_, j) => (
+            <motion.span
+              key={j}
+              className="absolute left-1/2 top-1/2 text-lg sm:text-xl"
+              initial={{ x: 0, y: 0, opacity: 1 }}
+              animate={{
+                x: Math.cos((j / 8) * Math.PI * 2) * (36 + b.size * 20),
+                y: Math.sin((j / 8) * Math.PI * 2) * (36 + b.size * 20),
+                opacity: [1, 0],
+              }}
+              transition={{
+                duration: 0.85,
+                delay: b.delay + 0.15,
+                repeat: Infinity,
+                repeatDelay: 1.4 + b.delay * 0.3,
+                ease: "easeOut",
+              }}
+            >
+              {b.hue === 0 ? "✨" : b.hue === 1 ? "💛" : "💖"}
+            </motion.span>
+          ))}
         </motion.div>
+      ))}
+
+      {sparks.map((s) => (
+        <motion.span
+          key={s.id}
+          className="absolute text-2xl sm:text-3xl"
+          style={{ left: `${s.x}%`, bottom: `${s.bottom}%` }}
+          animate={{
+            y: [0, -28, -8, -22, 0],
+            scale: [1, 1.2, 0.95, 1.15, 1],
+            opacity: [0.7, 1, 0.8, 1, 0.7],
+          }}
+          transition={{
+            duration: 1.6,
+            delay: s.delay,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          {s.emoji}
+        </motion.span>
       ))}
 
       <motion.div
@@ -107,6 +149,17 @@ export function FireworksCelebration({ milestone }: { milestone: number }) {
         <p className="mt-3 text-lg font-bold text-sun sm:text-2xl">
           {milestone} stars — what a party!
         </p>
+      </motion.div>
+
+      <motion.div
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.8 }}
+        className="absolute bottom-[18%] left-1/2 flex -translate-x-1/2 items-center gap-2 border-[3px] border-ink bg-white px-5 py-3 nb-shadow sm:gap-3 sm:px-7 sm:py-4"
+      >
+        <span className="text-4xl sm:text-5xl">🎆</span>
+        <span className="text-base font-bold sm:text-xl">Firework show!</span>
+        <span className="text-4xl sm:text-5xl">🎇</span>
       </motion.div>
     </motion.div>
   );
