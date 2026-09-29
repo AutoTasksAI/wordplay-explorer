@@ -1,1 +1,1 @@
-PLACEHOLDER
+@file:/workspace/wordplay-explorer/src/components/ModuleShell.tsx
