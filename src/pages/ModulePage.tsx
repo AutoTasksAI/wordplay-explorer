@@ -4,6 +4,8 @@ import { buildProgressMap, type ModuleId } from "@/lib/game-core";
 import { MODULES, isModuleId } from "@/lib/modules";
 import { useMutation, useQuery } from "convex/react";
 import { motion } from "framer-motion";
+import { GameEscapeHeader } from "@/components/GameEscapeHeader";
+import { useLoadingTimeout } from "@/hooks/use-loading-timeout";
 import { useMemo } from "react";
 import { Navigate, useParams } from "react-router";
 
@@ -12,6 +14,7 @@ export default function ModulePage() {
   const moduleId = isModuleId(moduleParam) ? (moduleParam as ModuleId) : null;
 
   const playerState = useQuery(api.game.getPlayerState);
+  const loadTimedOut = useLoadingTimeout(playerState, 8000);
   const recordAnswer = useMutation(api.game.recordAnswer);
   const completeSession = useMutation(api.game.completeSession);
 
@@ -29,16 +32,19 @@ export default function ModulePage() {
 
   const meta = MODULES[moduleId];
 
-  if (playerState === undefined) {
+  if (playerState === undefined && !loadTimedOut) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-paper">
-        <motion.span
-          className="text-6xl"
-          animate={{ scale: [1, 1.25, 1], rotate: [0, 12, -12, 0] }}
-          transition={{ duration: 1.2, repeat: Infinity }}
-        >
-          ⭐
-        </motion.span>
+      <main className="kid-ui flex min-h-screen flex-col bg-paper">
+        <GameEscapeHeader />
+        <div className="flex flex-1 items-center justify-center">
+          <motion.span
+            className="text-6xl"
+            animate={{ scale: [1, 1.25, 1], rotate: [0, 12, -12, 0] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
+          >
+            ⭐
+          </motion.span>
+        </div>
       </main>
     );
   }
