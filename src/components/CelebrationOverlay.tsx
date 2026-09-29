@@ -16,6 +16,7 @@ import { TheaterCurtainsCelebration } from "./TheaterCurtainsCelebration";
 import { BlackStallionCelebration } from "./BlackStallionCelebration";
 import { RainFinaleCelebration } from "./RainFinaleCelebration";
 import { WhaleCelebration } from "./WhaleCelebration";
+import { FireworksCelebration } from "./FireworksCelebration";
 
 interface CelebrationOverlayProps {
   kind: string;
@@ -59,6 +60,8 @@ export function CelebrationOverlay({
       return <TheaterCurtainsCelebration milestone={milestone} />;
     case "rain":
       return <RainFinaleCelebration milestone={milestone} />;
+    case "firework-show":
+      return <FireworksCelebration milestone={milestone} />;
     default: {
       const creature = findCreature(kind);
       if (creature?.style && creature.style !== "custom") {
