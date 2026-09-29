@@ -5,8 +5,14 @@ export type ModuleId = "words" | "numbers" | "patterns";
 /** Rounds per session, sized for a 5-year-old's attention span. */
 export const SESSION_LENGTH = 8;
 
-/** How many correct answers mark an item as "known". */
-export const MASTERY_COUNT = 3;
+/** Correct first-try answers before an item counts as mastered / "known". */
+export const MASTERY_COUNT = 4;
+
+/** Tier wrong-rate above this triggers struggle drop-back (see computeStruggleTier). */
+export const STRUGGLE_WRONG_RATE_THRESHOLD = 0.5;
+
+/** Minimum attempts in a tier before struggle drop-back can apply. */
+export const STRUGGLE_MIN_ATTEMPTS = 6;
 
 export interface ProgressEntry {
   correct: number;
@@ -147,8 +153,8 @@ export function pickTargets<T>(
 export function computeStruggleTier(
   progress: ProgressMap,
   spec: LevelSpec,
-  wrongRateThreshold = 0.55,
-  minAttempts = 5,
+  wrongRateThreshold = STRUGGLE_WRONG_RATE_THRESHOLD,
+  minAttempts = STRUGGLE_MIN_ATTEMPTS,
 ): number {
   const active = computeLevel(progress, spec);
   let tier = active.tier;
@@ -175,6 +181,21 @@ export function computeStruggleTier(
   return tier;
 }
 
+/**
+ * Session play pool: only items in tiers the player has graduated into,
+ * capped by struggle drop-back (never teasers from the next band).
+ */
+export function playPoolByTier<T>(
+  items: T[],
+  progress: ProgressMap,
+  spec: LevelSpec,
+  tierOfItem: (item: T) => number,
+): T[] {
+  const active = computeLevel(progress, spec);
+  const struggleTier = computeStruggleTier(progress, spec);
+  const playTier = Math.min(active.tier, struggleTier);
+  return items.filter((item) => tierOfItem(item) <= playTier);
+}
 
 /**
  * Build the 3 options for a round: the target plus two random distractors
