@@ -169,6 +169,8 @@ function customHover(kind: string) {
       return { scale: 1.12, y: -4 };
     case "monster-truck":
       return { scale: 1.1, x: [0, 2, -2, 0] };
+    case "firework-show":
+      return { scale: 1.12, rotate: [0, -6, 6, 0] };
     default:
       return { scale: 1.1, y: -3 };
   }
@@ -235,6 +237,15 @@ function customTap(kind: string): PalTapMotion {
       return {
         animate: { y: [0, 8, -4, 6, 0], scale: [1, 0.92, 1.05, 1] },
         transition: { duration: 0.6, ease: "easeInOut" },
+      };
+    case "firework-show":
+      return {
+        animate: {
+          scale: [1, 1.2, 1, 1.15, 1],
+          rotate: [0, -8, 8, 0],
+          y: [0, -10, 0],
+        },
+        transition: { duration: 0.65, ease: "easeOut" },
       };
     default:
       return styleTap("bounce");
