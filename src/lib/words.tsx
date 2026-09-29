@@ -1,6 +1,6 @@
 import {
   SESSION_LENGTH,
-  computeStruggleTier,
+  playPoolByTier,
   pickOptions,
   pickTargets,
   type LevelSpec,
@@ -17,19 +17,15 @@ export interface Word {
 }
 
 /**
- * Word pool, split into three curriculum levels:
+ * Word pool in four mastery bands (100% of a band before the next unlocks):
  *
- * Tier 1 "Starter Words": simple, mostly CVC words with a clear picture so a
- * very beginning reader can match word → meaning.
- *
- * Tier 2 "My World Words": the everyday words a kid actually wants to use,
- * colors, family, food, clothes, things around the house.
- *
- * Tier 3 "Big Kid Words": blends, digraphs and multisyllable words for
- * readers who are ready for a real challenge.
+ * Tier 1 "First Words": earliest CVC sight words.
+ * Tier 2 "Safari Words": more animals, nature, and everyday nouns.
+ * Tier 3 "My World Words": colors, family, food, home.
+ * Tier 4 "Big Kid Words": blends, digraphs, multisyllable words.
  */
 export const WORDS: Word[] = [
-  // Tier 1: starter CVC words
+  // Tier 1: first CVC words
   { word: "cat", emoji: "🐱", tier: 1 },
   { word: "dog", emoji: "🐶", tier: 1 },
   { word: "pig", emoji: "🐷", tier: 1 },
@@ -50,95 +46,106 @@ export const WORDS: Word[] = [
   { word: "cup", emoji: "🥤", tier: 1 },
   { word: "box", emoji: "📦", tier: 1 },
   { word: "key", emoji: "🔑", tier: 1 },
-  { word: "book", emoji: "📖", tier: 1 },
-  { word: "tree", emoji: "🌳", tier: 1 },
-  { word: "ball", emoji: "⚽", tier: 1 },
-  { word: "bed", emoji: "🛏️", tier: 1 },
-  // Safari friends + everyday words for more variety
-  { word: "frog", emoji: "🐸", tier: 1 },
-  { word: "bear", emoji: "🐻", tier: 1 },
-  { word: "lion", emoji: "🦁", tier: 1 },
-  { word: "tiger", emoji: "🐯", tier: 1 },
-  { word: "bird", emoji: "🐦", tier: 1 },
-  { word: "chick", emoji: "🐤", tier: 1 },
-  { word: "whale", emoji: "🐳", tier: 1 },
-  { word: "snake", emoji: "🐍", tier: 1 },
-  { word: "horse", emoji: "🐴", tier: 1 },
-  { word: "cake", emoji: "🎂", tier: 1 },
-  { word: "milk", emoji: "🥛", tier: 1 },
-  { word: "leaf", emoji: "🍃", tier: 1 },
-  { word: "hand", emoji: "✋", tier: 1 },
-  { word: "nose", emoji: "👃", tier: 1 },
-  { word: "rain", emoji: "🌧️", tier: 1 },
+  // Tier 2: safari + more starter nouns
+  { word: "book", emoji: "📖", tier: 2 },
+  { word: "tree", emoji: "🌳", tier: 2 },
+  { word: "ball", emoji: "⚽", tier: 2 },
+  { word: "bed", emoji: "🛏️", tier: 2 },
+  { word: "frog", emoji: "🐸", tier: 2 },
+  { word: "bear", emoji: "🐻", tier: 2 },
+  { word: "lion", emoji: "🦁", tier: 2 },
+  { word: "tiger", emoji: "🐯", tier: 2 },
+  { word: "bird", emoji: "🐦", tier: 2 },
+  { word: "chick", emoji: "🐤", tier: 2 },
+  { word: "whale", emoji: "🐳", tier: 2 },
+  { word: "snake", emoji: "🐍", tier: 2 },
+  { word: "horse", emoji: "🐴", tier: 2 },
+  { word: "cake", emoji: "🎂", tier: 2 },
+  { word: "milk", emoji: "🥛", tier: 2 },
+  { word: "leaf", emoji: "🍃", tier: 2 },
+  { word: "hand", emoji: "✋", tier: 2 },
+  { word: "nose", emoji: "👃", tier: 2 },
+  { word: "rain", emoji: "🌧️", tier: 2 },
 
-  // Tier 2: my-world words (colors, family, food, clothes, home)
-  { word: "red", emoji: "🟥", tier: 2 },
-  { word: "blue", emoji: "🟦", tier: 2 },
-  { word: "yellow", emoji: "🟨", tier: 2 },
-  { word: "green", emoji: "🟩", tier: 2 },
-  { word: "pink", emoji: "🌸", tier: 2 },
-  { word: "mom", emoji: "👩", tier: 2 },
-  { word: "dad", emoji: "👨", tier: 2 },
-  { word: "baby", emoji: "👶", tier: 2 },
-  { word: "apple", emoji: "🍎", tier: 2 },
-  { word: "banana", emoji: "🍌", tier: 2 },
-  { word: "bread", emoji: "🍞", tier: 2 },
-  { word: "cheese", emoji: "🧀", tier: 2 },
-  { word: "pizza", emoji: "🍕", tier: 2 },
-  { word: "juice", emoji: "🧃", tier: 2 },
-  { word: "water", emoji: "💧", tier: 2 },
-  { word: "shoe", emoji: "👟", tier: 2 },
-  { word: "sock", emoji: "🧦", tier: 2 },
-  { word: "shirt", emoji: "👕", tier: 2 },
-  { word: "door", emoji: "🚪", tier: 2 },
-  { word: "chair", emoji: "🪑", tier: 2 },
-  { word: "window", emoji: "🪟", tier: 2 },
-  { word: "bath", emoji: "🛁", tier: 2 },
-  { word: "soap", emoji: "🧼", tier: 2 },
-  { word: "spoon", emoji: "🥄", tier: 2 },
-  { word: "plate", emoji: "🍽️", tier: 2 },
-  { word: "flower", emoji: "🌻", tier: 2 },
-  { word: "bug", emoji: "🐞", tier: 2 },
-  { word: "home", emoji: "🏠", tier: 2 },
+  // Tier 3: my-world words (colors, family, food, clothes, home)
+  { word: "red", emoji: "🟥", tier: 3 },
+  { word: "blue", emoji: "🟦", tier: 3 },
+  { word: "yellow", emoji: "🟨", tier: 3 },
+  { word: "green", emoji: "🟩", tier: 3 },
+  { word: "pink", emoji: "🌸", tier: 3 },
+  { word: "mom", emoji: "👩", tier: 3 },
+  { word: "dad", emoji: "👨", tier: 3 },
+  { word: "baby", emoji: "👶", tier: 3 },
+  { word: "apple", emoji: "🍎", tier: 3 },
+  { word: "banana", emoji: "🍌", tier: 3 },
+  { word: "bread", emoji: "🍞", tier: 3 },
+  { word: "cheese", emoji: "🧀", tier: 3 },
+  { word: "pizza", emoji: "🍕", tier: 3 },
+  { word: "juice", emoji: "🧃", tier: 3 },
+  { word: "water", emoji: "💧", tier: 3 },
+  { word: "shoe", emoji: "👟", tier: 3 },
+  { word: "sock", emoji: "🧦", tier: 3 },
+  { word: "shirt", emoji: "👕", tier: 3 },
+  { word: "door", emoji: "🚪", tier: 3 },
+  { word: "chair", emoji: "🪑", tier: 3 },
+  { word: "window", emoji: "🪟", tier: 3 },
+  { word: "bath", emoji: "🛁", tier: 3 },
+  { word: "soap", emoji: "🧼", tier: 3 },
+  { word: "spoon", emoji: "🥄", tier: 3 },
+  { word: "plate", emoji: "🍽️", tier: 3 },
+  { word: "flower", emoji: "🌻", tier: 3 },
+  { word: "bug", emoji: "🐞", tier: 3 },
+  { word: "home", emoji: "🏠", tier: 3 },
 
-  // Tier 3: big-kid words (blends, digraphs, multisyllable)
-  { word: "train", emoji: "🚂", tier: 3 },
-  { word: "plane", emoji: "✈️", tier: 3 },
-  { word: "boat", emoji: "⛵", tier: 3 },
-  { word: "truck", emoji: "🚚", tier: 3 },
-  { word: "bike", emoji: "🚲", tier: 3 },
-  { word: "cloud", emoji: "☁️", tier: 3 },
-  { word: "snow", emoji: "❄️", tier: 3 },
-  { word: "storm", emoji: "⛈️", tier: 3 },
-  { word: "rainbow", emoji: "🌈", tier: 3 },
-  { word: "queen", emoji: "👸", tier: 3 },
-  { word: "king", emoji: "🤴", tier: 3 },
-  { word: "castle", emoji: "🏰", tier: 3 },
-  { word: "dragon", emoji: "🐉", tier: 3 },
-  { word: "unicorn", emoji: "🦄", tier: 3 },
-  { word: "monster", emoji: "👾", tier: 3 },
-  { word: "ghost", emoji: "👻", tier: 3 },
-  { word: "fairy", emoji: "🧚", tier: 3 },
-  { word: "guitar", emoji: "🎸", tier: 3 },
-  { word: "drum", emoji: "🥁", tier: 3 },
-  { word: "piano", emoji: "🎹", tier: 3 },
-  { word: "butterfly", emoji: "🦋", tier: 3 },
-  { word: "spider", emoji: "🕷️", tier: 3 },
-  { word: "turtle", emoji: "🐢", tier: 3 },
-  { word: "dolphin", emoji: "🐬", tier: 3 },
-  { word: "shark", emoji: "🦈", tier: 3 },
-  { word: "octopus", emoji: "🐙", tier: 3 },
+  // Tier 4: big-kid words (blends, digraphs, multisyllable)
+  { word: "train", emoji: "🚂", tier: 4 },
+  { word: "plane", emoji: "✈️", tier: 4 },
+  { word: "boat", emoji: "⛵", tier: 4 },
+  { word: "truck", emoji: "🚚", tier: 4 },
+  { word: "bike", emoji: "🚲", tier: 4 },
+  { word: "cloud", emoji: "☁️", tier: 4 },
+  { word: "snow", emoji: "❄️", tier: 4 },
+  { word: "storm", emoji: "⛈️", tier: 4 },
+  { word: "rainbow", emoji: "🌈", tier: 4 },
+  { word: "queen", emoji: "👸", tier: 4 },
+  { word: "king", emoji: "🤴", tier: 4 },
+  { word: "castle", emoji: "🏰", tier: 4 },
+  { word: "dragon", emoji: "🐉", tier: 4 },
+  { word: "unicorn", emoji: "🦄", tier: 4 },
+  { word: "monster", emoji: "👾", tier: 4 },
+  { word: "ghost", emoji: "👻", tier: 4 },
+  { word: "fairy", emoji: "🧚", tier: 4 },
+  { word: "guitar", emoji: "🎸", tier: 4 },
+  { word: "drum", emoji: "🥁", tier: 4 },
+  { word: "piano", emoji: "🎹", tier: 4 },
+  { word: "butterfly", emoji: "🦋", tier: 4 },
+  { word: "spider", emoji: "🕷️", tier: 4 },
+  { word: "turtle", emoji: "🐢", tier: 4 },
+  { word: "dolphin", emoji: "🐬", tier: 4 },
+  { word: "shark", emoji: "🦈", tier: 4 },
+  { word: "octopus", emoji: "🐙", tier: 4 },
 ];
 
 export const WORDS_LEVELS: LevelSpec = {
-  names: ["Starter Words", "My World Words", "Big Kid Words"],
-  emojis: ["🌱", "🏠", "🚀"],
+  names: [
+    "First Words",
+    "Safari Words",
+    "My World Words",
+    "Big Kid Words",
+  ],
+  emojis: ["🌱", "🦁", "🏠", "🚀"],
   tierOf: (itemKey) => {
     const w = WORDS.find((x) => x.word === itemKey);
     return w ? w.tier : 1;
   },
   sizeOf: (tier) => WORDS.filter((w) => w.tier === tier).length,
+  /** Every word in a band must be mastered before harder words enter the pool. */
+  graduation: 1,
 };
+
+function wordsPlayPool(progress: ProgressMap): Word[] {
+  return playPoolByTier(WORDS, progress, WORDS_LEVELS, (w) => w.tier);
+}
 
 /**
  * Rounds alternate between seeing the picture and picking the printed word
@@ -147,8 +154,7 @@ export const WORDS_LEVELS: LevelSpec = {
  * always matches the player's level while mastered words keep cycling back.
  */
 function buildRounds(progress: ProgressMap): Round[] {
-  const maxTier = computeStruggleTier(progress, WORDS_LEVELS);
-  const pool = WORDS.filter((w) => w.tier <= maxTier);
+  const pool = wordsPlayPool(progress);
   const targets = pickTargets(pool, progress, (w) => w.word, SESSION_LENGTH);
   return targets.map((w, i) => {
     const showPicture = i % 2 === 0;

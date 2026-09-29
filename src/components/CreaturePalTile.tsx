@@ -1,7 +1,12 @@
 import type { MilestoneCreature } from "@/lib/milestones";
 import { palAriaLabel, palEmojiVariants } from "@/lib/pal-hub-motion";
-import { motion } from "framer-motion";
-import { useCallback, useMemo, useState } from "react";
+import { useHoverCapable } from "@/hooks/use-hover-capable";
+import {
+  motion,
+  useAnimationControls,
+  useReducedMotion,
+} from "framer-motion";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 interface CreaturePalTileProps {
   creature: MilestoneCreature;
@@ -22,16 +27,39 @@ export function CreaturePalTile({
   starsAt,
   lockedHint,
 }: CreaturePalTileProps) {
+  const emojiControls = useAnimationControls();
+  const hoverCapable = useHoverCapable();
+  const reduceMotion = useReducedMotion();
+  const tapLock = useRef(false);
   const [tapPlaying, setTapPlaying] = useState(false);
   const emojiVariants = useMemo(
     () => palEmojiVariants(creature),
     [creature],
   );
 
-  const onActivate = useCallback(() => {
-    if (!earned || tapPlaying) return;
+  const playTapMotion = useCallback(async () => {
+    if (!earned || tapLock.current) return;
+    tapLock.current = true;
     setTapPlaying(true);
-  }, [earned, tapPlaying]);
+    try {
+      if (reduceMotion) {
+        await emojiControls.start({
+          scale: [1, 1.08, 1],
+          transition: { duration: 0.2 },
+        });
+        return;
+      }
+      await emojiControls.start("tap");
+      await emojiControls.start("idle");
+    } finally {
+      tapLock.current = false;
+      setTapPlaying(false);
+    }
+  }, [earned, emojiControls, reduceMotion]);
+
+  const onActivate = useCallback(() => {
+    void playTapMotion();
+  }, [playTapMotion]);
 
   const tileClass = `flex size-12 items-center justify-center border-[3px] border-ink nb-shadow-xs sm:size-14 ${
     earned ? "bg-white cursor-pointer" : "bg-paper opacity-45"
@@ -68,19 +96,18 @@ export function CreaturePalTile({
       }}
       title={`${starsAt} stars!`}
       aria-label={palAriaLabel(creature, starsAt)}
-      className={`${tileClass} touch-manipulation select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink [@media(hover:hover)]:hover:shadow-[4px_4px_0_0_#141414]`}
-      onClick={onActivate}
+      className={`${tileClass} touch-manipulation select-none [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink [@media(hover:hover)]:hover:shadow-[4px_4px_0_0_#141414]`}
       onTap={onActivate}
+      whileTap={reduceMotion ? undefined : { scale: 0.94 }}
     >
       <motion.span
-        className="block text-3xl leading-none"
+        className="pointer-events-none block text-3xl leading-none"
         variants={emojiVariants}
         initial="idle"
-        animate={tapPlaying ? "tap" : "idle"}
-        whileHover={tapPlaying ? undefined : "hover"}
-        onAnimationComplete={() => {
-          if (tapPlaying) setTapPlaying(false);
-        }}
+        animate={emojiControls}
+        whileHover={
+          hoverCapable && !reduceMotion && !tapPlaying ? "hover" : undefined
+        }
       >
         {creature.emoji}
       </motion.span>

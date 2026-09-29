@@ -9,12 +9,15 @@ import {
 import { MODULES } from "@/lib/modules";
 import { speak, warmUpAudio } from "@/lib/speech";
 import { CreaturePalTile } from "@/components/CreaturePalTile";
+import { GameEscapeHeader } from "@/components/GameEscapeHeader";
 import { SaveProgressDialog } from "@/components/SaveProgressDialog";
 import { StartOverDialog } from "@/components/StartOverDialog";
+import { useClearStuckOverlays } from "@/hooks/use-clear-stuck-overlays";
+import { useLoadingTimeout } from "@/hooks/use-loading-timeout";
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { LogOut, Volume2 } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useNavigate } from "react-router";
 
 const CARD_STAGGER = [0, 0.08, 0.16];
@@ -23,18 +26,23 @@ export default function GameHub() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const playerState = useQuery(api.game.getPlayerState);
+  const loadTimedOut = useLoadingTimeout(playerState, 8000);
+  const navigatingRef = useRef(false);
+  useClearStuckOverlays();
+
+  const stars = playerState?.stars ?? 0;
+  const items = playerState?.items ?? [];
+  const sessionsCompleted = playerState?.sessionsCompleted ?? 0;
 
   const counts = useMemo(() => {
     const c: Record<ModuleId, number> = { words: 0, numbers: 0, patterns: 0 };
-    for (const row of playerState?.items ?? []) {
+    for (const row of items) {
       if (row.correct >= MASTERY_COUNT) c[row.module] += 1;
     }
     return c;
-  }, [playerState]);
+  }, [items]);
 
-  // Creature pals: one collected per 20 lifetime stars. Kids can see their
-  // collection grow, which makes the long-term reward easy to understand.
-  const lifetimeStars = playerState?.stars ?? 0;
+  const lifetimeStars = stars;
   const creaturesEarned = Math.floor(lifetimeStars / MILESTONE_STEP);
   const rosterFull = creaturesEarned >= MILESTONE_CREATURES.length;
   const nextCreatureAt = rosterFull
@@ -55,29 +63,44 @@ export default function GameHub() {
     );
   };
 
-  const startModule = (id: ModuleId) => {
-    warmUpAudio();
-    speak(`Let's go! ${MODULES[id].title}!`);
-    navigate(`/game/${id}`);
-  };
+  const startModule = useCallback(
+    (id: ModuleId) => {
+      if (navigatingRef.current) return;
+      navigatingRef.current = true;
+      warmUpAudio();
+      navigate(`/game/${id}`);
+      window.setTimeout(() => {
+        navigatingRef.current = false;
+      }, 800);
+      void speak(`Let's go! ${MODULES[id].title}!`);
+    },
+    [navigate],
+  );
 
-  if (playerState === undefined) {
+  const showLoadingShell = playerState === undefined && !loadTimedOut;
+
+  if (showLoadingShell) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-paper">
-        <motion.span
-          className="text-6xl"
-          animate={{ scale: [1, 1.25, 1], rotate: [0, 12, -12, 0] }}
-          transition={{ duration: 1.2, repeat: Infinity }}
-        >
-          ⭐
-        </motion.span>
+      <main className="kid-ui flex min-h-screen flex-col bg-paper">
+        <GameEscapeHeader />
+        <div className="flex flex-1 flex-col items-center justify-center gap-3">
+          <motion.span
+            className="text-6xl"
+            animate={{ scale: [1, 1.25, 1], rotate: [0, 12, -12, 0] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
+          >
+            ⭐
+          </motion.span>
+          <p className="text-sm font-medium text-muted-foreground">
+            Loading your stars…
+          </p>
+        </div>
       </main>
     );
   }
 
   return (
     <main className="kid-ui flex min-h-screen flex-col bg-paper">
-      {/* top bar */}
       <header className="flex items-center justify-between border-b-[3px] border-ink px-4 py-3 sm:px-6">
         <div className="flex items-center gap-2">
           <span className="flex size-9 items-center justify-center border-[3px] border-ink bg-sun text-base leading-none shadow-[3px_3px_0_0_#141414]">
@@ -119,15 +142,27 @@ export default function GameHub() {
           </h1>
           <div className="mt-4 flex items-center gap-3 border-[3px] border-ink bg-white px-5 py-3 nb-shadow-sm">
             <span className="text-3xl">⭐</span>
-            <span className="text-3xl font-bold">{playerState?.stars ?? 0}</span>
-            {playerState && playerState.sessionsCompleted > 0 && (
+            <span className="text-3xl font-bold">{stars}</span>
+            {sessionsCompleted > 0 && (
               <span className="text-sm font-semibold text-muted-foreground">
-                · {playerState.sessionsCompleted}{" "}
-                {playerState.sessionsCompleted === 1 ? "adventure" : "adventures"}{" "}
+                · {sessionsCompleted}{" "}
+                {sessionsCompleted === 1 ? "adventure" : "adventures"}{" "}
                 done
               </span>
             )}
           </div>
+          {loadTimedOut && playerState === undefined && (
+            <p className="mt-2 text-xs font-semibold text-tomato">
+              Offline mode — tap a game to play.{" "}
+              <button
+                type="button"
+                className="underline touch-manipulation"
+                onClick={() => window.location.reload()}
+              >
+                Retry sync
+              </button>
+            </p>
+          )}
           <button
             type="button"
             onClick={hearChoices}
@@ -138,7 +173,6 @@ export default function GameHub() {
           </button>
         </div>
 
-        {/* creature pals: a new friend joins the crew every 20 stars */}
         <div className="flex w-full max-w-2xl flex-col items-center gap-3">
           <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
             My creature pals
@@ -182,7 +216,7 @@ export default function GameHub() {
                 transition={{ duration: 0.35, delay: CARD_STAGGER[i] }}
                 whileHover={{ y: -6 }}
                 whileTap={{ scale: 0.96 }}
-                className={`flex flex-col items-center gap-4 border-[3px] border-ink p-7 nb-shadow transition-shadow hover:shadow-[8px_8px_0_0_#141414] ${m.cardBg} ${m.cardText}`}
+                className={`flex touch-manipulation select-none flex-col items-center gap-4 border-[3px] border-ink p-7 nb-shadow transition-shadow hover:shadow-[8px_8px_0_0_#141414] ${m.cardBg} ${m.cardText}`}
               >
                 <span className="text-7xl leading-none">{m.cardEmoji}</span>
                 <span className="text-2xl font-bold tracking-tight sm:text-3xl">

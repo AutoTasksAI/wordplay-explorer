@@ -68,6 +68,12 @@ const convexUrl = (import.meta.env.VITE_CONVEX_URL as string | undefined)?.repla
   "",
 );
 
+/** One client for the app lifetime — recreating it on re-render breaks queries/auth. */
+const convex = convexUrl ? new ConvexReactClient(convexUrl) : null;
+if (convex) {
+  setSpeechClient(convex);
+}
+
 /** Friendly screen when the app is opened before the backend is configured. */
 function BackendMissing() {
   return (
@@ -83,11 +89,7 @@ function BackendMissing() {
 }
 
 function App() {
-  if (!convexUrl) return <BackendMissing />;
-  const convex = new ConvexReactClient(convexUrl);
-  // Give the speech helpers the Convex client so they can fetch the cached
-  // cartoon TTS audio for words and phrases (with browser speech as fallback).
-  setSpeechClient(convex);
+  if (!convex) return <BackendMissing />;
 
   return (
     <ConvexAuthProvider client={convex}>

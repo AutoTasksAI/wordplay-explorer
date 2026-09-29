@@ -1,8 +1,7 @@
 import {
   MASTERY_COUNT,
   SESSION_LENGTH,
-  computeLevel,
-  computeStruggleTier,
+  playPoolByTier,
   pickOptions,
   pickTargets,
   type LevelSpec,
@@ -72,10 +71,7 @@ export const NUMBERS_LEVELS: LevelSpec = {
  * at the active curriculum tier (never teasers from the next band).
  */
 export function numbersPlayPool(progress: ProgressMap): NumberItem[] {
-  const active = computeLevel(progress, NUMBERS_LEVELS);
-  const struggleTier = computeStruggleTier(progress, NUMBERS_LEVELS);
-  const playTier = Math.min(active.tier, struggleTier);
-  return NUMBERS.filter((n) => n.tier <= playTier);
+  return playPoolByTier(NUMBERS, progress, NUMBERS_LEVELS, (n) => n.tier);
 }
 
 /** Teens (11+) only after 7–10 are each mastered at least once at MASTERY_COUNT. */
@@ -91,9 +87,83 @@ export function teensUnlocked(progress: ProgressMap): boolean {
  *  pure counting, not recognizing different pictures. */
 const COUNT_EMOJIS = ["🦖", "🍎", "🐝", "⭐", "🎈", "🌼", "🍓"];
 
-/** A grid of `value` emojis, used as the display or as an option tile.
- *  Emoji size shrinks as the count grows so teen numbers (11-20) stay
- *  countable on a 390px phone instead of jumbling together. */
+type CountGridLayout = {
+  colsClass: "grid-cols-4" | "grid-cols-5";
+  gapClass: string;
+  sizeClass: string;
+  wrapClass: string;
+};
+
+/** Readability-first layout: fewer columns and larger gaps as counts grow. */
+function countGridLayout(value: number, small: boolean): CountGridLayout {
+  if (small) {
+    if (value <= 5) {
+      return {
+        colsClass: "grid-cols-5",
+        gapClass: "gap-1 sm:gap-1.5",
+        sizeClass: "text-2xl leading-none sm:text-3xl",
+        wrapClass: "w-full",
+      };
+    }
+    if (value <= 10) {
+      return {
+        colsClass: "grid-cols-5",
+        gapClass: "gap-1 sm:gap-2",
+        sizeClass: "text-xl leading-none sm:text-2xl",
+        wrapClass: "w-full",
+      };
+    }
+    if (value <= 15) {
+      return {
+        colsClass: "grid-cols-4",
+        gapClass: "gap-1 sm:gap-1.5",
+        sizeClass: "text-lg leading-none sm:text-xl",
+        wrapClass: "w-full",
+      };
+    }
+    return {
+      colsClass: "grid-cols-4",
+      gapClass: "gap-1.5 sm:gap-2",
+      sizeClass: "text-base leading-none sm:text-lg",
+      wrapClass: "w-full max-h-[108px] overflow-y-auto overscroll-y-contain",
+    };
+  }
+
+  if (value <= 5) {
+    return {
+      colsClass: "grid-cols-5",
+      gapClass: "gap-3 sm:gap-4",
+      sizeClass: "text-5xl leading-none sm:text-6xl",
+      wrapClass: "w-full max-w-md mx-auto",
+    };
+  }
+  if (value <= 10) {
+    return {
+      colsClass: "grid-cols-5",
+      gapClass: "gap-2.5 sm:gap-3",
+      sizeClass: "text-4xl leading-none sm:text-5xl",
+      wrapClass: "w-full max-w-lg mx-auto",
+    };
+  }
+  if (value <= 15) {
+    return {
+      colsClass: "grid-cols-4",
+      gapClass: "gap-3 sm:gap-4",
+      sizeClass: "text-3xl leading-none sm:text-4xl",
+      wrapClass:
+        "w-full max-w-lg mx-auto max-h-[min(380px,52vh)] overflow-y-auto overscroll-y-contain px-1 py-1",
+    };
+  }
+  return {
+    colsClass: "grid-cols-4",
+    gapClass: "gap-3.5 sm:gap-5",
+    sizeClass: "text-3xl leading-none sm:text-4xl",
+    wrapClass:
+      "w-full max-w-xl mx-auto max-h-[min(420px,55vh)] overflow-y-auto overscroll-y-contain px-1 py-2",
+  };
+}
+
+/** A grid of `value` emojis, used as the display or as an option tile. */
 function CountGrid({
   value,
   emoji,
@@ -103,39 +173,29 @@ function CountGrid({
   emoji: string;
   small?: boolean;
 }) {
-  // Display (prompt): 5 columns, generous gaps, smaller glyphs for big counts.
-  // Option tiles (small): same 5-col layout so the shape matches the prompt,
-  // sized to fit a ~110px phone tile even at 20 items (4 rows x ~16px).
-  const sizeClass = small
-    ? value <= 5
-      ? "text-2xl leading-none sm:text-3xl"
-      : value <= 10
-        ? "text-xl leading-none sm:text-2xl"
-        : value <= 15
-          ? "text-lg leading-none sm:text-2xl"
-          : "text-base leading-none sm:text-xl"
-    : value <= 5
-      ? "text-5xl leading-none sm:text-6xl"
-      : value <= 10
-        ? "text-4xl leading-none sm:text-5xl"
-        : value <= 15
-          ? "text-3xl leading-none sm:text-4xl"
-          : "text-2xl leading-none sm:text-4xl";
-  const gapClass = small ? "gap-1 sm:gap-1.5" : "gap-2 sm:gap-3";
+  const { colsClass, gapClass, sizeClass, wrapClass } = countGridLayout(
+    value,
+    small,
+  );
   return (
-    <div
-      className={
-        "grid grid-cols-5 place-items-center justify-items-center " + gapClass
-      }
-    >
-      {Array.from({ length: value }).map((_, i) => (
-        <span
-          key={i}
-          className={"inline-flex items-center justify-center " + sizeClass}
-        >
-          {emoji}
-        </span>
-      ))}
+    <div className={wrapClass}>
+      <div
+        className={
+          "grid place-items-center justify-items-center " +
+          colsClass +
+          " " +
+          gapClass
+        }
+      >
+        {Array.from({ length: value }).map((_, i) => (
+          <span
+            key={i}
+            className={"inline-flex items-center justify-center " + sizeClass}
+          >
+            {emoji}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

@@ -535,7 +535,7 @@ export function ModuleShell({
                           : { x: 0 }
                     }
                     transition={{ duration: isWrongFlash ? 0.4 : 0.3 }}
-                    className={`relative flex min-h-[110px] w-full items-center justify-center overflow-hidden border-[3px] border-ink p-1.5 nb-shadow-sm sm:aspect-square sm:min-h-0 ${
+                    className={`relative flex min-h-[120px] w-full items-center justify-center overflow-x-hidden overflow-y-auto border-[3px] border-ink p-2 nb-shadow-sm sm:aspect-square sm:min-h-0 sm:p-1.5 ${
                       isCorrect
                         ? "bg-grass"
                         : isWrongFlash
@@ -625,7 +625,7 @@ export function ModuleShell({
                 onClick={handlePlayAgain}
                 className={`nb-btn ${meta.accent} px-10 py-5 text-2xl font-bold ${meta.accentText}`}
               >
-                ▶ PLAY AGAIN
+              ▶ PLAY AGAIN
               </button>
               <button
                 type="button"

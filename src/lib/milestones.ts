@@ -44,7 +44,12 @@ export const MILESTONE_CREATURES: MilestoneCreature[] = [
   { kind: "penguin", emoji: "🐧", durationMs: 8500, style: "wiggle" },
   { kind: "bunny", emoji: "🐰", durationMs: 8500, style: "bounce" },
   { kind: "frog", emoji: "🐸", durationMs: 8500, style: "pop" },
-  { kind: "owl", emoji: "🦉", durationMs: 9000, style: "float" },
+  {
+    kind: "firework-show",
+    emoji: "🎆",
+    durationMs: 14000,
+    style: "custom",
+  },
   { kind: "bee", emoji: "🐝", durationMs: 8500, style: "orbit" },
   { kind: "butterfly", emoji: "🦋", durationMs: 9000, style: "float" },
   { kind: "crab", emoji: "🦀", durationMs: 8500, style: "slide" },
