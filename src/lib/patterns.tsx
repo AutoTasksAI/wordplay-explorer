@@ -110,11 +110,6 @@ function PatternRow({ slots }: { slots: (PatternColor | null)[] }) {
   );
 }
 
-/**
- * Rounds alternate between "what comes next?" (hole at the end) and "what is
- * missing?" (hole in the middle). Options are the pattern's own colors plus
- * one decoy, shuffled.
- */
 function buildPatternRound(type: PatternType, isNext: boolean): Round {
   const itemCount = type.id === "abc" ? 3 : 2;
   const colors = shuffle(COLORS).slice(0, itemCount);
@@ -124,9 +119,6 @@ function buildPatternRound(type: PatternType, isNext: boolean): Round {
   const slots: (PatternColor | null)[] = isNext
     ? [...visible, null]
     : visible.map((c, i) => (i === 2 ? null : c));
-  // "Next": the hole sits after the six visible items, so the answer is the
-  // first item of the next cycle (position 6), NOT the last visible item.
-  // "Missing": the hole replaces position 2 of the cycle.
   const answer = isNext ? cycle[6 % cycle.length] : cycle[2 % cycle.length];
   const visibleForSpeech = slots.filter(
     (c): c is PatternColor => c !== null,
