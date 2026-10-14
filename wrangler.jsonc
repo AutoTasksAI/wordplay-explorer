@@ -3,6 +3,10 @@
   // No pages_build_output_dir on purpose: the old Pages project ignores this file.
   "name": "wordplay-explorer",
   "compatibility_date": "2026-09-01",
+  "routes": [
+    { "pattern": "readwithrex.com", "custom_domain": true },
+    { "pattern": "www.readwithrex.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
