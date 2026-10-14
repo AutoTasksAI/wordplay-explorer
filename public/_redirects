@@ -1,3 +1,0 @@
-# Cloudflare Pages SPA routing: send every path to the app, which handles
-# client-side routing (/game, /sight-words, /reading-milestones, ...).
-/* /index.html 200
